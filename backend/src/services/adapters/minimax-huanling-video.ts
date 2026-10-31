@@ -19,6 +19,7 @@ import type {
   DownloadRequest,
 } from './types'
 import { joinProviderUrl } from './url'
+import { uploadLocalImages, getImageUploader } from '../image-upload.js'
 
 const MODEL = 'MiniMax-H3'
 
@@ -42,7 +43,7 @@ function parseUrlArray(raw?: string | null): string[] {
 export class MiniMaxHuanlingVideoAdapter implements VideoProviderAdapter {
   provider = 'minimax_huanling'
 
-  buildGenerateRequest(config: AIConfig, record: VideoGenerationRecord): ProviderRequest {
+  async buildGenerateRequest(config: AIConfig, record: VideoGenerationRecord): Promise<ProviderRequest> {
     const model = record.model || config.model || MODEL
     if (model !== MODEL) throw new Error(`幻灵网关仅支持 ${MODEL} 模型，当前: ${model}`)
 
@@ -50,21 +51,57 @@ export class MiniMaxHuanlingVideoAdapter implements VideoProviderAdapter {
     const refImages = parseUrlArray(record.referenceImageUrls)
     const refVideos = parseUrlArray(record.referenceVideoUrls)
     const refAudios = parseUrlArray(record.referenceAudioUrls)
-    const firstFrame = (record.firstFrameUrl || record.imageUrl || '').trim()
-    const lastFrame = (record.lastFrameUrl || '').trim()
+    let firstFrame = (record.firstFrameUrl || record.imageUrl || '').trim()
+    let lastFrame = (record.lastFrameUrl || '').trim()
 
     if (!prompt) throw new Error('MiniMax H3 要求必须提供提示词（text content）')
     if (prompt.length > PROMPT_MAX_CHARS) {
       throw new Error(`提示词超长：MiniMax H3 上限 ${PROMPT_MAX_CHARS} 字符，当前 ${prompt.length}`)
     }
 
-    // 本地参考图在 generation.ts 里会被编码成 data: URL，网关不接受
-    const media = [firstFrame, lastFrame, ...refImages, ...refVideos, ...refAudios].filter(Boolean)
-    if (media.some((url) => !/^https:\/\//i.test(url))) {
-      throw new Error(
-        '幻灵网关的首帧 / 尾帧 / 参考素材只接受公网 HTTPS 地址，不支持本地图片（base64）。' +
-        '服务器部署可在 backend/.env 配置 PUBLIC_BASE_URL；桌面版请改用不带参考图的文生视频，或换用官方 MiniMax。',
-      )
+    // 收集所有需要处理的媒体 URL（首帧、尾帧、参考素材）
+    const allMedia = [firstFrame, lastFrame, ...refImages, ...refVideos, ...refAudios].filter(Boolean)
+    const hasLocalMedia = allMedia.some((url) => !/^https:\/\//i.test(url))
+
+    // 如果有本地媒体（非 HTTPS），尝试上传到图床
+    if (hasLocalMedia) {
+      const uploader = getImageUploader()
+      if (!uploader) {
+        throw new Error(
+          '幻灵网关的首帧 / 尾帧 / 参考素材只接受公网 HTTPS 地址，不支持本地图片（base64）。\n' +
+          '桌面版解决方案：\n' +
+          '  1. 在设置中配置 ImgBB API Key（免费申请：https://api.imgbb.com/），自动上传本地图片到公共图床\n' +
+          '  2. 或改用不带参考图的文生视频\n' +
+          '  3. 或换用官方 MiniMax\n' +
+          '服务器部署：在 backend/.env 配置 PUBLIC_BASE_URL 暴露本地 /static 目录',
+        )
+      }
+
+      // 上传本地图片到图床，获取公网 URL
+      console.log(`[MiniMaxHuanling] 检测到本地媒体，正在上传到 ${uploader.serviceName}...`)
+      const uploadedMedia: string[] = []
+      for (const url of allMedia) {
+        if (url.startsWith('https://')) {
+          uploadedMedia.push(url)
+        } else {
+          // 上传本地文件（data: URL 或 static/ 路径）
+          const uploaded = await this.uploadMedia(url)
+          uploadedMedia.push(uploaded)
+        }
+      }
+
+      // 替换为上传后的 URL
+      let idx = 0
+      if (firstFrame) firstFrame = uploadedMedia[idx++]
+      if (lastFrame) lastFrame = uploadedMedia[idx++]
+      const uploadedRefImages = refImages.map(() => uploadedMedia[idx++])
+      const uploadedRefVideos = refVideos.map(() => uploadedMedia[idx++])
+      const uploadedRefAudios = refAudios.map(() => uploadedMedia[idx++])
+
+      // 更新引用数组
+      refImages.splice(0, refImages.length, ...uploadedRefImages)
+      refVideos.splice(0, refVideos.length, ...uploadedRefVideos)
+      refAudios.splice(0, refAudios.length, ...uploadedRefAudios)
     }
 
     const totalRefs = refImages.length + refVideos.length + refAudios.length + (firstFrame ? 1 : 0) + (lastFrame ? 1 : 0)
@@ -101,6 +138,24 @@ export class MiniMaxHuanlingVideoAdapter implements VideoProviderAdapter {
       },
       body,
     }
+  }
+
+  /** 上传单个媒体文件（data: URL 或本地路径）到图床 */
+  private async uploadMedia(url: string): Promise<string> {
+    // data: URL 转 Buffer 上传
+    if (url.startsWith('data:')) {
+      const uploader = getImageUploader()!
+      const match = url.match(/^data:image\/(\w+);base64,(.+)$/)
+      if (!match) throw new Error(`不支持的 data URL 格式: ${url.substring(0, 50)}...`)
+      const [, ext, base64] = match
+      const buffer = Buffer.from(base64, 'base64')
+      const filename = `ref-${Date.now()}.${ext}`
+      return await uploader.upload(buffer, filename)
+    }
+
+    // 本地路径上传（通过 image-upload 模块处理）
+    const { uploadLocalImage } = await import('../image-upload.js')
+    return await uploadLocalImage(url)
   }
 
   parseGenerateResponse(result: any): VideoGenResponse {

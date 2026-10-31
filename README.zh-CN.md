@@ -99,7 +99,8 @@ cd ../backend && npm start                                      # 访问 http://
 | `WORKSPACE_PATH` | `backend/workspace` | Agent 技能/提示词目录 |
 | `FRONTEND_DIST` | `frontend/dist` | 前端静态产物目录 |
 | `FFMPEG_BIN` / `FFPROBE_BIN` | npm 内置二进制 | 自定义 ffmpeg/ffprobe 路径 |
-| `PUBLIC_BASE_URL` | — | Seedance 引用本地参考视频/音频时所需的公网地址 |
+| `PUBLIC_BASE_URL` | — | Seedance / 幻灵网关引用本地参考视频/音频时所需的公网地址 |
+| `IMGBB_API_KEY` | — | ImgBB 图床 API Key，桌面版使用幻灵网关生成视频且无 `PUBLIC_BASE_URL` 时，自动上传本地参考图到公共图床（免费申请：https://api.imgbb.com/） |
 | `MODEL_INSTALLER_LOCAL` | `1` | 设为 `0` 时关闭「一键下载模型」的本机模式（服务器部署不想让网页操作服务器本机文件时使用，远程 SSH 模式不受影响） |
 | `SUBTITLE_FONT` | 自动 | 烧录字幕用的字体文件路径；默认自动找系统中文字体（Windows 微软雅黑、macOS 苹方 / 黑体、Linux Noto CJK / 文泉驿） |
 | `MODEL_INSTALLER_DETACHED` | `1` | 设为 `0` 时本机模型下载改由程序内完成，不启动后台进程（默认用后台进程，退出 Hail 短剧 也会继续下完） |

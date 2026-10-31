@@ -87,4 +87,5 @@ SQLite 单文件（默认 `data/hail.sqlite3`，桌面版在 userData）。启�
 ## Key Config
 - AI 服务配置存 DB（`ai_service_configs` 表），设置页维护，不在配置文件
 - 环境变量全集见 README「环境变量」；`configs/config.yaml` 是死配置（勿参考）
-- `PUBLIC_BASE_URL`：Seedance 引用本地参考资源需公网地址，桌面版无此能力（有中文报错）
+- `PUBLIC_BASE_URL`：Seedance / 幻灵网关引用本地参考资源需公网地址，桌面版无此能力时可配置 `IMGBB_API_KEY` 自动上传到公共图床
+- **图片上传服务**：`services/image-upload.ts`——桌面版用幻灵网关（`minimax_huanling`）生成视频时，本地参考图自动上传到 ImgBB 图床获取 HTTPS URL（24 小时自动过期）；需要配置 `IMGBB_API_KEY`（免费申请：https://api.imgbb.com/），单图 32MB；`minimax-huanling-video.ts` 的 `buildGenerateRequest` 检测到非 HTTPS 媒体时调用 `uploadMedia` 上传 data: URL 或本地路径，失败时给出配置提示
