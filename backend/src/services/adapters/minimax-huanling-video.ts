@@ -150,10 +150,13 @@ export class MiniMaxHuanlingVideoAdapter implements VideoProviderAdapter {
     // data: URL 转 Buffer 上传
     if (url.startsWith('data:')) {
       const uploader = getImageUploader(imgbbConfig)!
-      const match = url.match(/^data:image\/(\w+);base64,(.+)$/)
+      // 匹配 data:image/png, data:image/jpeg, data:image/svg+xml 等格式
+      const match = url.match(/^data:image\/([a-z0-9+.-]+);base64,(.+)$/i)
       if (!match) throw new Error(`不支持的 data URL 格式: ${url.substring(0, 50)}...`)
-      const [, ext, base64] = match
+      const [, mimeSubtype, base64] = match
       const buffer = Buffer.from(base64, 'base64')
+      // svg+xml -> svg, jpeg -> jpg
+      const ext = mimeSubtype.replace(/\+.*$/, '').replace(/^jpeg$/, 'jpg')
       const filename = `ref-${Date.now()}.${ext}`
       return await uploader.upload(buffer, filename)
     }

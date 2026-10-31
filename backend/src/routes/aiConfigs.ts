@@ -84,7 +84,11 @@ const PROVIDER_SETTING_RULES: Record<string, Record<string, SettingRule>> = {
   runway: { ...VIDEO_LIMIT_RULES },
   volcengine: { ...VIDEO_LIMIT_RULES },
   minimax: { ...VIDEO_LIMIT_RULES },
-  minimax_huanling: { ...VIDEO_LIMIT_RULES },
+  minimax_huanling: {
+    ...VIDEO_LIMIT_RULES,
+    imgbb_api_key: { kind: 'text', max: 200 },
+    imgbb_base_url: { kind: 'text', max: 500 },
+  },
   aliyun: { ...VIDEO_LIMIT_RULES },
   comfyui: {
     comfyui_workflow: { kind: 'workflow' },
