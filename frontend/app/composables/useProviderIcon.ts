@@ -10,6 +10,7 @@ const FILENAMES: Record<string, string> = {
   gemini: 'gemini-color.png',
   volcengine: 'volcengine-color.png',
   minimax: 'minimax-color.png',
+  minimax_huanling: 'minimax-color.png',  // 幻灵网关复用 MiniMax 图标
   claude: 'claude-color.png',
   deepseek: 'deepseek-color.png',
   doubao: 'doubao-color.png',

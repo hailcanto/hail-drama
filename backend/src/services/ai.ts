@@ -44,7 +44,7 @@ export function parseConfigSettings(settingsRaw: string | null | undefined): Rec
 export const officialProviders: Record<ServiceType, readonly string[]> = {
   text: ['aiask', 'openai', 'gemini', 'volcengine', 'deepseek', 'qwen', 'claude', 'xai'],
   image: ['aiask', 'openai', 'gemini', 'volcengine', 'xai', 'comfyui', 'sdwebui', 'fooocus'],
-  video: ['aiask', 'xai', 'veo', 'runway', 'comfyui', 'volcengine', 'minimax', 'aliyun'],
+  video: ['aiask', 'xai', 'veo', 'runway', 'comfyui', 'volcengine', 'minimax', 'minimax_huanling', 'aliyun'],
 }
 
 export function isOfficialProvider(serviceType?: string | null, provider?: string | null): boolean {

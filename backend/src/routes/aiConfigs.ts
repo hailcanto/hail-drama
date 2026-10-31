@@ -84,6 +84,7 @@ const PROVIDER_SETTING_RULES: Record<string, Record<string, SettingRule>> = {
   runway: { ...VIDEO_LIMIT_RULES },
   volcengine: { ...VIDEO_LIMIT_RULES },
   minimax: { ...VIDEO_LIMIT_RULES },
+  minimax_huanling: { ...VIDEO_LIMIT_RULES },
   aliyun: { ...VIDEO_LIMIT_RULES },
   comfyui: {
     comfyui_workflow: { kind: 'workflow' },
@@ -320,6 +321,16 @@ function buildProbe(serviceType: string, provider: string, baseUrl: string, mode
 
   if (p === 'minimax') {
     // MiniMax 仅提供视频服务，空请求体探测鉴权/端点连通性
+    return {
+      method: 'POST',
+      url: joinProviderUrl(baseUrl, '/v2', '/video_generation'),
+      headers: bearerHeaders(apiKey, true),
+      body: {},
+    }
+  }
+
+  if (p === 'minimax_huanling') {
+    // 幻灵 MiniMax 网关，同样空请求体探测连通性
     return {
       method: 'POST',
       url: joinProviderUrl(baseUrl, '/v2', '/video_generation'),

@@ -273,11 +273,28 @@ const zh: GuideTable = {
       links: [['火山方舟', 'https://console.volcengine.com/ark']],
     },
     minimax: {
-      summary: 'MiniMax 视频（H3）。',
+      summary: 'MiniMax 官方视频（H3）。',
       steps: ['在 https://platform.minimaxi.com 创建 Key。', '点「MiniMax H3 官方」预设，粘贴 Key 后保存。'],
       fields: [['Base URL', 'https://api.minimaxi.com'], ['API Key', 'MiniMax Key'], ['模型', 'MiniMax-H3']],
-      tips: ['支持首帧 / 尾帧与参考图。'],
+      tips: ['支持首帧 / 尾帧与参考图（≤9 张）、参考视频（≤3 个）、参考音频（≤3 个）。', '分辨率支持 768P / 2K，时长 4–15 秒。'],
       links: [['MiniMax 开放平台', 'https://platform.minimaxi.com']],
+    },
+    minimax_huanling: {
+      summary: '第三方 MiniMax（幻灵网关）—— 更低价接入 MiniMax H3 视频生成。',
+      steps: [
+        '在 https://api.huanling.icu 注册账号并充值。',
+        '在「API Keys」页创建 Key，**分组必须选包含 MiniMax-H3 的分组**（否则路由拒绝）。',
+        '点「第三方 MiniMax（幻灵）」预设，粘贴 Key 后保存。',
+      ],
+      fields: [['Base URL', 'https://api.huanling.icu'], ['API Key', 'sk-...（从幻灵后台获取）'], ['模型', 'MiniMax-H3']],
+      tips: [
+        '协议与 MiniMax 官方保持一致，已接入官方 API 的项目只需替换 Base URL 和 Key。',
+        '**限制**：分辨率仅支持 768P（不支持 2K）；时长 1–15 秒。',
+        '**媒体输入**：参考图 / 首尾帧 / 参考视频音频只接受**公网 HTTPS URL**，不支持 base64。本地图片需要配置后端 PUBLIC_BASE_URL（公网地址），桌面版不支持。',
+        '**下载鉴权**：成片下载时网关会验证 API Key（与官方裸链不同），UU889-Drama 已自动处理。',
+        '当前价格约 ¥0.1/秒（官方参考价 ¥0.5/秒 @768P），以幻灵「模型广场」实时展示为准。',
+      ],
+      links: [['幻灵 AI 网关', 'https://api.huanling.icu'], ['接入指南', 'https://api.huanling.icu/guides/minimax-h3']],
     },
     aliyun: {
       summary: '阿里云百炼 Wan 3.0 视频。',
@@ -453,7 +470,24 @@ const en: GuideTable = {
     veo: { summary: 'Google Veo 3.1 via the Gemini API.', steps: ['Create a paid key in Google AI Studio.', 'Click the preset, paste the key and save.'], fields: [['Base URL', 'https://generativelanguage.googleapis.com'], ['Models', 'veo-3.1-generate-preview']], tips: ['Generation takes 1–5 minutes; Tasks show the elapsed time.'], links: [['Google AI Studio', 'https://aistudio.google.com/apikey']] },
     runway: { summary: 'Runway API (gen4.5 / gen4_turbo / veo3.1).', steps: ['Create a key at https://dev.runwayml.com.', 'Click the preset, paste the key and save.'], fields: [['Base URL', 'https://api.dev.runwayml.com'], ['Models', 'gen4.5']], tips: ['gen4 image-to-video needs a first frame.'], links: [['Runway Developer', 'https://dev.runwayml.com']] },
     volcengine: { summary: 'Volcengine Seedance 2.0.', steps: ['Enable Seedance in Ark and create a key.', 'Click the preset, paste the key and save.'], fields: [['Base URL', 'https://ark.cn-beijing.volces.com'], ['Models', 'doubao-seedance-2-0-…']], tips: ['Local reference video / audio needs PUBLIC_BASE_URL on the backend.'], links: [['Volcengine Ark', 'https://console.volcengine.com/ark']] },
-    minimax: { summary: 'MiniMax video (H3).', steps: ['Create a key at https://platform.minimaxi.com.', 'Click the preset, paste the key and save.'], fields: [['Base URL', 'https://api.minimaxi.com'], ['Models', 'MiniMax-H3']], tips: ['Supports first / last frame and references.'], links: [['MiniMax', 'https://platform.minimaxi.com']] },
+    minimax: { summary: 'MiniMax official video (H3).', steps: ['Create a key at https://platform.minimaxi.com.', 'Click the preset, paste the key and save.'], fields: [['Base URL', 'https://api.minimaxi.com'], ['Models', 'MiniMax-H3']], tips: ['Supports first / last frame, reference images (≤9), reference videos (≤3), and reference audios (≤3).', 'Resolution: 768P / 2K; duration: 4–15 seconds.'], links: [['MiniMax', 'https://platform.minimaxi.com']] },
+    minimax_huanling: {
+      summary: 'Third-party MiniMax (Huanling Gateway) — lower-cost access to MiniMax H3 video generation.',
+      steps: [
+        'Sign up at https://api.huanling.icu and add credit.',
+        'Create an API key under "API Keys" and **select a group containing MiniMax-H3** (otherwise requests are rejected).',
+        'Click the "Third-party MiniMax (Huanling)" preset, paste the key and save.',
+      ],
+      fields: [['Base URL', 'https://api.huanling.icu'], ['API Key', 'sk-... (from Huanling dashboard)'], ['Models', 'MiniMax-H3']],
+      tips: [
+        'Protocol mirrors the official MiniMax API; projects already using the official one just swap Base URL and key.',
+        '**Limitations**: resolution is 768P only (2K not supported); duration 1–15 seconds.',
+        '**Media input**: reference images / first-last frame / reference video / audio must be **public HTTPS URLs**; base64 is not supported. Local images need PUBLIC_BASE_URL configured on the backend; desktop builds do not support this.',
+        '**Download auth**: unlike the official API\'s bare links, the gateway requires API Key for video downloads (UU889-Drama handles this automatically).',
+        'Current pricing ~¥0.1/sec (official reference ¥0.5/sec @768P); check the gateway\'s Model Marketplace for real-time rates.',
+      ],
+      links: [['Huanling AI Gateway', 'https://api.huanling.icu'], ['Integration Guide', 'https://api.huanling.icu/guides/minimax-h3']],
+    },
     aliyun: { summary: 'Alibaba Cloud Wan 3.0 video.', steps: ['Create a key and find your WorkspaceId in Model Studio.', 'Replace {WorkspaceId} in Base URL.'], fields: [['Base URL', 'https://{WorkspaceId}.cn-beijing.maas.aliyuncs.com'], ['Models', 'wan3.0-video']], tips: ['{WorkspaceId} must be replaced.'], links: [['Model Studio', 'https://bailian.console.aliyun.com']] },
     comfyui: {
       summary: 'Local ComfyUI video: built-in Wan 2.2 templates (5B text+image, 14B image-to-video, 14B first-last frame, 14B text-to-video) and MiniMax H3 templates with native audio (20 steps / Turbo 8 / Turbo 4), or your own workflow — prompt, first / last frame, references, duration, ratio, resolution, seed, FPS and model are all wired in for full control.',
