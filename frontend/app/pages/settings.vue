@@ -748,6 +748,22 @@
             </select>
             <span class="field-hint">{{ t('settings.cfg.aiask.concurrentHint') }}</span>
           </div>
+          <!-- MiniMax 幻灵：ImgBB 图床配置（桌面版参考图上传） -->
+          <template v-if="isHuanlingForm">
+            <div class="field">
+              <span class="field-label">ImgBB API Key <span class="dim">({{ locale === 'zh' ? '参考图上传用' : 'For reference image upload' }})</span></span>
+              <input v-model="cfgForm.imgbb_api_key" class="input mono" type="password" :placeholder="locale === 'zh' ? '留空则无法使用参考图' : 'Leave empty to disable reference images'" />
+              <span class="field-hint">
+                {{ locale === 'zh' ? '桌面版使用幻灵生成视频时，本地参考图会自动上传到 ImgBB 图床（24小时自动过期）。免费申请：' : 'Desktop app will auto-upload local reference images to ImgBB (expires in 24h). Get free key: ' }}
+                <a href="https://api.imgbb.com/" target="_blank" rel="noopener">https://api.imgbb.com/</a>
+              </span>
+            </div>
+            <div class="field">
+              <span class="field-label">ImgBB Base URL <span class="dim">({{ locale === 'zh' ? '可选' : 'Optional' }})</span></span>
+              <input v-model="cfgForm.imgbb_base_url" class="input mono" placeholder="https://api.imgbb.com" />
+              <span class="field-hint">{{ locale === 'zh' ? '默认使用官方地址，通常无需修改' : 'Uses official URL by default, usually no need to change' }}</span>
+            </div>
+          </template>
           <!-- 提示词模板 + 中文翻译（全部本地服务） -->
           <template v-if="isLocalMediaForm">
             <div class="field">
@@ -1084,7 +1100,7 @@ const aiaskSaving = ref(false)
 // 本地服务（ComfyUI / SD WebUI / Fooocus）专属参数存后端 settings JSON，接口上以顶层字段读写
 const LOCAL_SETTING_FIELDS = ['max_concurrent', 'max_duration', 'max_prompt_bytes', 'moderation_retries', 'restart_every', 'comfy_start_command', 'comfyui_workflow', 'comfyui_template', 'comfyui_fps', 'comfyui_steps', 'comfyui_cfg', 'comfyui_negative_prompt', 'prompt_template', 'image_base_size', 'image_steps', 'image_cfg_scale', 'image_sampler', 'image_negative_prompt', 'fooocus_performance', 'fooocus_styles']
 // 布尔设置单独处理：自动绑定默认开；中文翻译默认值按服务类型（本地生图开、ComfyUI 视频关）
-const EMPTY_CFG_FORM = { name: '', provider: '', api_key: '', base_url: '', models: [], service_type: 'text', priority: 0, temperature: '', ...Object.fromEntries(LOCAL_SETTING_FIELDS.map(k => [k, ''])), comfyui_auto_bind: true, free_vram_between: '', auto_restart_comfy: true, oom_lower_resolution: true, prompt_translate: true, style_models_enabled: false, style_models: {}, model_install: null, style_models_auto_download: false, download_prefer_mirror: false, civitai_token: '', hf_token: '' }
+const EMPTY_CFG_FORM = { name: '', provider: '', api_key: '', base_url: '', models: [], service_type: 'text', priority: 0, temperature: '', ...Object.fromEntries(LOCAL_SETTING_FIELDS.map(k => [k, ''])), comfyui_auto_bind: true, free_vram_between: '', auto_restart_comfy: true, oom_lower_resolution: true, prompt_translate: true, style_models_enabled: false, style_models: {}, model_install: null, style_models_auto_download: false, download_prefer_mirror: false, civitai_token: '', hf_token: '', imgbb_api_key: '', imgbb_base_url: 'https://api.imgbb.com' }
 const cfgForm = reactive({ ...EMPTY_CFG_FORM })
 const LOCAL_BASE_URLS = { comfyui: 'http://127.0.0.1:8188', sdwebui: 'http://127.0.0.1:7860', fooocus: 'http://127.0.0.1:8888' }
 const FOOOCUS_PERFORMANCE = ['Speed', 'Quality', 'Extreme Speed', 'Lightning', 'Hyper-SD']
@@ -1092,6 +1108,7 @@ const isLocalForm = computed(() => !!LOCAL_BASE_URLS[cfgForm.provider])
 const isComfyForm = computed(() => cfgForm.provider === 'comfyui' && ['image', 'video'].includes(cfgForm.service_type))
 const isSdForm = computed(() => cfgForm.provider === 'sdwebui' && cfgForm.service_type === 'image')
 const isFooocusForm = computed(() => cfgForm.provider === 'fooocus' && cfgForm.service_type === 'image')
+const isHuanlingForm = computed(() => cfgForm.provider === 'minimax_huanling' && cfgForm.service_type === 'video')
 // 基准尺寸 / 步数 / CFG：ComfyUI 生图（内置模板）与 SD WebUI 使用
 const showLocalImageParams = computed(() => cfgForm.service_type === 'image' && ['comfyui', 'sdwebui'].includes(cfgForm.provider))
 const isLocalMediaForm = computed(() => isComfyForm.value || isSdForm.value || isFooocusForm.value)
@@ -1525,6 +1542,8 @@ function startEditCfg(c) {
     download_prefer_mirror: c.download_prefer_mirror === true,
     civitai_token: c.civitai_token || '',
     hf_token: c.hf_token || '',
+    imgbb_api_key: c.imgbb_api_key || '',
+    imgbb_base_url: c.imgbb_base_url || 'https://api.imgbb.com',
   })
   comfySource.value = c.comfyui_workflow ? 'custom' : 'builtin'
   inspectResult.value = null
@@ -1615,6 +1634,7 @@ function providerSettingsPayload() {
   if (isSdForm.value) return { image_negative_prompt: text(cfgForm.image_negative_prompt), image_sampler: text(cfgForm.image_sampler), ...promptParams(), ...imageParams() }
   if (isFooocusForm.value) return { image_negative_prompt: text(cfgForm.image_negative_prompt), fooocus_performance: text(cfgForm.fooocus_performance), fooocus_styles: text(cfgForm.fooocus_styles), ...promptParams() }
   if (isAiaskVideoForm.value) return { max_concurrent: num(cfgForm.max_concurrent) }
+  if (isHuanlingForm.value) return { imgbb_api_key: text(cfgForm.imgbb_api_key), imgbb_base_url: text(cfgForm.imgbb_base_url) }
   return {}
 }
 // ===== 配置弹窗：只能主动关闭；有未保存的修改时先确认 =====

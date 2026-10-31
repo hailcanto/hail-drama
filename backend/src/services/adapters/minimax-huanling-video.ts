@@ -65,12 +65,17 @@ export class MiniMaxHuanlingVideoAdapter implements VideoProviderAdapter {
 
     // 如果有本地媒体（非 HTTPS），尝试上传到图床
     if (hasLocalMedia) {
-      const uploader = getImageUploader()
+      // 从配置中读取 ImgBB 设置
+      const imgbbConfig = {
+        apiKey: config.settings?.imgbb_api_key,
+        baseUrl: config.settings?.imgbb_base_url,
+      }
+      const uploader = getImageUploader(imgbbConfig)
       if (!uploader) {
         throw new Error(
           '幻灵网关的首帧 / 尾帧 / 参考素材只接受公网 HTTPS 地址，不支持本地图片（base64）。\n' +
           '桌面版解决方案：\n' +
-          '  1. 在设置中配置 ImgBB API Key（免费申请：https://api.imgbb.com/），自动上传本地图片到公共图床\n' +
+          '  1. 在设置中编辑第三方 MiniMax（幻灵）配置，填写 ImgBB API Key（免费申请：https://api.imgbb.com/），自动上传本地图片到公共图床\n' +
           '  2. 或改用不带参考图的文生视频\n' +
           '  3. 或换用官方 MiniMax\n' +
           '服务器部署：在 backend/.env 配置 PUBLIC_BASE_URL 暴露本地 /static 目录',
@@ -85,7 +90,7 @@ export class MiniMaxHuanlingVideoAdapter implements VideoProviderAdapter {
           uploadedMedia.push(url)
         } else {
           // 上传本地文件（data: URL 或 static/ 路径）
-          const uploaded = await this.uploadMedia(url)
+          const uploaded = await this.uploadMedia(url, imgbbConfig)
           uploadedMedia.push(uploaded)
         }
       }
@@ -141,10 +146,10 @@ export class MiniMaxHuanlingVideoAdapter implements VideoProviderAdapter {
   }
 
   /** 上传单个媒体文件（data: URL 或本地路径）到图床 */
-  private async uploadMedia(url: string): Promise<string> {
+  private async uploadMedia(url: string, imgbbConfig?: { apiKey?: string; baseUrl?: string }): Promise<string> {
     // data: URL 转 Buffer 上传
     if (url.startsWith('data:')) {
-      const uploader = getImageUploader()!
+      const uploader = getImageUploader(imgbbConfig)!
       const match = url.match(/^data:image\/(\w+);base64,(.+)$/)
       if (!match) throw new Error(`不支持的 data URL 格式: ${url.substring(0, 50)}...`)
       const [, ext, base64] = match
@@ -155,7 +160,7 @@ export class MiniMaxHuanlingVideoAdapter implements VideoProviderAdapter {
 
     // 本地路径上传（通过 image-upload 模块处理）
     const { uploadLocalImage } = await import('../image-upload.js')
-    return await uploadLocalImage(url)
+    return await uploadLocalImage(url, imgbbConfig)
   }
 
   parseGenerateResponse(result: any): VideoGenResponse {

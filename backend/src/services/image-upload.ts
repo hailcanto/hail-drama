@@ -18,19 +18,20 @@ export interface ImageUploadService {
 
 /**
  * ImgBB 图床上传器
- * 环境变量：IMGBB_API_KEY
- * 申请地址：https://api.imgbb.com/
+ * 配置来源优先级：config 参数 > 环境变量
  */
 export class ImgBBUploader implements ImageUploadService {
   readonly serviceName = 'ImgBB'
+  private readonly baseUrl: string
   private readonly apiKey: string
   private readonly expirationSeconds: number
 
-  constructor(apiKey: string, expirationSeconds = 86400) {
+  constructor(apiKey: string, baseUrl = 'https://api.imgbb.com', expirationSeconds = 86400) {
     if (!apiKey || typeof apiKey !== 'string') {
       throw new Error('ImgBB API Key 未配置或无效')
     }
     this.apiKey = apiKey.trim()
+    this.baseUrl = baseUrl.trim().replace(/\/+$/, '')
     this.expirationSeconds = expirationSeconds
   }
 
@@ -42,7 +43,7 @@ export class ImgBBUploader implements ImageUploadService {
       formData.append('name', filename.replace(/\.[^.]+$/, '')) // 去掉扩展名
     }
 
-    const url = `https://api.imgbb.com/1/upload?expiration=${this.expirationSeconds}&key=${this.apiKey}`
+    const url = `${this.baseUrl}/1/upload?expiration=${this.expirationSeconds}&key=${this.apiKey}`
     const response = await fetch(url, {
       method: 'POST',
       body: formData,
@@ -63,25 +64,22 @@ export class ImgBBUploader implements ImageUploadService {
   }
 }
 
-/** 单例：从环境变量创建上传服务，未配置时返回 null */
-let cachedUploader: ImageUploadService | null | undefined
+/**
+ * 创建或获取上传服务实例
+ * @param config 可选配置：{ apiKey, baseUrl }，优先级高于环境变量
+ * @returns 上传服务实例，未配置时返回 null
+ */
+export function getImageUploader(config?: { apiKey?: string; baseUrl?: string }): ImageUploadService | null {
+  // 优先使用传入的配置
+  const apiKey = config?.apiKey?.trim() || process.env.IMGBB_API_KEY?.trim()
+  if (!apiKey) return null
 
-export function getImageUploader(): ImageUploadService | null {
-  if (cachedUploader !== undefined) return cachedUploader
-
-  const apiKey = process.env.IMGBB_API_KEY?.trim()
-  if (!apiKey) {
-    cachedUploader = null
-    return null
-  }
+  const baseUrl = config?.baseUrl?.trim() || process.env.IMGBB_BASE_URL?.trim() || 'https://api.imgbb.com'
 
   try {
-    cachedUploader = new ImgBBUploader(apiKey)
-    console.log('[ImageUpload] ImgBB uploader initialized')
-    return cachedUploader
+    return new ImgBBUploader(apiKey, baseUrl)
   } catch (err) {
     console.error('[ImageUpload] Failed to create uploader:', err)
-    cachedUploader = null
     return null
   }
 }
@@ -89,10 +87,11 @@ export function getImageUploader(): ImageUploadService | null {
 /**
  * 将本地图片路径上传到图床，返回公网 HTTPS URL
  * @param localPath 本地路径（相对 DATA_ROOT 或绝对路径）
+ * @param config 可选配置：{ apiKey, baseUrl }
  * @returns 公网 URL，失败时抛出错误
  */
-export async function uploadLocalImage(localPath: string): Promise<string> {
-  const uploader = getImageUploader()
+export async function uploadLocalImage(localPath: string, config?: { apiKey?: string; baseUrl?: string }): Promise<string> {
+  const uploader = getImageUploader(config)
   if (!uploader) {
     throw new Error(
       '图片上传服务未配置。桌面版请在设置中配置 ImgBB API Key，' +
@@ -117,15 +116,17 @@ export async function uploadLocalImage(localPath: string): Promise<string> {
 
 /**
  * 批量上传本地图片，跳过已经是 HTTPS URL 的项
+ * @param paths 图片路径数组
+ * @param config 可选配置
  * @returns 全部转换为公网 URL 的数组
  */
-export async function uploadLocalImages(paths: string[]): Promise<string[]> {
+export async function uploadLocalImages(paths: string[], config?: { apiKey?: string; baseUrl?: string }): Promise<string[]> {
   const results: string[] = []
   for (const path of paths) {
     if (path.startsWith('https://')) {
       results.push(path)
     } else {
-      const url = await uploadLocalImage(path)
+      const url = await uploadLocalImage(path, config)
       results.push(url)
     }
   }
