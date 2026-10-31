@@ -21,7 +21,11 @@ const FEED_URLS = process.env.HAIL_UPDATE_FEED
   ? [process.env.HAIL_UPDATE_FEED]
   : [
     'https://github.com/hailcanto/hail-drama/releases/latest/download/latest.json',
+    'https://cdn.jsdelivr.net/gh/hailcanto/hail-drama@latest/releases/latest.json',
   ]
+
+const FETCH_TIMEOUT = 30_000 // 30秒，考虑国内网络环境
+const FETCH_RETRIES = 2 // 每个源失败后重试次数
 
 export interface UpdateState {
   status: 'idle' | 'checking' | 'up-to-date' | 'available' | 'downloading' | 'downloaded' | 'error'
@@ -78,19 +82,36 @@ function installedAppBundle(): string {
 }
 
 async function fetchFeed(): Promise<{ version: string, notes?: string, platforms: Record<string, { url: string, sha256: string, size?: number }> }> {
-  let lastError: unknown
+  const errors: string[] = []
+
   for (const url of FEED_URLS) {
-    try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(15_000) })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const feed = await res.json()
-      if (!feed?.version || !feed?.platforms) throw new Error('版本清单格式不正确')
-      return feed
-    } catch (err) {
-      lastError = err
+    for (let attempt = 1; attempt <= FETCH_RETRIES; attempt++) {
+      try {
+        const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT) })
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const feed = await res.json()
+        if (!feed?.version || !feed?.platforms) throw new Error('版本清单格式不正确')
+        return feed
+      } catch (err) {
+        const isTimeout = (err as Error).name === 'TimeoutError' || (err as Error).message.includes('timeout')
+        const errMsg = isTimeout
+          ? `请求超时 (${FETCH_TIMEOUT / 1000}秒)`
+          : (err as Error).message
+        errors.push(`${url} (尝试 ${attempt}/${FETCH_RETRIES}): ${errMsg}`)
+
+        // 非最后一次尝试，等待后重试
+        if (attempt < FETCH_RETRIES) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
+        }
+      }
     }
   }
-  throw new Error(`版本清单请求失败（已尝试 ${FEED_URLS.length} 个源）：${(lastError as Error)?.message ?? ''}`)
+
+  throw new Error(
+    `版本清单请求失败，已尝试 ${FEED_URLS.length} 个源，共 ${errors.length} 次请求。\n` +
+    `可能原因：网络不稳定或 GitHub 访问受限。请稍后重试或检查网络连接。\n` +
+    `详细信息：\n${errors.slice(-3).join('\n')}`
+  )
 }
 
 // ---- 检查 ----

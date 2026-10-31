@@ -17,7 +17,11 @@ const FEED_URLS = process.env.HAIL_UPDATE_FEED
   ? [process.env.HAIL_UPDATE_FEED]
   : [
     'https://github.com/hailcanto/hail-drama/releases/latest/download/latest.json',
+    'https://cdn.jsdelivr.net/gh/hailcanto/hail-drama@latest/releases/latest.json',
   ]
+
+const FETCH_TIMEOUT = 30_000 // 30秒，考虑国内网络环境
+const FETCH_RETRIES = 2 // 每个源失败后重试次数
 
 const WATCHTOWER_URL = brandEnv('WATCHTOWER_URL')?.replace(/\/+$/, '')
 const WATCHTOWER_TOKEN = brandEnv('WATCHTOWER_TOKEN') || ''
@@ -77,19 +81,40 @@ export function getServerUpdateState(): ServerUpdateState {
 export async function checkServerUpdate(): Promise<ServerUpdateState> {
   try {
     let feed: any
-    let lastError: unknown
+    const errors: string[] = []
+
     for (const url of FEED_URLS) {
-      try {
-        const res = await fetch(url, { signal: AbortSignal.timeout(15_000) })
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        feed = await res.json()
-        if (!feed?.version) throw new Error('版本清单格式不正确')
-        break
-      } catch (err) {
-        lastError = err
+      for (let attempt = 1; attempt <= FETCH_RETRIES; attempt++) {
+        try {
+          const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT) })
+          if (!res.ok) throw new Error(`HTTP ${res.status}`)
+          feed = await res.json()
+          if (!feed?.version) throw new Error('版本清单格式不正确')
+          break // 成功，跳出重试循环
+        } catch (err) {
+          const isTimeout = (err as Error).name === 'TimeoutError' || (err as Error).message.includes('timeout')
+          const errMsg = isTimeout
+            ? `请求超时 (${FETCH_TIMEOUT / 1000}秒)`
+            : (err as Error).message
+          errors.push(`${url} (尝试 ${attempt}/${FETCH_RETRIES}): ${errMsg}`)
+
+          // 非最后一次尝试，等待后重试
+          if (attempt < FETCH_RETRIES) {
+            await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
+          }
+        }
       }
+      if (feed) break // 已成功获取 feed，跳出源循环
     }
-    if (!feed) throw new Error(`版本清单请求失败（已尝试 ${FEED_URLS.length} 个源）：${(lastError as Error)?.message ?? ''}`)
+
+    if (!feed) {
+      throw new Error(
+        `版本清单请求失败，已尝试 ${FEED_URLS.length} 个源，共 ${errors.length} 次请求。\n` +
+        `可能原因：网络不稳定或 GitHub 访问受限。请稍后重试或检查网络连接。\n` +
+        `详细信息：\n${errors.slice(-3).join('\n')}`
+      )
+    }
+
     const latestVersion = String(feed.version).replace(/^v/, '')
     lastState = {
       status: compareVersions(latestVersion, currentVersion()) > 0 ? 'available' : 'up-to-date',
@@ -116,7 +141,7 @@ export async function triggerWatchtowerUpdate(): Promise<void> {
   const res = await fetch(`${WATCHTOWER_URL}/v1/update`, {
     method: 'POST',
     headers: WATCHTOWER_TOKEN ? { Authorization: `Bearer ${WATCHTOWER_TOKEN}` } : {},
-    signal: AbortSignal.timeout(15_000),
+    signal: AbortSignal.timeout(FETCH_TIMEOUT),
   })
   if (!res.ok) throw new Error(`Watchtower 触发失败（HTTP ${res.status}）`)
 }
