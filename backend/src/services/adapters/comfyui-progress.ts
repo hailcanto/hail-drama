@@ -111,7 +111,7 @@ export function describeComfyPromptMeta(workflow: Record<string, any>, kind: 'im
 }
 
 export class ComfyMonitor {
-  readonly clientId = `uu889-drama-${randomBytes(4).toString('hex')}`
+  readonly clientId = `hail-drama-${randomBytes(4).toString('hex')}`
   private ws: any = null
   private connecting: Promise<boolean> | null = null
   private prompts = new Map<string, PromptState>()

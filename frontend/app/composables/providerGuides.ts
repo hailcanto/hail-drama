@@ -19,16 +19,16 @@ export interface ProviderGuide {
 type ServiceType = 'text' | 'image' | 'video'
 type GuideTable = Partial<Record<ServiceType, Record<string, ProviderGuide>>>
 
-/** 各服务类型在 UU889-Drama 里的用途 */
+/** 各服务类型在 Hail 短剧 里的用途 */
 export const SERVICE_USAGE: Record<'zh' | 'en', Record<ServiceType, string>> = {
   zh: {
     text: '文字模型负责：小说改写成剧本、提取角色 / 场景 / 道具、拆分镜、为每张图和每段视频写提示词。启用多个配置时，优先级最高的为默认，工作台里可按集切换。',
-    image: '图片模型负责：角色定妆照、场景图、道具图、分镜首帧 / 尾帧。生成后自动下载回 UU889-Drama，写回对应的角色 / 场景 / 分镜。',
+    image: '图片模型负责：角色定妆照、场景图、道具图、分镜首帧 / 尾帧。生成后自动下载回 Hail 短剧，写回对应的角色 / 场景 / 分镜。',
     video: '视频模型负责：把每个分镜生成视频（提示词 + 首帧 / 尾帧 / 参考图 + 时长 / 比例 / 分辨率），完成后下载回来，可在「导出」里用 FFmpeg 拼成整集。',
   },
   en: {
     text: 'Text models rewrite novels into scripts, extract characters / scenes / props, break down storyboards and write the prompts for every image and video. With several active configs, the highest priority one is the default; each episode can switch.',
-    image: 'Image models render character portraits, scenes, props and storyboard first / last frames. Results are downloaded back into UU889-Drama and attached to the right character / scene / shot.',
+    image: 'Image models render character portraits, scenes, props and storyboard first / last frames. Results are downloaded back into Hail-Drama and attached to the right character / scene / shot.',
     video: 'Video models turn each storyboard shot into a clip (prompt + first / last frame / references + duration / ratio / resolution). Clips are downloaded back and can be merged into a full episode with FFmpeg in Export.',
   },
 }
@@ -182,14 +182,14 @@ const zh: GuideTable = {
       links: [['ComfyUI', 'https://github.com/comfyanonymous/ComfyUI'], ['ComfyUI 官方示例工作流', 'https://comfyanonymous.github.io/ComfyUI_examples/']],
     },
     sdwebui: {
-      summary: 'Stable Diffusion WebUI（AUTOMATIC1111 / Forge / reForge）的 /sdapi/v1/txt2img 接口，出图后直接把图片传回 UU889-Drama。',
+      summary: 'Stable Diffusion WebUI（AUTOMATIC1111 / Forge / reForge）的 /sdapi/v1/txt2img 接口，出图后直接把图片传回 Hail 短剧。',
       steps: [
         '用 --api 参数启动 WebUI：Windows 在 webui-user.bat 里写 set COMMANDLINE_ARGS=--api（远程访问再加 --listen）；Linux / macOS 运行 ./webui.sh --api。',
         '浏览器打开 http://127.0.0.1:7860/docs 能看到接口文档，说明 API 已开启。',
         'Base URL 填 http://127.0.0.1:7860。',
         '「模型」填 default 沿用 WebUI 当前选中的模型；填模型名（点「读取 WebUI 模型」可选）则每次生成临时切换到该模型。',
         '点一个「参数预设」（SDXL / SD1.5 / Lightning / Pony），按需修改采样器、步数、CFG。',
-        '可选：选一个「提示词模板」，{{prompt}} 处插入 UU889-Drama 写好的提示词。',
+        '可选：选一个「提示词模板」，{{prompt}} 处插入 Hail 短剧 写好的提示词。',
         '测试连接后保存。出图时任务里会显示排队位置、采样步数和预计剩余时间。',
       ],
       fields: [
@@ -291,7 +291,7 @@ const zh: GuideTable = {
         '协议与 MiniMax 官方保持一致，已接入官方 API 的项目只需替换 Base URL 和 Key。',
         '**限制**：分辨率仅支持 768P（不支持 2K）；时长 1–15 秒。',
         '**媒体输入**：参考图 / 首尾帧 / 参考视频音频只接受**公网 HTTPS URL**，不支持 base64。本地图片需要配置后端 PUBLIC_BASE_URL（公网地址），桌面版不支持。',
-        '**下载鉴权**：成片下载时网关会验证 API Key（与官方裸链不同），UU889-Drama 已自动处理。',
+        '**下载鉴权**：成片下载时网关会验证 API Key（与官方裸链不同），Hail 短剧 已自动处理。',
         '当前价格约 ¥0.1/秒（官方参考价 ¥0.5/秒 @768P），以幻灵「模型广场」实时展示为准。',
       ],
       links: [['幻灵 AI 网关', 'https://api.huanling.icu'], ['接入指南', 'https://api.huanling.icu/guides/minimax-h3']],
@@ -304,15 +304,15 @@ const zh: GuideTable = {
       links: [['阿里云百炼', 'https://bailian.console.aliyun.com']],
     },
     comfyui: {
-      summary: '本地 ComfyUI 生视频：内置 Wan 2.2 模板（5B 文图二合一 / 14B 图生 / 14B 首尾帧 / 14B 文生）与 MiniMax H3 模板（音画同出，20 步 / Turbo 8 步 / Turbo 4 步）开箱即用；也可粘贴自己的工作流，UU889-Drama 的提示词、首尾帧、参考图、时长、比例、分辨率、种子、FPS、模型都会自动接入，做到强控制。',
+      summary: '本地 ComfyUI 生视频：内置 Wan 2.2 模板（5B 文图二合一 / 14B 图生 / 14B 首尾帧 / 14B 文生）与 MiniMax H3 模板（音画同出，20 步 / Turbo 8 步 / Turbo 4 步）开箱即用；也可粘贴自己的工作流，Hail 短剧 的提示词、首尾帧、参考图、时长、比例、分辨率、种子、FPS、模型都会自动接入，做到强控制。',
         steps: [
         '启动 ComfyUI（建议更新到最新版，内置 Wan 2.2 节点）：默认 http://127.0.0.1:8188，ComfyUI Desktop 默认 :8000；在另一台机器上运行时加 --listen 0.0.0.0，Base URL 填那台机器的 IP。',
         '「工作流来源」选一个内置模板：显存 12GB 左右选「Wan 2.2 TI2V 5B」；24GB 以上选 14B 图生（画质最好）或首尾帧（镜头衔接）；32GB 以上可选 MiniMax H3（视频自带对白 / 音效 / 配乐，推荐 Turbo 8 步）。',
-        'MiniMax H3 需要 ComfyUI 0.30.0 以上（自带 MiniMaxH3ImageToVideo 节点）和 4 个文件：diffusion_models/minimax_h3_fl2va_int8_convrot.safetensors、text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors、vae/minimax_h3_video_vae_fp16.safetensors、vae/minimax_h3_audio_vae_fp32.safetensors；Turbo 模板再加 loras/ 里对应的 8 步或 4 步 LoRA。MiniMaxH3_Director 是交互式时间线编辑插件，UU889-Drama 通过接口提交时用不到，可以不装。',
+        'MiniMax H3 需要 ComfyUI 0.30.0 以上（自带 MiniMaxH3ImageToVideo 节点）和 4 个文件：diffusion_models/minimax_h3_fl2va_int8_convrot.safetensors、text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors、vae/minimax_h3_video_vae_fp16.safetensors、vae/minimax_h3_audio_vae_fp32.safetensors；Turbo 模板再加 loras/ 里对应的 8 步或 4 步 LoRA。MiniMaxH3_Director 是交互式时间线编辑插件，Hail 短剧 通过接口提交时用不到，可以不装。',
         '按模板下方的清单下载模型文件，放到对应目录（diffusion_models / text_encoders / vae），文件名保持不变。',
         '「模型」填模板 ID（如 wan2.2-i2v-14b，会自动选中对应模板），或填模型文件名直接替换工作流里的扩散模型；Wan 2.2 14B 双模型写成「高噪声文件|低噪声文件」。',
         '用自己的工作流：在 ComfyUI 里「工作流 → 导出 (API)」得到 JSON，选「自定义工作流」粘贴。保持「自动绑定」开启，不需要手写占位符；想精确控制也可以在任意字段写 {{prompt}}、{{image}}、{{last_frame}} 等占位符（见下方列表），写了的类别以手写为准。',
-        '点「检查工作流」：表格会列出每个节点哪个字段接到了 UU889-Drama 的哪个参数，没接上的会给出提醒，缺的模型文件标红。',
+        '点「检查工作流」：表格会列出每个节点哪个字段接到了 Hail 短剧 的哪个参数，没接上的会给出提醒，缺的模型文件标红。',
         '点「测试连接」后保存。生成时工作台的视频面板和「任务」抽屉会显示：上传参考图 → 排队第几位 → 当前节点 → 采样第几段第几步 → 预计剩余时间 → 解码 / 合成 → 下载进度（MB）。',
       ],
       fields: [
@@ -332,7 +332,7 @@ const zh: GuideTable = {
         '进度细节依赖 ComfyUI 的 WebSocket（/ws）；经过不支持 WebSocket 的反向代理时只显示排队与已等待时长，不影响生成。',
         '显存不足：降低分辨率或时长、换 fp8 / GGUF 模型、用 --lowvram 启动。',
         '「视觉风格 → 模型」：画风主要靠首帧（先用风格生图模型出分镜图），Wan 2.2 I2V 14B 低噪声模型再挂 Wan 14B 风格 LoRA 稳住画风；5B / MiniMax H3 不挂 LoRA。',
-        '「一键下载模型」会连同模板的基础模型（扩散模型 / 文本编码器 / VAE，14B 约 34 GB）一起下载；远程下载在对方后台运行，关掉 UU889-Drama 也会下完。',
+        '「一键下载模型」会连同模板的基础模型（扩散模型 / 文本编码器 / VAE，14B 约 34 GB）一起下载；远程下载在对方后台运行，关掉 Hail 短剧 也会下完。',
       ],
       links: [['ComfyUI Wan 2.2 教程', 'https://docs.comfy.org/tutorials/video/wan/wan2_2'], ['Wan 2.2 模型下载', 'https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged']],
     },
@@ -450,8 +450,8 @@ const en: GuideTable = {
       links: [['ComfyUI', 'https://github.com/comfyanonymous/ComfyUI'], ['ComfyUI examples', 'https://comfyanonymous.github.io/ComfyUI_examples/']],
     },
     sdwebui: {
-      summary: 'Stable Diffusion WebUI (AUTOMATIC1111 / Forge / reForge) via /sdapi/v1/txt2img; images come straight back into UU889-Drama.',
-      steps: ['Start WebUI with --api (Windows: set COMMANDLINE_ARGS=--api in webui-user.bat; Linux / macOS: ./webui.sh --api; add --listen for remote access).', 'Open http://127.0.0.1:7860/docs to confirm the API is on.', 'Base URL: http://127.0.0.1:7860.', 'Models: "default" keeps the loaded model; a model name switches per request (click "Read WebUI models").', 'Pick a parameter preset (SDXL / SD1.5 / Lightning / Pony) and adjust sampler, steps, CFG.', 'Optional: a prompt template wraps the UU889-Drama prompt at {{prompt}}.', 'Test and save. Tasks show queue position, sampling step and ETA.'],
+      summary: 'Stable Diffusion WebUI (AUTOMATIC1111 / Forge / reForge) via /sdapi/v1/txt2img; images come straight back into Hail-Drama.',
+      steps: ['Start WebUI with --api (Windows: set COMMANDLINE_ARGS=--api in webui-user.bat; Linux / macOS: ./webui.sh --api; add --listen for remote access).', 'Open http://127.0.0.1:7860/docs to confirm the API is on.', 'Base URL: http://127.0.0.1:7860.', 'Models: "default" keeps the loaded model; a model name switches per request (click "Read WebUI models").', 'Pick a parameter preset (SDXL / SD1.5 / Lightning / Pony) and adjust sampler, steps, CFG.', 'Optional: a prompt template wraps the Hail-Drama prompt at {{prompt}}.', 'Test and save. Tasks show queue position, sampling step and ETA.'],
       fields: [['Base URL', 'http://127.0.0.1:7860'], ['API Key', '"user:password" when started with --api-auth, otherwise empty'], ['Models', 'default or a checkpoint name'], ['Sampler', 'e.g. DPM++ 2M, Euler a']],
       tips: ['Prompts must be English — keep "Translate non-English prompts to English" on (default).', '404: --api missing; 401: wrong --api-auth credentials.', 'Reference images are not sent to WebUI; use ComfyUI or Fooocus for character consistency.', '"Visual style → models" switches to a Civitai SDXL checkpoint + style LoRA (<lora:name:weight>) per project style; see docs/style-models.md.', '"One-click model download" installs missing files into the WebUI folder locally or over SSH; Civitai models with an identical Hugging Face copy are fetched from HF without a Civitai key.'],
       links: [['AUTOMATIC1111 API', 'https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/API']],
@@ -483,7 +483,7 @@ const en: GuideTable = {
         'Protocol mirrors the official MiniMax API; projects already using the official one just swap Base URL and key.',
         '**Limitations**: resolution is 768P only (2K not supported); duration 1–15 seconds.',
         '**Media input**: reference images / first-last frame / reference video / audio must be **public HTTPS URLs**; base64 is not supported. Local images need PUBLIC_BASE_URL configured on the backend; desktop builds do not support this.',
-        '**Download auth**: unlike the official API\'s bare links, the gateway requires API Key for video downloads (UU889-Drama handles this automatically).',
+        '**Download auth**: unlike the official API\'s bare links, the gateway requires API Key for video downloads (Hail-Drama handles this automatically).',
         'Current pricing ~¥0.1/sec (official reference ¥0.5/sec @768P); check the gateway\'s Model Marketplace for real-time rates.',
       ],
       links: [['Huanling AI Gateway', 'https://api.huanling.icu'], ['Integration Guide', 'https://api.huanling.icu/guides/minimax-h3']],
@@ -494,15 +494,15 @@ const en: GuideTable = {
       steps: [
         'Start an up-to-date ComfyUI (Wan 2.2 nodes are built in): http://127.0.0.1:8188, Desktop :8000; use --listen 0.0.0.0 on another machine.',
         'Pick a template: ~12 GB VRAM → Wan 2.2 TI2V 5B; 24 GB+ → 14B image-to-video (best quality) or first-last frame (transitions); 32 GB+ → MiniMax H3 (video with dialogue / SFX / music; Turbo 8-step recommended).',
-        'MiniMax H3 needs ComfyUI 0.30.0+ (built-in MiniMaxH3ImageToVideo node) and four files: diffusion_models/minimax_h3_fl2va_int8_convrot.safetensors, text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors, vae/minimax_h3_video_vae_fp16.safetensors, vae/minimax_h3_audio_vae_fp32.safetensors; Turbo templates also need the 8-step or 4-step LoRA in loras/. MiniMaxH3_Director is an interactive timeline editor plugin that UU889-Drama does not need.',
+        'MiniMax H3 needs ComfyUI 0.30.0+ (built-in MiniMaxH3ImageToVideo node) and four files: diffusion_models/minimax_h3_fl2va_int8_convrot.safetensors, text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors, vae/minimax_h3_video_vae_fp16.safetensors, vae/minimax_h3_audio_vae_fp32.safetensors; Turbo templates also need the 8-step or 4-step LoRA in loras/. MiniMaxH3_Director is an interactive timeline editor plugin that Hail-Drama does not need.',
         'Download the listed model files into the shown folders without renaming them.',
         'Models: a template ID (e.g. wan2.2-i2v-14b selects that template) or model file names to replace the diffusion model; for the 14B pair write "high-noise-file|low-noise-file".',
         'Own workflow: Workflow → Export (API) in ComfyUI, choose "Custom workflow" and paste it. Keep Auto-bind on — no placeholders needed; you can still write {{prompt}}, {{image}}, {{last_frame}} … in any field, and hand-written categories win.',
-        'Click "Check workflow" to see which node field receives which UU889-Drama parameter; missing model files are marked red.',
+        'Click "Check workflow" to see which node field receives which Hail-Drama parameter; missing model files are marked red.',
         'Test and save. The video panel and Tasks drawer show: reference upload → queue position → current node → sampler stage & step → ETA → decode / encode → download (MB).',
       ],
       fields: [['Base URL', 'http://127.0.0.1:8188 (Desktop :8000)'], ['Models', 'template ID or model file names (| for pairs)'], ['FPS', 'empty = template value (24 for 5B, 16 for 14B) or the workflow value'], ['Steps / CFG', 'empty = keep the workflow; filled = override every sampler (two-stage split rescaled)']],
-      tips: ['Frames = duration × FPS aligned to 4n+1 (5 s at 16 fps = 81); 480p / 720p / 1080p map to width / height by ratio.', 'MiniMax H3 is fixed at 24 fps with frames snapped to 17k+5 (5 s = 124); short edge up to 768 (1344×768 at 16:9), so 1080p renders at 768p. H3 has no negative prompt — describe dialogue / SFX / music in the prompt.', 'Output must be mp4 (SaveVideo or VHS_VideoCombine h264-mp4).', 'Detailed progress uses ComfyUI\'s WebSocket (/ws); behind a proxy without WebSocket only queue / elapsed time is shown.', 'Out of memory: lower resolution / duration, use fp8 / GGUF, or --lowvram.', '"Visual style → models": the style comes mainly from the first frame (render it with the style image model); Wan 2.2 I2V 14B adds a Wan 14B style LoRA on the low-noise model. 5B / MiniMax H3 get no LoRA.', '"One-click model download" also fetches the template base models (diffusion / text encoder / VAE, ~34 GB for 14B); remote downloads run on the remote machine and finish even if UU889-Drama is closed.'],
+      tips: ['Frames = duration × FPS aligned to 4n+1 (5 s at 16 fps = 81); 480p / 720p / 1080p map to width / height by ratio.', 'MiniMax H3 is fixed at 24 fps with frames snapped to 17k+5 (5 s = 124); short edge up to 768 (1344×768 at 16:9), so 1080p renders at 768p. H3 has no negative prompt — describe dialogue / SFX / music in the prompt.', 'Output must be mp4 (SaveVideo or VHS_VideoCombine h264-mp4).', 'Detailed progress uses ComfyUI\'s WebSocket (/ws); behind a proxy without WebSocket only queue / elapsed time is shown.', 'Out of memory: lower resolution / duration, use fp8 / GGUF, or --lowvram.', '"Visual style → models": the style comes mainly from the first frame (render it with the style image model); Wan 2.2 I2V 14B adds a Wan 14B style LoRA on the low-noise model. 5B / MiniMax H3 get no LoRA.', '"One-click model download" also fetches the template base models (diffusion / text encoder / VAE, ~34 GB for 14B); remote downloads run on the remote machine and finish even if Hail-Drama is closed.'],
       links: [['ComfyUI Wan 2.2 guide', 'https://docs.comfy.org/tutorials/video/wan/wan2_2'], ['Wan 2.2 models', 'https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged']],
     },
   },
@@ -517,7 +517,7 @@ export function getServiceUsage(locale: string, type: string): string {
   return SERVICE_USAGE[locale === 'zh' ? 'zh' : 'en'][type as ServiceType] || ''
 }
 
-/** 提示词模板预设（{{prompt}} 处插入 UU889-Drama 的提示词） */
+/** 提示词模板预设（{{prompt}} 处插入 Hail 短剧 的提示词） */
 export const PROMPT_TEMPLATE_PRESETS: Array<{ id: string; zh: string; en: string; value: string; for: Array<'image' | 'video'> }> = [
   { id: 'none', zh: '不使用模板', en: 'None', value: '', for: ['image', 'video'] },
   { id: 'quality', zh: '通用高画质（SD / SDXL）', en: 'Quality tags (SD / SDXL)', value: 'masterpiece, best quality, highly detailed, {{prompt}}', for: ['image'] },

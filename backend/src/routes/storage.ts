@@ -10,6 +10,7 @@ import { DATA_ROOT, STORAGE_ROOT } from '../utils/paths.js'
 import { dbPath } from '../db/index.js'
 import { dirUsage, volumeFreeBytes } from '../utils/dirsize.js'
 import { success } from '../utils/response.js'
+import { brandEnv } from '../utils/env.js'
 
 const app = new Hono()
 
@@ -52,7 +53,7 @@ app.get('/', async (c) => {
     }
   }
 
-  const mode = process.env.UU889_DESKTOP === '1' ? 'desktop' : 'server'
+  const mode = brandEnv('DESKTOP') === '1' ? 'desktop' : 'server'
   return success(c, {
     mode,
     dataDir: DATA_ROOT,

@@ -1,8 +1,8 @@
-# 🎬 UU889-Drama - AI 短剧生成平台
+# 🎬 Hail 短剧 - AI 短剧生成平台
 
 <div align="center">
 
-<img src="docs/images/logo.png" alt="UU889-Drama" width="128" />
+<img src="docs/images/logo.png" alt="Hail-Drama" width="128" />
 
 **基于 TypeScript 全栈的 AI 短剧自动化生产平台**
 
@@ -20,13 +20,13 @@
 
 </div>
 
-> UU889-Drama 复刻自 [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama)（火宝短剧），沿用其 [CC BY-NC-SA 4.0](LICENSE) 许可证，在此基础上更换品牌并新增 aiask.me 文本/图片/视频接口、aiask.me Grok 视频与本地 ComfyUI 视频接入。
+> Hail 短剧（Hail-Drama）复刻自 UU889-Drama，UU889-Drama 又复刻自 [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama)（火宝短剧），沿用其 [CC BY-NC-SA 4.0](LICENSE) 许可证，在此基础上更换品牌并新增 aiask.me 文本/图片/视频接口、aiask.me Grok 视频与本地 ComfyUI 视频接入。
 
 ---
 
 ## 📖 项目简介
 
-UU889-Drama 是一个基于 AI 的短剧自动化生产平台：小说 → 剧本改写 → 角色/场景/道具提取 → 生图 → 分镜拆解 → 生视频 → FFmpeg 拼接导出，全流程一站式完成。支持 Electron 桌面版（macOS / Windows）、服务器与 Docker 部署。
+Hail 短剧 是一个基于 AI 的短剧自动化生产平台：小说 → 剧本改写 → 角色/场景/道具提取 → 生图 → 分镜拆解 → 生视频 → FFmpeg 拼接导出，全流程一站式完成。支持 Electron 桌面版（macOS / Windows）、服务器与 Docker 部署。
 
 ```
 frontend/   — Nuxt 3 + Vue 3 + TypeScript（纯 CSS，无 UI 框架）
@@ -70,8 +70,8 @@ data/       — 生成资源文件与 SQLite 数据库
 ### 📥 安装与启动（开发模式）
 
 ```bash
-git clone https://github.com/uu889/uu889-drama.git
-cd uu889-drama
+git clone https://github.com/hailcanto/hail-drama.git
+cd hail-drama
 
 cd backend && npm install && npm run dev      # 终端 1：后端 http://localhost:5679/api/v1
 cd frontend && npm install && npm run dev     # 终端 2：前端 http://localhost:3013
@@ -92,18 +92,18 @@ cd ../backend && npm start                                      # 访问 http://
 
 | 变量 | 默认值 | 说明 |
 |---|---|---|
-| `SQLITE_PATH` | `<仓库根>/data/uu889.sqlite3` | SQLite 数据库文件位置 |
+| `SQLITE_PATH` | `<仓库根>/data/hail.sqlite3` | SQLite 数据库文件位置 |
 | `PORT` | `5679` | 后端服务端口 |
 | `STORAGE_PATH` | `<仓库根>/data/static` | 生成文件存储目录 |
-| `UU889_DATA_DIR` | — | 桌面版由 Electron 主进程注入（userData 数据根） |
+| `HAIL_DATA_DIR` | — | 桌面版由 Electron 主进程注入（userData 数据根） |
 | `WORKSPACE_PATH` | `backend/workspace` | Agent 技能/提示词目录 |
 | `FRONTEND_DIST` | `frontend/dist` | 前端静态产物目录 |
 | `FFMPEG_BIN` / `FFPROBE_BIN` | npm 内置二进制 | 自定义 ffmpeg/ffprobe 路径 |
 | `PUBLIC_BASE_URL` | — | Seedance 引用本地参考视频/音频时所需的公网地址 |
 | `MODEL_INSTALLER_LOCAL` | `1` | 设为 `0` 时关闭「一键下载模型」的本机模式（服务器部署不想让网页操作服务器本机文件时使用，远程 SSH 模式不受影响） |
 | `SUBTITLE_FONT` | 自动 | 烧录字幕用的字体文件路径；默认自动找系统中文字体（Windows 微软雅黑、macOS 苹方 / 黑体、Linux Noto CJK / 文泉驿） |
-| `MODEL_INSTALLER_DETACHED` | `1` | 设为 `0` 时本机模型下载改由程序内完成，不启动后台进程（默认用后台进程，退出 UU889-Drama 也会继续下完） |
-| `UU889_UPDATE_FEED` | GitHub Releases 的 `latest.json` | 自定义更新清单地址 |
+| `MODEL_INSTALLER_DETACHED` | `1` | 设为 `0` 时本机模型下载改由程序内完成，不启动后台进程（默认用后台进程，退出 Hail 短剧 也会继续下完） |
+| `HAIL_UPDATE_FEED` | GitHub Releases 的 `latest.json` | 自定义更新清单地址 |
 
 > AI 服务的 API Key、Base URL 与模型全部在「设置」页配置并入库，不在配置文件中维护。
 
@@ -183,7 +183,7 @@ aiask.me 是 OpenAI 兼容的 AI API 网关，一个 Key 覆盖文本、图片�
 - 本地 GPU 排队：ComfyUI 生图最长等 6 小时、Fooocus 1 小时；SD WebUI 为同步接口，单张最长 10 分钟
 - **内置模板（ComfyUI）**：SDXL（默认）、SD 1.5、FLUX.1 dev fp8、FLUX.1 schnell fp8；设置页列出每个模板需要的模型文件、放置目录和下载地址，可一键「填入编辑框」改成自己的
 - **自动绑定（ComfyUI）**：直接从 ComfyUI「导出 (API)」的工作流不用写占位符，正 / 负提示词、LoadImage 参考图、种子、宽高、Checkpoint 会按节点结构自动接入；「检查工作流」按钮列出每个节点被接到哪个参数，并检查模型文件是否存在
-- **提示词模板**：三种本地服务都可以设置 `masterpiece, best quality, {{prompt}}` 这样的模板，`{{prompt}}` 处插入 UU889-Drama 写好的提示词；SD WebUI / Fooocus 另有参数 / 风格预设一键套用
+- **提示词模板**：三种本地服务都可以设置 `masterpiece, best quality, {{prompt}}` 这样的模板，`{{prompt}}` 处插入 Hail 短剧 写好的提示词；SD WebUI / Fooocus 另有参数 / 风格预设一键套用
 - **中文提示词自动翻译**：SD / SDXL / FLUX 只认英文，本地生图默认在提交前用当前启用的文字模型把中文提示词翻译成英文（可关闭，失败时用原文）
 - **读取本机模型**：设置页可直接列出 ComfyUI 的 checkpoints / diffusion_models / LoRA、SD WebUI 的模型与采样器、Fooocus 的模型与风格，点选即填
 - **实时进度**：任务抽屉与资产卡片显示排队位置、采样步数、预计剩余时间、下载进度（SD WebUI 用 `force_task_id` + `/internal/progress`，Fooocus 用 `query-job` 的 `job_progress`）
@@ -198,12 +198,12 @@ aiask.me 是 OpenAI 兼容的 AI API 网关，一个 Key 覆盖文本、图片�
 2. 「设置 → 视频服务 → 添加」选择「本地 ComfyUI」模板，API Key 可留空（仅在反向代理鉴权时填写）
 3. **工作流来源**二选一：
    - **内置模板**：Wan 2.2 TI2V 5B（文生 / 图生二合一，默认）、Wan 2.2 I2V 14B（图生，高 / 低噪声两段采样）、Wan 2.2 首尾帧 14B、Wan 2.2 T2V 14B；**MiniMax H3**（音画同出，20 步 / Turbo 8 步 / Turbo 4 步 768p，固定 24fps、帧数 17k+5、短边 768，需要 ComfyUI 0.30.0+）；**按显存选**：Wan 2.2 图生视频 14B 的 12G / 16G（GGUF 量化 + 4 步加速，需 ComfyUI-GGUF 插件，限 480p / 640p）、24G（fp8 + 4 步）、32G（fp8 20 步）、48G（fp16 20 步）、96G（fp16 30 步，最高 1080p）、141G / 192G / 288G（fp16 40 步，1080p，越大越能出长镜头）九档，模板 ID 为 `wan2.2-i2v-14b-<显存>g`；**MiniMax H3 音画同出**同样九档 `minimax-h3-<显存>g`，用参考图生视频（Ref2VA）模型：分镜绑定的场景 / 角色 / 道具图作为 `<Picture N>` 参考图（人物与角色资产一致），首帧 / 尾帧用引导节点锚定，另有不分档的 `minimax-h3-r2v`；12G / 16G / 24G 剪枝版 GGUF Q3 / Q4 / Q5 + 4 步加速（需 ComfyUI-GGUF，12G 限 480p）、32G 官方剪枝 int8 + 4 步（官方模板同款）、48G 完整版 int8 20 步、96G 完整版 int8 + int8 文本编码器 25 步、141G / 192G / 288G 完整版 bf16 30 / 40 / 50 步。设置页列出所需模型文件、放置目录与下载地址；「模型」填模板 ID（如 `wan2.2-i2v-14b`）即自动选中对应模板
-   - **自定义工作流**：在 ComfyUI 中用「导出 (API)」/ Export (API) 得到 JSON 粘贴进来。**不需要手写占位符**——开启「自动绑定」（默认）后，正 / 负提示词、首帧 / 尾帧 / 参考图（LoadImage）、种子、宽高、帧数、FPS、扩散模型会按节点结构自动接入 UU889-Drama 的参数；某类参数手写了占位符时以手写为准
+   - **自定义工作流**：在 ComfyUI 中用「导出 (API)」/ Export (API) 得到 JSON 粘贴进来。**不需要手写占位符**——开启「自动绑定」（默认）后，正 / 负提示词、首帧 / 尾帧 / 参考图（LoadImage）、种子、宽高、帧数、FPS、扩散模型会按节点结构自动接入 Hail 短剧 的参数；某类参数手写了占位符时以手写为准
 4. **模型**：填模板 ID，或填模型文件名直接替换工作流里的 UNETLoader / CheckpointLoaderSimple（Wan 2.2 14B 双模型写成 `高噪声文件|低噪声文件`）
 5. 可选：FPS（留空用模板推荐值或工作流自带值）、步数 / CFG（留空不改工作流；填写后覆盖所有采样节点，两段采样按比例换算分段点）、负向提示词（默认 Wan 官方负向词）、提示词模板
 6. 点「检查工作流」：表格列出每个节点的哪个字段接到了哪个参数、缺少哪些模型文件
 
-**实时进度**：后端订阅 ComfyUI 的 WebSocket（`/ws?clientId=`，提交 `/prompt` 时带同一个 `client_id`），工作台的视频面板、分镜列表和「任务」抽屉实时显示：上传参考图 → 排队位置 → 当前执行的节点 → 第几段采样第几步 → 预计剩余时间 → 解码 / 合成视频 → 下载回 UU889-Drama 的字节进度，并保留一份过程记录。WebSocket 不可用时退回显示排队位置与已等待时长，不影响生成。
+**实时进度**：后端订阅 ComfyUI 的 WebSocket（`/ws?clientId=`，提交 `/prompt` 时带同一个 `client_id`），工作台的视频面板、分镜列表和「任务」抽屉实时显示：上传参考图 → 排队位置 → 当前执行的节点 → 第几段采样第几步 → 预计剩余时间 → 解码 / 合成视频 → 下载回 Hail 短剧 的字节进度，并保留一份过程记录。WebSocket 不可用时退回显示排队位置与已等待时长，不影响生成。
 
 调用流程：`POST /upload/image`（上传工作流用到的参考图）→ `POST /prompt` → 轮询 `GET /history/{prompt_id}` → `GET /view?filename=…` 下载成片。
 
@@ -267,7 +267,7 @@ AI 视频常见的三个问题和对应处理：
 - **本机**（Windows / macOS / Linux）或 **远程 SSH**（Windows / macOS / Linux；macOS 与 Linux 支持账号密码登录和证书（私钥）登录，私钥支持 OpenSSH / PEM / PKCS#8 / PuTTY .ppk）；自动识别 SD WebUI / ComfyUI / Fooocus 安装根目录，也可手动选择
 - 来源顺序：Hugging Face → hf-mirror.com 镜像 → Civitai → Civitai 镜像（CivArchive）；Civitai 模型有 HF 同哈希副本时直接走 HF，不需要 Civitai Key
 - 进度条（总进度 + 每个文件的速度 / 剩余时间 / 当前来源）、断点续传、SHA256 校验、暂停 / 继续 / 取消
-- 后台离线下载：本机关掉页面继续下、程序重启接着下；远程在对方后台运行，关掉 UU889-Drama 也会下完
+- 后台离线下载：本机关掉页面继续下、程序重启接着下；远程在对方后台运行，关掉 Hail 短剧 也会下完
 - 可选「生成时自动下载缺少的模型」：生成前缺什么下什么，下完自动开始生成
 
 ---
@@ -276,7 +276,7 @@ AI 视频常见的三个问题和对应处理：
 
 ### 🖥️ 桌面应用
 
-**下载安装包**：[GitHub Releases](https://github.com/uu889/uu889-drama/releases/latest)（Windows `.exe`、macOS Apple Silicon / Intel `.dmg`）
+**下载安装包**：[GitHub Releases](https://github.com/hailcanto/hail-drama/releases/latest)（Windows `.exe`、macOS Apple Silicon / Intel `.dmg`）
 
 **发布新版本**（GitHub Actions 自动构建 Windows + macOS 双架构，并上传安装包与更新清单 `latest.json`）：
 
@@ -296,13 +296,13 @@ npm run dist        # macOS dmg（arm64 + Intel）+ 更新用 zip
 npm run dist:win    # Windows NSIS 安装器（win-x64）
 
 # 产物
-# desktop/release/UU889Drama-<版本>-arm64.dmg   (Apple Silicon)
-# desktop/release/UU889Drama-<版本>.dmg         (Intel)
-# desktop/release/UU889Drama Setup <版本>.exe   (Windows)
+# desktop/release/HailDrama-<版本>-arm64.dmg   (Apple Silicon)
+# desktop/release/HailDrama-<版本>.dmg         (Intel)
+# desktop/release/HailDrama Setup <版本>.exe   (Windows)
 ```
 
-- 用户数据目录：macOS `~/Library/Application Support/UU889Drama/`，Windows `%APPDATA%\UU889Drama\`（数据库、生成媒体、技能副本），卸载应用不影响数据
-- macOS 未签名包首次打开若提示「已损坏」：双击 dmg 内「如提示已损坏请双击我.command」，或执行 `sudo xattr -cr /Applications/UU889Drama.app`
+- 用户数据目录：macOS `~/Library/Application Support/HailDrama/`，Windows `%APPDATA%\HailDrama\`（数据库、生成媒体、技能副本），卸载应用不影响数据
+- macOS 未签名包首次打开若提示「已损坏」：双击 dmg 内「如提示已损坏请双击我.command」，或执行 `sudo xattr -cr /Applications/HailDrama.app`
 - Windows 未签名包 SmartScreen 会提示「更多信息 → 仍要运行」
 - 应用内更新：已安装的客户端读取最新 Release 的 `latest.json` 自动提示升级；需要国内镜像时可用 `cd desktop && npm run publish`（配置 `COS_BASE_URL` 等）
 - 修改 logo 后执行 `node desktop/scripts/make-brand-icons.mjs`，由 `docs/images/logo.svg` 重新生成全部图标
@@ -323,7 +323,7 @@ server {
     client_max_body_size 100m;
 
     location /static/ {
-        alias /path/to/uu889-drama/data/static/;
+        alias /path/to/hail-drama/data/static/;
         sendfile on;
         expires 1y;
         add_header Cache-Control "public, immutable";
@@ -344,13 +344,15 @@ server {
 
 ```bash
 cp .env.example .env                              # 修改 WATCHTOWER_TOKEN
-UU889_VERSION=1.0.0 docker compose up -d --build  # 访问 http://localhost:5679
+HAIL_VERSION=1.0.0 docker compose up -d --build  # 访问 http://localhost:5679
 ```
 
-- 数据持久化：命名卷 `uu889-data` 挂载 `/app/data`
-- 更新：源码构建时执行 `git pull && UU889_VERSION=<新版本> docker compose up -d --build`
-- 一键更新（可选）：compose 自带 Watchtower，但它需要能从镜像仓库拉取 `image` 指定的镜像。先按下面的命令把镜像发布到你的仓库，并把 `docker-compose.yml` 的 `image` 改成它，「设置 → 关于更新」的「立即更新」才会生效；删除 app 的 `UU889_WATCHTOWER_*` 环境变量即只做新版本提示
-- 发布多架构镜像：`docker buildx build --platform linux/amd64,linux/arm64 --build-arg UU889_VERSION=x.y.z -t <你的仓库>/uu889-drama:x.y.z --push .`，并把 `docker-compose.yml` 的 `image` 改成你的仓库
+- 数据持久化：命名卷 `hail-data` 挂载 `/app/data`
+- 镜像：推送 `v*` 标签后 GitHub Actions 自动发布 `ghcr.io/hailcanto/hail-drama:<版本>` 与 `:latest`（amd64 / arm64）
+- 从 UU889-Drama 升级：先把旧卷 `uu889-data` 复制到新卷（命令见 `docker-compose.yml` 顶部注释），数据库启动时自动改名为 `hail.sqlite3`；旧的 `UU889_*` 环境变量仍然有效
+- 更新：源码构建时执行 `git pull && HAIL_VERSION=<新版本> docker compose up -d --build`
+- 一键更新（可选）：compose 自带 Watchtower，但它需要能从镜像仓库拉取 `image` 指定的镜像。先按下面的命令把镜像发布到你的仓库，并把 `docker-compose.yml` 的 `image` 改成它，「设置 → 关于更新」的「立即更新」才会生效；删除 app 的 `HAIL_WATCHTOWER_*` 环境变量即只做新版本提示
+- 发布多架构镜像：`docker buildx build --platform linux/amd64,linux/arm64 --build-arg HAIL_VERSION=x.y.z -t <你的仓库>/hail-drama:x.y.z --push .`，并把 `docker-compose.yml` 的 `image` 改成你的仓库
 
 ---
 
@@ -364,7 +366,7 @@ UU889_VERSION=1.0.0 docker compose up -d --build  # 访问 http://localhost:5679
 
 **Q: ComfyUI 报 `CLIPLoader … incomplete metadata, file not fully covered`？** 模型文件不完整或已损坏（多为下载中断），报错里会写明是哪个文件、在哪个目录。内置模板对应的是文本编码器：删除 `ComfyUI/models/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors`，从 Hugging Face `Comfy-Org/Wan_2.2_ComfyUI_Repackaged`（`split_files/text_encoders`，6,735,906,897 字节）重新下载后重启 ComfyUI。
 
-**Q: 桌面版数据存在哪里？** `~/Library/Application Support/UU889Drama/data/`（Windows 为 `%APPDATA%\UU889Drama\data\`），开发模式使用仓库 `data/`。
+**Q: 桌面版数据存在哪里？** `~/Library/Application Support/HailDrama/data/`（Windows 为 `%APPDATA%\HailDrama\data\`），开发模式使用仓库 `data/`。
 
 **Q: 页面顶部提示「尚未配置模型」？** 前往「设置」用 aiask.me 快捷配置一键写入，或通过「手动模板」添加；文本、图片、视频三类都有启用的配置后横幅自动消失。
 
@@ -387,7 +389,7 @@ cd ../frontend && npm run generate
 
 ## 📄 许可证与致谢
 
-本项目基于 [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama)（火宝短剧）二次开发，原作者保留其作品版权，完整提交历史保留在本仓库中。
+本项目基于 UU889-Drama 与 [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama)（火宝短剧）二次开发，原作者保留其作品版权，完整提交历史保留在本仓库中。
 
 依照原项目许可证，本项目同样采用 **[CC BY-NC-SA 4.0](LICENSE)**（署名-非商业性使用-相同方式共享 4.0 国际）：
 

@@ -250,8 +250,8 @@ const ScriptBox = defineComponent({
 .sm-style-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12.5px; }
 .sm-key { font-size: 11px; color: var(--text-3); }
 .sm-tag { font-size: 10.5px; padding: 1px 6px; border-radius: 999px; border: 1px solid var(--border); color: var(--text-2); }
-.sm-tag.is-ok { color: var(--success, #30a46c); border-color: currentColor; }
-.sm-tag.is-warn { color: var(--warning, #f59e0b); border-color: currentColor; }
+.sm-tag.is-ok { color: var(--success); border-color: currentColor; }
+.sm-tag.is-warn { color: var(--warning); border-color: currentColor; }
 .sm-files { display: flex; flex-direction: column; gap: 3px; }
 .sm-file { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; font-size: 11.5px; min-width: 0; }
 .sm-file a { color: var(--accent, #6e56cf); text-decoration: none; }
@@ -260,7 +260,7 @@ const ScriptBox = defineComponent({
 .sm-dim { color: var(--text-3); font-size: 11px; }
 .sm-code { font-family: var(--font-mono, ui-monospace, monospace); font-size: 11px; background: var(--bg-1); padding: 0 4px; border-radius: 4px; word-break: break-all; margin-right: 4px; }
 .sm-lic { font-size: 10.5px; padding: 0 6px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
-.lic-ok { color: var(--success, #30a46c); }
+.lic-ok { color: var(--success); }
 .lic-attention { color: var(--warning, #d97706); }
 .lic-restricted { color: var(--danger, #e5484d); }
 .sm-lic-note { margin: 0 0 0 70px; font-size: 11px; line-height: 1.5; }

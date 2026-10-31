@@ -7,8 +7,8 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
-const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-sysv-'))
-process.env.UU889_DATA_DIR = DATA
+const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-sysv-'))
+process.env.HAIL_DATA_DIR = DATA
 process.env.SQLITE_PATH = path.join(DATA, 'test.sqlite3')
 
 const { parseShotDialogue, buildShotDirectives, systemNamesFor, planDialogue } = await import('../src/services/shot-direction')

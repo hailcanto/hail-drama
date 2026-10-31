@@ -5,8 +5,8 @@ import os from 'node:os'
 import path from 'node:path'
 import http from 'node:http'
 
-const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-typewriter-'))
-process.env.UU889_DATA_DIR = DATA
+const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-typewriter-'))
+process.env.HAIL_DATA_DIR = DATA
 process.env.SQLITE_PATH = path.join(DATA, 'test.sqlite3')
 
 const { db, initDb, schema, getInsertId } = await import('../src/db/index')

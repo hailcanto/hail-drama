@@ -1,8 +1,8 @@
-# 🎬 UU889-Drama - AI 숏드라마 제작 플랫폼
+# 🎬 Hail-Drama - AI 숏드라마 제작 플랫폼
 
 <div align="center">
 
-<img src="docs/images/logo.png" alt="UU889-Drama" width="128" />
+<img src="docs/images/logo.png" alt="Hail-Drama" width="128" />
 
 **TypeScript 풀스택 기반 AI 숏드라마 자동 제작 플랫폼**
 
@@ -18,7 +18,7 @@
 
 </div>
 
-> UU889-Drama는 [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama)(화바오 숏드라마)의 포크입니다. 동일한 [CC BY-NC-SA 4.0](LICENSE) 라이선스로 브랜드를 변경하고 aiask.me 텍스트 / 이미지 / 영상 프로바이더, aiask.me Grok 영상, 로컬 ComfyUI 영상 생성을 추가했습니다.
+> Hail-Drama는 UU889-Drama의 포크이며, UU889-Drama는 [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama)(화바오 숏드라마)의 포크입니다. 동일한 [CC BY-NC-SA 4.0](LICENSE) 라이선스로 브랜드를 변경하고 aiask.me 텍스트 / 이미지 / 영상 프로바이더, aiask.me Grok 영상, 로컬 ComfyUI 영상 생성을 추가했습니다.
 
 ## 📖 개요
 
@@ -39,8 +39,8 @@ UI 및 생성 콘텐츠 언어: 中文 / English / 日本語 / 한국어 / Tiế
 Node.js 20+ / npm 9+만 있으면 됩니다(SQLite와 FFmpeg 내장).
 
 ```bash
-git clone https://github.com/uu889/uu889-drama.git
-cd uu889-drama
+git clone https://github.com/hailcanto/hail-drama.git
+cd hail-drama
 cd backend && npm install && npm run dev      # API: http://localhost:5679/api/v1
 cd frontend && npm install && npm run dev     # UI:  http://localhost:3013
 ```
@@ -71,10 +71,10 @@ Grok 영상 파라미터: `duration_seconds`(1–15초), `ratio`(`1:1` `16:9` `9
 
 - **데스크톱**: `npm run build:frontend` 후 `cd desktop && npm install && npm run dist`(macOS) / `npm run dist:win`(Windows)
 - **서버**: `cd frontend && npm run generate && cp -r .output/public dist`, `cd backend && npm start`
-- **Docker**: `cp .env.example .env` 후 `UU889_VERSION=1.0.0 docker compose up -d --build`(데이터는 볼륨 `uu889-data`)
+- **Docker**: `cp .env.example .env` 후 `HAIL_VERSION=1.0.0 docker compose up -d --build`(데이터는 볼륨 `hail-data`)
 
 자세한 내용은 [简体中文 README](README.zh-CN.md) / [English README](README.md)를 참고하세요.
 
 ## 📄 라이선스 및 크레딧
 
-이 프로젝트는 [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama)를 기반으로 하며 원저작자가 저작권을 보유합니다(업스트림 커밋 기록 유지). 업스트림과 동일하게 **[CC BY-NC-SA 4.0](LICENSE)**으로 공개되며, **원저작자의 서면 허가 없는 상업적 이용은 금지**됩니다.
+이 프로젝트는 UU889-Drama와 [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama)를 기반으로 하며 원저작자가 저작권을 보유합니다(업스트림 커밋 기록 유지). 업스트림과 동일하게 **[CC BY-NC-SA 4.0](LICENSE)**으로 공개되며, **원저작자의 서면 허가 없는 상업적 이용은 금지**됩니다.

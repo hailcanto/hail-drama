@@ -10,9 +10,9 @@
  *
  * 产物布局:
  *   GitHub: vX.Y.Z Release(空格文件名自动规范化为点号,见 make-update-feed)
- *   COS:    uu889-drama/vX.Y.Z/<点号文件名> + uu889-drama/latest.json(指向 COS 直链;未配 COS_BASE_URL 时跳过)
+ *   COS:    hail-drama/vX.Y.Z/<点号文件名> + hail-drama/latest.json(指向 COS 直链;未配 COS_BASE_URL 时跳过)
  *
- * 国内镜像(COS_BASE_URL)仅在配置时启用;更新器默认只读 GitHub,用镜像时设 UU889_UPDATE_FEED 指向 COS 的 latest.json。
+ * 国内镜像(COS_BASE_URL)仅在配置时启用;更新器默认只读 GitHub,用镜像时设 HAIL_UPDATE_FEED 指向 COS 的 latest.json。
  */
 import fs from 'fs'
 import path from 'path'
@@ -25,10 +25,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DESKTOP = path.resolve(__dirname, '..')
 const RELEASE = path.join(DESKTOP, 'release')
 
-/** 国内镜像下载基址(如 https://dl.example.com/uu889-drama);未配置则只发布 GitHub */
+/** 国内镜像下载基址(如 https://dl.example.com/hail-drama);未配置则只发布 GitHub */
 const COS_BASE_URL = (process.env.COS_BASE_URL || '').replace(/\/+$/, '')
-const COS_KEY_PREFIX = 'uu889-drama'
-const GITHUB_REPO = process.env.GITHUB_REPO || 'uu889/uu889-drama'
+const COS_KEY_PREFIX = 'hail-drama'
+const GITHUB_REPO = process.env.GITHUB_REPO || 'hailcanto/hail-drama'
 
 const pkg = JSON.parse(fs.readFileSync(path.join(DESKTOP, 'package.json'), 'utf8'))
 const version = pkg.version
@@ -40,13 +40,13 @@ const notes = argOf('--notes') || ''
 const skipGh = argv.includes('--skip-gh')
 
 // 与 make-update-feed 相同的产物清单。注意 electron-builder 的 NSIS 本地产物带空格
-// （UU889Drama Setup X.Y.Z.exe），GitHub 服务端会规范化为点号；COS key/URL 需自行归一化
+// （HailDrama Setup X.Y.Z.exe），GitHub 服务端会规范化为点号；COS key/URL 需自行归一化
 const assets = [
-  `UU889Drama-${version}-arm64.dmg`,
-  `UU889Drama-${version}.dmg`,
-  `UU889Drama-${version}-arm64-mac.zip`,
-  `UU889Drama-${version}-mac.zip`,
-  `UU889Drama Setup ${version}.exe`,
+  `HailDrama-${version}-arm64.dmg`,
+  `HailDrama-${version}.dmg`,
+  `HailDrama-${version}-arm64-mac.zip`,
+  `HailDrama-${version}-mac.zip`,
+  `HailDrama Setup ${version}.exe`,
 ]
 // URL/COS key 使用的规范化文件名（空格 → 点号，与 GitHub 服务端一致）
 const dotName = (f) => f.replace(/ /g, '.')
@@ -108,7 +108,7 @@ if (!COS_BASE_URL) {
   process.exit(0)
 }
 
-// COS 版(桶内固定路径 latest.json,国内镜像入口;更新器需设 UU889_UPDATE_FEED 指向它)
+// COS 版(桶内固定路径 latest.json,国内镜像入口;更新器需设 HAIL_UPDATE_FEED 指向它)
 const cosFeed = await buildFeed(`${COS_BASE_URL}/v${version}`)
 fs.writeFileSync(path.join(RELEASE, 'latest.cos.json'), JSON.stringify(cosFeed, null, 2))
 console.log(`  ✓ latest.json(GitHub) / latest.cos.json(COS) 平台: ${Object.keys(cosFeed.platforms).join(', ')}`)
@@ -130,13 +130,13 @@ console.log(`  ✓ latest.json (no-cache)`)
 const websiteRelease = {
   version,
   downloads: {
-    'darwin-arm64': `${COS_BASE_URL}/${tag}/UU889Drama-${version}-arm64.dmg`,
-    'darwin-x64': `${COS_BASE_URL}/${tag}/UU889Drama-${version}.dmg`,
-    'win32-x64': `${COS_BASE_URL}/${tag}/UU889Drama.Setup.${version}.exe`,
+    'darwin-arm64': `${COS_BASE_URL}/${tag}/HailDrama-${version}-arm64.dmg`,
+    'darwin-x64': `${COS_BASE_URL}/${tag}/HailDrama-${version}.dmg`,
+    'win32-x64': `${COS_BASE_URL}/${tag}/HailDrama.Setup.${version}.exe`,
   },
 }
 const websiteFeedPath = path.join(RELEASE, 'latest.js')
-fs.writeFileSync(websiteFeedPath, `window.uu889DramaRelease(${JSON.stringify(websiteRelease)});\n`)
+fs.writeFileSync(websiteFeedPath, `window.hailDramaRelease(${JSON.stringify(websiteRelease)});\n`)
 await cosPut(websiteFeedPath, `${COS_KEY_PREFIX}/latest.js`, {
   cacheControl: 'no-cache',
   contentType: 'application/javascript; charset=utf-8',

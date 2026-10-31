@@ -5,11 +5,11 @@
       <div class="header-left">
         <button class="brand" @click="navigateTo('/')">
           <div class="brand-mark">
-            <img v-if="showBrandImage" :src="brandLogo" alt="UU889-Drama" class="brand-logo" @error="showBrandImage = false" />
-            <span v-else class="brand-fallback">UU</span>
+            <img v-if="showBrandImage" :src="brandLogo" :alt="t('app.title')" class="brand-logo" @error="showBrandImage = false" />
+            <span v-else class="brand-fallback">H</span>
           </div>
           <div class="brand-text">
-            <span class="brand-name">UU889-Drama</span>
+            <span class="brand-name">{{ t('app.title') }}</span>
             <span class="brand-sub">AI Shorts Studio</span>
           </div>
         </button>
@@ -29,7 +29,7 @@
       <div class="header-right">
         <a
           class="github-link"
-          href="https://github.com/uu889/uu889-drama"
+          href="https://github.com/hailcanto/hail-drama"
           target="_blank"
           rel="noopener"
           aria-label="GitHub"

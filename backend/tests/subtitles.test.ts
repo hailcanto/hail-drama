@@ -7,8 +7,8 @@ import http from 'node:http'
 import { execFileSync } from 'node:child_process'
 
 // 临时数据目录 / 数据库；有系统 ffmpeg 时用它跑真实烧录（必须在导入 ffmpeg 工具之前设置）
-const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-sub-'))
-process.env.UU889_DATA_DIR = DATA
+const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-sub-'))
+process.env.HAIL_DATA_DIR = DATA
 process.env.SQLITE_PATH = path.join(DATA, 'test.sqlite3')
 const SYS_FFMPEG = ['/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg', '/opt/homebrew/bin/ffmpeg'].find((p) => fs.existsSync(p))
 if (SYS_FFMPEG && !process.env.FFMPEG_BIN) {

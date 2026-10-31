@@ -5,12 +5,12 @@
  * - 「看过」标记存服务端 app_settings（tours_seen）：桌面端每次启动端口随机，
  *   localStorage 随 origin 失效，故落库；localStorage 仅作离线兜底缓存
  * - 首次自动弹、帮助按钮随时重看；跳过/完成都算看过
- * - 主题样式沿用设计 token（火焰橙 accent），见 app.vue 内 .driver-theme 覆写
+ * - 主题样式沿用设计 token（翡翠绿 accent），见 app.vue 内 .driver-theme 覆写
  */
 import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
 
-const SEEN_KEY = 'uu889:tours'
+const SEEN_KEY = 'hail:tours'
 
 let seenSet = new Set<string>()
 let hydrated = false
@@ -87,7 +87,7 @@ export function startTour(id: string, steps: TourStep[], t: (key: string) => str
     showProgress: true,
     allowClose: true,
     overlayClickBehavior: 'nextStep',
-    popoverClass: 'uu889-tour-popover',
+    popoverClass: 'hail-tour-popover',
     progressText: '{{current}} / {{total}}',
     nextBtnText: t('tour.next'),
     prevBtnText: t('tour.prev'),

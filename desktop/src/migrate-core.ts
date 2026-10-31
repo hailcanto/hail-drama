@@ -1,7 +1,7 @@
 /**
  * 存储迁移的文件操作（不依赖 Electron，便于测试）
  *
- * - 目标目录：选了已有内容的文件夹（如 D:\ 或某个项目目录）时，自动在里面建 UU889Drama-Data 子目录
+ * - 目标目录：选了已有内容的文件夹（如 D:\ 或某个项目目录）时，自动在里面建 HailDrama-Data 子目录
  * - 同盘判断：用 stat().dev（statfs 没有 dev 字段，旧代码会把所有情况都当成同盘）
  * - 同盘：逐个顶层条目 rename；Windows 上被杀毒 / 索引短暂占用（EPERM / EBUSY / EACCES）时重试，
  *   仍失败就改为复制该条目；中途出错把已经搬过去的条目搬回来，旧目录保持完整
@@ -11,7 +11,7 @@ import * as fs from 'fs'
 import * as fsp from 'fs/promises'
 import * as path from 'path'
 
-export const DATA_SUBDIR = 'UU889Drama-Data'
+export const DATA_SUBDIR = 'HailDrama-Data'
 
 export interface MoveProgress {
   copiedBytes: number
@@ -39,7 +39,7 @@ async function isEmptyDir(dir: string): Promise<boolean> {
 
 /**
  * 用户选的目录 → 实际使用的数据目录。
- * 不存在或是空目录：直接用；已有内容：用其中的 UU889Drama-Data 子目录（该子目录也已有内容时报错）。
+ * 不存在或是空目录：直接用；已有内容：用其中的 HailDrama-Data 子目录（该子目录也已有内容时报错）。
  */
 export async function resolveMigrationTarget(picked: string, currentDir: string, platform = process.platform): Promise<string> {
   const target = path.resolve(picked)
@@ -64,7 +64,7 @@ export async function validateTarget(target: string, currentDir: string, platfor
   else if (!st.isDirectory()) throw new Error('目标路径不是文件夹')
   else if (!(await isEmptyDir(target))) throw new Error('目标文件夹必须为空')
 
-  const probe = path.join(target, `.uu889-probe-${Date.now()}`)
+  const probe = path.join(target, `.hail-probe-${Date.now()}`)
   try {
     await fsp.writeFile(probe, 'probe')
     await fsp.rm(probe, { force: true })
@@ -227,6 +227,50 @@ export async function moveData(oldDir: string, newDir: string, onProgress: (p: M
     throw err
   }
   return (await removeWithRetry(oldDir)) ? {} : { leftover: oldDir }
+}
+
+// ---- 导入改名前（UU889-Drama）的数据 ----
+
+/** 改名前的 userData 目录名（打包版 / dev 版） */
+export const LEGACY_APP_DIRS = { packaged: 'UU889Drama', dev: 'UU889Drama-Dev' } as const
+
+/**
+ * 旧版数据目录：旧 userData 下的 storage-config.json 指向的位置（用户改过存储位置），否则 <旧 userData>/data。
+ * 里面没有 uu889.sqlite3 时返回 null（没用过或已卸载）。
+ */
+export function findLegacyDataDir(legacyUserData: string): string | null {
+  let dir = path.join(legacyUserData, 'data')
+  try {
+    const cfg = JSON.parse(fs.readFileSync(path.join(legacyUserData, 'storage-config.json'), 'utf8'))
+    if (typeof cfg?.dataDir === 'string' && path.isAbsolute(cfg.dataDir)) dir = cfg.dataDir
+  } catch { /* 没有配置或损坏：用默认位置 */ }
+  return fs.existsSync(path.join(dir, 'uu889.sqlite3')) ? dir : null
+}
+
+/**
+ * 复制整个目录（旧目录不动），每个文件核对大小；中途失败删掉已复制的文件。
+ * 数据库文件名留给后端启动时改成 hail.sqlite3（backend/src/db/index.ts adoptLegacyDb）。
+ */
+export async function copyData(oldDir: string, newDir: string, onProgress: (p: MoveProgress) => void = () => {}): Promise<void> {
+  const files = await listFiles(oldDir)
+  const totalBytes = files.reduce((s, f) => s + f.size, 0)
+  const copied: string[] = []
+  let done = 0
+  try {
+    for (const f of files) {
+      const dst = path.join(newDir, f.rel)
+      await fsp.mkdir(path.dirname(dst), { recursive: true })
+      await fsp.copyFile(path.join(oldDir, f.rel), dst)
+      copied.push(dst)
+      const size = (await fsp.stat(dst)).size
+      if (size !== f.size) throw new Error(`复制校验失败：${f.rel}（${size} / ${f.size} 字节）`)
+      done += f.size
+      onProgress({ copiedBytes: done, totalBytes })
+    }
+  } catch (err) {
+    for (const dst of copied) await fsp.rm(dst, { force: true }).catch(() => {})
+    throw err
+  }
 }
 
 /** Electron ipcRenderer.invoke 抛出的错误带「Error invoking remote method 'x': Error: 」前缀，去掉只留原因 */

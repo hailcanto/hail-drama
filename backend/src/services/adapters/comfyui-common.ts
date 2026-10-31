@@ -17,7 +17,7 @@ import { comfyMonitorFor, comfyQueuePosition, describeComfyPromptMeta } from './
 import { stagePercent, type TaskProgressPatch } from '../task-progress'
 
 /** WebSocket 不可用时提交用的 client_id（与进度订阅的 clientId 不同也能正常生成） */
-const COMFYUI_CLIENT_ID = 'uu889-drama'
+const COMFYUI_CLIENT_ID = 'hail-drama'
 
 const NUMERIC_PLACEHOLDERS = new Set(['seed', 'width', 'height', 'duration', 'fps', 'frames', 'length', 'steps', 'cfg'])
 const TEXT_PLACEHOLDERS = new Set(['prompt', 'negative_prompt', 'aspect_ratio', 'resolution', 'model', 'shot_type', 'frame_type'])

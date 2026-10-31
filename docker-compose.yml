@@ -1,30 +1,35 @@
-# UU889-Drama Docker 一体化部署：应用 + Watchtower（自动拉新镜像重建容器，支撑应用内一键更新）
+# Hail 短剧 Docker 一体化部署：应用 + Watchtower（自动拉新镜像重建容器，支撑应用内一键更新）
 #
 # 使用：
 #   1. 复制 .env.example 为 .env 并修改 WATCHTOWER_TOKEN（两端必须一致）
 #   2. docker compose up -d
 #   3. 访问 http://localhost:5679 ，设置页「关于更新」可检查/一键更新
 #
-# 数据持久化在命名卷 uu889-data（SQLite + 生成的图片/视频 + 可在线编辑的 workspace/skills）。
+# 数据持久化在命名卷 hail-data（SQLite + 生成的图片/视频 + 可在线编辑的 workspace/skills）。
+#
+# 从 UU889-Drama 升级：旧数据在卷 uu889-data（docker volume ls 看实际名字，可能带项目名前缀），先复制再启动，
+# 数据库会在启动时自动改名为 hail.sqlite3：
+#   docker volume create hail-drama_hail-data
+#   docker run --rm -v <旧卷名>:/from -v hail-drama_hail-data:/to alpine sh -c "cp -a /from/. /to/"
 
 services:
   app:
-    image: uu889/uu889-drama:latest
+    image: ghcr.io/hailcanto/hail-drama:latest
     build:
       context: .
       args:
-        # 构建时注入版本号（发布镜像时务必指定，如 UU889_VERSION=1.2.0）
-        UU889_VERSION: ${UU889_VERSION:-dev}
+        # 构建时注入版本号（发布镜像时务必指定，如 HAIL_VERSION=1.2.0）
+        HAIL_VERSION: ${HAIL_VERSION:-dev}
     ports:
       - "5679:5679"
     environment:
       # 配置后设置页「关于更新」出现「立即更新」按钮；删除这两行则退化为手动更新提示
-      UU889_WATCHTOWER_URL: http://watchtower:8080
-      UU889_WATCHTOWER_TOKEN: ${WATCHTOWER_TOKEN:-please-change-me}
+      HAIL_WATCHTOWER_URL: http://watchtower:8080
+      HAIL_WATCHTOWER_TOKEN: ${WATCHTOWER_TOKEN:-please-change-me}
       # 发布清单（默认 GitHub Releases latest.json，与桌面版同一份）
-      # UU889_UPDATE_FEED: https://github.com/uu889/uu889-drama/releases/latest/download/latest.json
+      # HAIL_UPDATE_FEED: https://github.com/hailcanto/hail-drama/releases/latest/download/latest.json
     volumes:
-      - uu889-data:/app/data
+      - hail-data:/app/data
     labels:
       # Watchtower --label-enable：只更新显式标记的容器
       com.centurylinklabs.watchtower.enable: "true"
@@ -44,4 +49,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  uu889-data:
+  hail-data:

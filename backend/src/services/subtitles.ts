@@ -355,7 +355,7 @@ export async function burnSubtitles(relativeVideo: string, lines: DialogueLine[]
   const cues = buildSubtitleCues(lines, info.duration || 5, opts, subtitleMaxEm(info.width, info.height, opts.size))
   if (!cues.length) return null
 
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-sub-'))
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-sub-'))
   try {
     const filter = buildDrawtextFilter(cues, opts, {
       width: info.width,

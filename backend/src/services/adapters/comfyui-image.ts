@@ -86,7 +86,7 @@ export class ComfyUIImageAdapter extends ComfyUIClient implements ImageProviderA
       aspect_ratio: `${width}:${height}`,
       frame_type: record.frameType || '',
     }
-    return this.buildPromptRequest(config, template, values, imageSources, `uu889-img-${record.id}`, {
+    return this.buildPromptRequest(config, template, values, imageSources, `hail-img-${record.id}`, {
       kind: 'image',
       ctx,
       bind: {

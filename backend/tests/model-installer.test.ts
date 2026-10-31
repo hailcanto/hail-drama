@@ -8,8 +8,8 @@ import crypto from 'node:crypto'
 import { execFile, spawn } from 'node:child_process'
 
 // 任务记录写到临时数据目录（必须在导入 jobs 之前设置）
-const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-mi-data-'))
-process.env.UU889_DATA_DIR = DATA
+const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-mi-data-'))
+process.env.HAIL_DATA_DIR = DATA
 // 大部分用例测程序内下载器；后台进程下载在下面的「退出程序」用例里单独测
 process.env.MODEL_INSTALLER_DETACHED = '0'
 
@@ -95,7 +95,7 @@ function fakeFile(dir: string, name: string, sources: Array<{ label: any; url: s
 }
 
 test('local download falls back through broken / 404 / html sources, verifies size + sha256, renames', async () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-mi-'))
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-mi-'))
   const job = createJob({
     provider: 'comfyui', serviceType: 'image', styles: ['anime'], root: dir, target: { mode: 'local' }, fsInfo: { os: 'linux', hostname: 'h' },
     files: [fakeFile(dir, 'a.safetensors', [
@@ -108,12 +108,12 @@ test('local download falls back through broken / 404 / html sources, verifies si
   assert.equal(done.status, 'done', JSON.stringify(publicJob(done).items[0].log))
   const out = fs.readFileSync(path.join(dir, 'a.safetensors'))
   assert.equal(crypto.createHash('sha256').update(out).digest('hex'), SHA)
-  assert.ok(!fs.existsSync(path.join(dir, 'a.safetensors.uu889part')))
+  assert.ok(!fs.existsSync(path.join(dir, 'a.safetensors.hailpart')))
   assert.equal(done.items[0].sourceLabel, 'civitai')
 })
 
 test('local download resumes with Range after the connection drops', async () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-mi-'))
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-mi-'))
   rangeHits = 0
   cutNext = 1024 * 1024
   const job = createJob({
@@ -127,7 +127,7 @@ test('local download resumes with Range after the connection drops', async () =>
 })
 
 test('wrong sha256 is rejected and the file is not installed', async () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-mi-'))
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-mi-'))
   const job = createJob({
     provider: 'fooocus', serviceType: 'image', styles: ['anime'], root: dir, target: { mode: 'local' }, fsInfo: { os: 'linux', hostname: 'h' },
     files: [fakeFile(dir, 'c.safetensors', [{ label: 'huggingface', url: `${base}/ok/c` }], { sha256: 'f'.repeat(64) })],
@@ -139,13 +139,13 @@ test('wrong sha256 is rejected and the file is not installed', async () => {
 })
 
 test('pause keeps the partial file and resume continues from it', async () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-mi-'))
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-mi-'))
   rangeHits = 0
   const job = createJob({
     provider: 'comfyui', serviceType: 'video', styles: ['anime'], root: dir, target: { mode: 'local' }, fsInfo: { os: 'linux', hostname: 'h' },
     files: [fakeFile(dir, 'd.safetensors', [{ label: 'huggingface', url: `${base}/slow/d` }])],
   })
-  const part = path.join(dir, 'd.safetensors.uu889part')
+  const part = path.join(dir, 'd.safetensors.hailpart')
   const t0 = Date.now()
   while ((!fs.existsSync(part) || fs.statSync(part).size < 256 * 1024) && Date.now() - t0 < 10_000) await new Promise((r) => setTimeout(r, 20))
   await pauseJob(job.id)
@@ -164,7 +164,7 @@ test('pause keeps the partial file and resume continues from it', async () => {
 })
 
 test('existing complete file is skipped; duplicate jobs for the same file are refused', async () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-mi-'))
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-mi-'))
   fs.writeFileSync(path.join(dir, 'e.safetensors'), PAYLOAD)
   const job = createJob({
     provider: 'comfyui', serviceType: 'image', styles: ['anime'], root: dir, target: { mode: 'local' }, fsInfo: { os: 'linux', hostname: 'h' },
@@ -184,12 +184,12 @@ test('existing complete file is skipped; duplicate jobs for the same file are re
 })
 
 test('remote POSIX script: fallback, resume, size + sha checks, status log', async () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-mi-sh-'))
-  const jobDir = path.join(dir, '.uu889-downloads', 'uu889dl-t1')
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-mi-sh-'))
+  const jobDir = path.join(dir, '.hail-downloads', 'haildl-t1')
   fs.mkdirSync(jobDir, { recursive: true })
   // 预先放一段已下载的部分，验证续传
   fs.mkdirSync(path.join(dir, 'models', 'loras'), { recursive: true })
-  fs.writeFileSync(path.join(dir, 'models', 'loras', 'x.safetensors.uu889part'), PAYLOAD.subarray(0, 500_000))
+  fs.writeFileSync(path.join(dir, 'models', 'loras', 'x.safetensors.hailpart'), PAYLOAD.subarray(0, 500_000))
   fs.writeFileSync(path.join(dir, 'models', 'loras', 'skip.safetensors'), PAYLOAD)
   const items = [
     { dest: path.join(dir, 'models', 'loras', 'x.safetensors'), bytes: PAYLOAD.length, sha256: SHA, sources: [{ label: 'huggingface', url: `${base}/broken/x` }, { label: 'hf-mirror', url: `${base}/ok/x` }] },
@@ -220,12 +220,12 @@ test('remote POSIX script: fallback, resume, size + sha checks, status log', asy
 })
 
 test('PowerShell script: BOM, quoting, flat source arrays', () => {
-  const ps = buildPowerShellScript('t2', "C:\\Users\\张三\\ComfyUI\\.uu889-downloads\\uu889dl-t2", [
+  const ps = buildPowerShellScript('t2', "C:\\Users\\张三\\ComfyUI\\.hail-downloads\\haildl-t2", [
     { dest: "C:\\Users\\张三\\ComfyUI\\models\\loras\\it's.safetensors", bytes: 10, sha256: 'ab', sources: [{ label: 'huggingface', url: 'https://huggingface.co/a/b/resolve/main/c?x=1' }, { label: 'civitai', url: 'https://civitai.com/api/download/models/1?token=t' }] },
   ])
   assert.ok(ps.startsWith('\ufeff'))
   assert.match(ps, /Dl 0 'C:\\Users\\张三\\ComfyUI\\models\\loras\\it''s\.safetensors' 10 'ab' @\('huggingface', 'https:\/\/huggingface\.co\/a\/b\/resolve\/main\/c\?x=1', '', 'civitai', 'https:\/\/civitai\.com\/api\/download\/models\/1\?token=t', ''\)/)
-  assert.match(ps, /uu889dl-t2/)
+  assert.match(ps, /haildl-t2/)
 })
 
 test('status log parser handles BOM, retries and unknown lines', () => {
@@ -245,7 +245,7 @@ test('root detection: markers, layout per program, scan finds nested installs', 
   assert.equal(identifyRoot(new Set(['entry_with_update.py', 'modules']))?.flavor, 'Fooocus')
   assert.equal(identifyRoot(new Set(['README.md'])), null)
 
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-home-'))
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-home-'))
   const comfy = path.join(home, 'AI', 'ComfyUI')
   for (const d of ['comfy', 'models']) fs.mkdirSync(path.join(comfy, d), { recursive: true })
   fs.writeFileSync(path.join(comfy, 'main.py'), '')
@@ -292,7 +292,7 @@ test('plan: files per style, dedupe, template base files + 14B LoRA only, states
   assert.ok(offVid.files.some((f) => f.role === 'diffusion_models'))
   assert.equal(buildPlanFiles({ provider: 'sdwebui', serviceType: 'image', styles: ['3d'], settings: { style_models_enabled: false } }).files.length, 0)
 
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-comfy-'))
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-comfy-'))
   for (const d of ['comfy', 'models/checkpoints']) fs.mkdirSync(path.join(root, d), { recursive: true })
   fs.writeFileSync(path.join(root, 'main.py'), '')
   fs.writeFileSync(path.join(root, 'models', 'checkpoints', 'animagine-xl-4.0-opt.safetensors'), Buffer.alloc(2 * 1024 * 1024))
@@ -350,7 +350,7 @@ test('every default catalog file has verified sha256; HF files have exact sizes'
 test('generation hook: missing style models are downloaded first (progress reported), then generation continues', async () => {
   const { ensureStyleModelsForTask } = await import('../src/services/model-installer/index')
   const { FILE_META } = await import('../src/services/model-installer/sources')
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-auto-'))
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-auto-'))
   for (const d of ['comfy', 'models/checkpoints', 'models/loras']) fs.mkdirSync(path.join(root, d), { recursive: true })
   fs.writeFileSync(path.join(root, 'main.py'), '')
   // 推荐清单里的文件指向模拟服务器（大小 / 哈希按模拟数据）
@@ -385,7 +385,7 @@ test('generation hook: concurrent tasks with different styles share the base che
   const { ensureStyleModelsForTask } = await import('../src/services/model-installer/index')
   const { listJobs } = await import('../src/services/model-installer/jobs')
   const { FILE_META } = await import('../src/services/model-installer/sources')
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-auto2-'))
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-auto2-'))
   for (const d of ['comfy', 'models/checkpoints', 'models/loras']) fs.mkdirSync(path.join(root, d), { recursive: true })
   fs.writeFileSync(path.join(root, 'main.py'), '')
   const names = ['sd_xl_base_1.0.safetensors', 'watercolor_v1_sdxl.safetensors', 'comic-ink-halftone.safetensors']
@@ -426,13 +426,13 @@ test('generation hook: concurrent tasks with different styles share the base che
 
 const JOBS_MODULE = path.resolve('src/services/model-installer/jobs.ts')
 
-/** 在单独的进程里跑一段代码，模拟一次「打开 UU889-Drama」（kill 它 = 退出程序） */
+/** 在单独的进程里跑一段代码，模拟一次「打开 Hail 短剧」（kill 它 = 退出程序） */
 function appProcess(dataDir: string, code: string) {
-  const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-app-')), 'app.mts')
+  const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'hail-app-')), 'app.mts')
   fs.writeFileSync(file, `const J = await import(${JSON.stringify(JOBS_MODULE)})\n${code}`)
   const child = spawn(process.execPath, ['--import', 'tsx', file], {
     cwd: process.cwd(),
-    env: { ...process.env, UU889_DATA_DIR: dataDir, MODEL_INSTALLER_DETACHED: '1', NO_PROXY: '*', no_proxy: '*' },
+    env: { ...process.env, HAIL_DATA_DIR: dataDir, MODEL_INSTALLER_DETACHED: '1', NO_PROXY: '*', no_proxy: '*' },
     stdio: ['ignore', 'pipe', 'pipe'],
   })
   let out = ''
@@ -464,9 +464,9 @@ J.resumeJobsOnStartup()
 const iv = setInterval(() => { const j = J.listJobs()[0]; if (j.status !== 'running' && j.status !== 'queued') { clearInterval(iv); console.log('STATUS=' + j.status + ' MSG=' + (j.message || '') + ' ERR=' + (j.error || '')); process.exit(0) } }, 200)
 `
 
-test('quitting UU889-Drama mid-download: local download keeps running in the background and the next start sees it finished', { skip: process.platform === 'win32' }, async () => {
-  const data = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-quit-data-'))
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-quit-root-'))
+test('quitting Hail-Drama mid-download: local download keeps running in the background and the next start sees it finished', { skip: process.platform === 'win32' }, async () => {
+  const data = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-quit-data-'))
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-quit-root-'))
   const dest = path.join(root, 'models', 'checkpoints', 'q.safetensors')
   const app1 = appProcess(data, createSlowJobCode(root, 'q.safetensors'))
   await app1.waitFor(/LAUNCHED/)
@@ -486,8 +486,8 @@ test('quitting UU889-Drama mid-download: local download keeps running in the bac
 })
 
 test('download process killed (e.g. computer restarted): next start resumes automatically from the partial file', { skip: process.platform === 'win32' }, async () => {
-  const data = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-reboot-data-'))
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-reboot-root-'))
+  const data = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-reboot-data-'))
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-reboot-root-'))
   const dest = path.join(root, 'models', 'checkpoints', 'r.safetensors')
   const app1 = appProcess(data, createSlowJobCode(root, 'r.safetensors'))
   await app1.waitFor(/LAUNCHED/)
@@ -500,8 +500,8 @@ test('download process killed (e.g. computer restarted): next start resumes auto
   const pid = Number(fs.readFileSync(path.join(jobDir, 'pid'), 'utf8').trim())
   process.kill(-pid, 'SIGKILL')
   await new Promise((r) => setTimeout(r, 300))
-  const partBytes = fs.statSync(`${dest}.uu889part`).size
-  assert.ok(partBytes > 0 && partBytes < PAYLOAD.length, `留下了没下完的 .uu889part（${partBytes}）`)
+  const partBytes = fs.statSync(`${dest}.hailpart`).size
+  assert.ok(partBytes > 0 && partBytes < PAYLOAD.length, `留下了没下完的 .hailpart（${partBytes}）`)
   assert.ok(!fs.existsSync(dest), '没下完的文件不会出现在正式文件名下')
   // 模拟过了一段时间（跳过启动后 20 秒的宽限）
   saved[0].remote.launchedAt = 0
@@ -510,7 +510,7 @@ test('download process killed (e.g. computer restarted): next start resumes auto
   const app2 = appProcess(data, RESUME_CODE)
   const line = await app2.waitFor(/STATUS=\S+ MSG=[^\n]*/, 60_000)
   assert.match(line, /^STATUS=done/, app2.output())
-  assert.ok(rangeHits >= 1, '从 .uu889part 断点续传，而不是从头下')
+  assert.ok(rangeHits >= 1, '从 .hailpart 断点续传，而不是从头下')
   assert.equal(crypto.createHash('sha256').update(fs.readFileSync(dest)).digest('hex'), SHA)
   assert.ok(!fs.existsSync(path.join(jobDir, 'run.sh')), '下完后删掉脚本（里面可能有 Token）')
 })
@@ -518,7 +518,7 @@ test('download process killed (e.g. computer restarted): next start resumes auto
 test('generation waits for a model that is still downloading even when auto-download is off', async () => {
   const { ensureStyleModelsForTask } = await import('../src/services/model-installer/index')
   const { FILE_META } = await import('../src/services/model-installer/sources')
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-manual-'))
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-manual-'))
   for (const d of ['comfy', 'models/checkpoints', 'models/loras']) fs.mkdirSync(path.join(root, d), { recursive: true })
   fs.writeFileSync(path.join(root, 'main.py'), '')
   const name = 'watercolor_v1_sdxl.safetensors'
@@ -546,7 +546,7 @@ test('generation waits for a model that is still downloading even when auto-down
 })
 
 test('background script: unknown-size files under 1 MB are not accepted as models', async () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-mi-small-'))
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-mi-small-'))
   const jobDir = path.join(dir, 'job')
   fs.mkdirSync(jobDir, { recursive: true })
   fs.writeFileSync(path.join(dir, 'tiny.safetensors'), 'oops')

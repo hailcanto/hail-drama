@@ -2131,7 +2131,7 @@ function isSystemVoiceCharacter(char) {
 
 // 工作台面板位置记忆（按剧集隔离）：仅页面刷新(reload)时恢复到上次所在步骤；
 // 从列表/详情页点击进入时始终默认「剧本」面板
-const PANEL_STORE_KEY = `uu889:workbench:panel:${dramaId}:${episodeNumber}`
+const PANEL_STORE_KEY = `hail:workbench:panel:${dramaId}:${episodeNumber}`
 const isPageReload = (() => {
   try { return performance.getEntriesByType('navigation')[0]?.type === 'reload' } catch { return false }
 })()
@@ -2188,7 +2188,7 @@ async function loadExportMerges() {
 }
 
 // ===== 拼接导出的背景音乐（曲库在后端 static/bgm，选择与音量等记在本机）=====
-const BGM_STORE_KEY = 'uu889:merge-bgm'
+const BGM_STORE_KEY = 'hail:merge-bgm'
 const BGM_DEFAULTS = { enabled: false, path: '', volume: 30, duck: true, fade: true }
 function readBgmPrefs() {
   try {
@@ -2207,7 +2207,7 @@ function readBgmPrefs() {
   return { ...BGM_DEFAULTS }
 }
 // ===== 片头 / 封面（每个项目一套：封面图统一，标题默认用「第 N 集 · 集标题」）=====
-const INTRO_STORE_KEY = `uu889:merge-intro:${dramaId}`
+const INTRO_STORE_KEY = `hail:merge-intro:${dramaId}`
 const INTRO_STYLE_DEFAULTS = { font: '', size: 1, color: '#FFFFFF', box: true, shadow: true, y: 0.7 }
 const INTRO_DEFAULTS = { enabled: false, image: '', showTitle: true, showDrama: true, duration: 2, ...INTRO_STYLE_DEFAULTS }
 const INTRO_COLORS = ['#FFFFFF', '#FFD84D', '#FF5A4E', '#7FD3FF', '#111111']
@@ -2290,7 +2290,7 @@ const loadedFontFaces = new Set()
 function introFontFamily(f) {
   if (!f) return ''
   if (f.url) {
-    const name = `uu889-intro-${f.id.replace(/[^a-z0-9]/gi, '')}`
+    const name = `hail-intro-${f.id.replace(/[^a-z0-9]/gi, '')}`
     if (!loadedFontFaces.has(name) && typeof FontFace !== 'undefined') {
       loadedFontFaces.add(name)
       new FontFace(name, `url("${f.url}")`).load().then(face => document.fonts.add(face)).catch(() => {})
@@ -2432,7 +2432,7 @@ watch([panel, scriptStep, prodTab], ([p, s, pt]) => {
   try { localStorage.setItem(PANEL_STORE_KEY, JSON.stringify({ panel: p, scriptStep: s, prodTab: pt })) } catch { /* 静默 */ }
 })
 // ===== 视频制作三栏宽度：拖拽调节 + 全局持久化（双击分隔条恢复默认） =====
-const VIDEO_COL_STORE_KEY = 'uu889:workbench:video-cols'
+const VIDEO_COL_STORE_KEY = 'hail:workbench:video-cols'
 const VIDEO_COL_DEFAULTS = { left: 236, right: 340 }
 const VIDEO_COL_LIMITS = { left: [180, 420], right: [260, 560] }
 const storedVideoCols = (() => {
@@ -2480,12 +2480,12 @@ const imageConfigs = ref([])
 const videoConfigs = ref([])
 const textConfigs = ref([])
 // 生成时可选模型：空串 = 跟随配置默认（models[0]）；选择持久化到 localStorage，刷新页面后保留
-const MODEL_STORE_KEYS = { chat: 'uu889:model:chat', image: 'uu889:model:image', video: 'uu889:model:video' }
+const MODEL_STORE_KEYS = { chat: 'hail:model:chat', image: 'hail:model:image', video: 'hail:model:video' }
 function readStoredModel(key, legacyKey = '') {
   try { return localStorage.getItem(key) || (legacyKey && localStorage.getItem(legacyKey)) || '' } catch { return '' }
 }
 // 顶栏文本模型：适用于所有 Chat Agent 调用（改写/提取/拆镜/视频提示词/最终提示词），空串 = 跟随配置默认
-const chatModel = ref(readStoredModel(MODEL_STORE_KEYS.chat, 'uu889:model:rewrite'))
+const chatModel = ref(readStoredModel(MODEL_STORE_KEYS.chat, 'hail:model:rewrite'))
 const imageModel = ref(readStoredModel(MODEL_STORE_KEYS.image))
 const videoModel = ref(readStoredModel(MODEL_STORE_KEYS.video))
 function persistModel(modelRef, key) {
@@ -2497,7 +2497,7 @@ persistModel(chatModel, MODEL_STORE_KEYS.chat)
 persistModel(imageModel, MODEL_STORE_KEYS.image)
 persistModel(videoModel, MODEL_STORE_KEYS.video)
 // 左侧菜单栏收起/展开：收起为窄图标栏给内容区让位，持久化到 localStorage
-const SIDEBAR_COLLAPSED_KEY = 'uu889:sidebar-collapsed'
+const SIDEBAR_COLLAPSED_KEY = 'hail:sidebar-collapsed'
 const sidebarCollapsed = ref((() => {
   try { return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1' } catch { return false }
 })())
@@ -3117,7 +3117,7 @@ function retryFailedVideos() {
 }
 
 // ===== 视频高清化（768p / 720p → 1080p 等）：AI 超分（ComfyUI 放大模型）或快速放大（FFmpeg） =====
-const UPSCALE_STORE_KEY = 'uu889:upscale'
+const UPSCALE_STORE_KEY = 'hail:upscale'
 function readUpscalePrefs() {
   try {
     const v = JSON.parse(localStorage.getItem(UPSCALE_STORE_KEY) || 'null')
@@ -3182,7 +3182,7 @@ async function confirmUpscale() {
   }
 }
 // 批量生成方式：sequential = 按镜头顺序一个出片再交下一个，某镜失败后面全部暂停；parallel = 同时提交（接戏镜头仍按场景串链）
-const BATCH_MODE_KEY = 'uu889:batch-video-mode'
+const BATCH_MODE_KEY = 'hail:batch-video-mode'
 const batchVideoMode = ref((() => { try { return localStorage.getItem(BATCH_MODE_KEY) === 'parallel' ? 'parallel' : 'sequential' } catch { return 'sequential' } })())
 watch(batchVideoMode, v => { try { localStorage.setItem(BATCH_MODE_KEY, v) } catch { /* 静默 */ } })
 
@@ -3840,7 +3840,7 @@ function doRewrite() {
 }
 
 // ===== 改写方式：打字机（默认，边生成边显示）/ 一次性出剧本（Agent 写完再保存） =====
-const REWRITE_MODE_KEY = 'uu889:rewrite-mode'
+const REWRITE_MODE_KEY = 'hail:rewrite-mode'
 const REWRITE_MODES = [
   { key: 'typewriter', label: 'episode.script.modeTypewriter', hint: 'episode.script.modeTypewriterHint' },
   { key: 'oneshot', label: 'episode.script.modeOneShot', hint: 'episode.script.modeOneShotHint' },
@@ -4711,7 +4711,7 @@ function uploadAssetImage(kind, id) {
 }
 
 // ===== 镜头导演：台词控制 / 人物场景画风锁定 / 接戏 =====
-const DIRECTION_STORE_KEY = 'uu889:video-direction'
+const DIRECTION_STORE_KEY = 'hail:video-direction'
 const DIRECTION_DEFAULTS = { dialogue_lock: true, appearance_lock: true, continuity: true, chain_previous: true, physics_lock: true, quality_lock: true }
 function readDirectionPrefs() {
   try { return { ...DIRECTION_DEFAULTS, ...(JSON.parse(localStorage.getItem(DIRECTION_STORE_KEY) || 'null') || {}) } } catch { return { ...DIRECTION_DEFAULTS } }
@@ -4721,7 +4721,7 @@ watch(videoDirection, v => { try { localStorage.setItem(DIRECTION_STORE_KEY, JSO
 
 // ===== 字幕：生成视频后把分镜台词烧进画面（后端 services/subtitles.ts） =====
 const SUBTITLE_STYLES = ['classic', 'yellow', 'box', 'shadow', 'pink']
-const SUBTITLE_STORE_KEY = 'uu889:video-subtitle'
+const SUBTITLE_STORE_KEY = 'hail:video-subtitle'
 const SUBTITLE_DEFAULTS = { enabled: false, style: 'classic', size: 'medium', position: 'bottom', speaker: false }
 function readSubtitlePrefs() {
   try { return { ...SUBTITLE_DEFAULTS, ...(JSON.parse(localStorage.getItem(SUBTITLE_STORE_KEY) || 'null') || {}) } } catch { return { ...SUBTITLE_DEFAULTS } }

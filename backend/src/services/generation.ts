@@ -1102,8 +1102,8 @@ function downloadReporter(id: number, label: string) {
       stage: 'downloading',
       percent: total ? stagePercent('downloading', downloaded / total) : undefined,
       message: total
-        ? `下载${label}回 UU889-Drama：${formatBytes(downloaded)} / ${formatBytes(total)}（${Math.round((downloaded / total) * 100)}%）${speed ? `，${formatBytes(speed)}/s` : ''}${eta && eta > 1 ? `，约 ${formatEta(eta)}` : ''}`
-        : `下载${label}回 UU889-Drama：已接收 ${formatBytes(downloaded)}`,
+        ? `下载${label}回 Hail 短剧：${formatBytes(downloaded)} / ${formatBytes(total)}（${Math.round((downloaded / total) * 100)}%）${speed ? `，${formatBytes(speed)}/s` : ''}${eta && eta > 1 ? `，约 ${formatEta(eta)}` : ''}`
+        : `下载${label}回 Hail 短剧：已接收 ${formatBytes(downloaded)}`,
       detail: { downloaded_bytes: downloaded, total_bytes: total ?? undefined, eta_seconds: eta ? Math.round(eta) : undefined },
       replaceDetail: true,
     })

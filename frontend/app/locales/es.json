@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "UU889-Drama",
+    "title": "Hail-Drama",
     "updateAvailable": "Nueva versión v{version} disponible. Actualiza en Configuración → Acerca de."
   },
   "common": {
@@ -439,13 +439,13 @@
         "copyToEditor": "Copiar al editor para modificar",
         "overwriteConfirm": "¿Reemplazar el workflow del editor por esta plantilla?",
         "workflowEmpty": "Elegiste «Workflow propio» pero el editor está vacío",
-        "exportHint": "Funciona sin marcadores: con la vinculación automática, UU889-Drama conecta prompt, imágenes, tamaño… según la estructura de nodos.",
+        "exportHint": "Funciona sin marcadores: con la vinculación automática, Hail-Drama conecta prompt, imágenes, tamaño… según la estructura de nodos.",
         "autoBind": "Vinculación automática (recomendado)",
-        "autoBindHint": "Encuentra el prompt positivo / negativo, fotogramas inicial / final / referencias (LoadImage), semilla, ancho / alto, fotogramas, FPS y modelo de difusión, y usa los valores de UU889-Drama.",
-        "autoBindHintImage": "Encuentra el prompt, referencias (LoadImage), semilla, ancho / alto y checkpoint, y usa los valores de UU889-Drama.",
+        "autoBindHint": "Encuentra el prompt positivo / negativo, fotogramas inicial / final / referencias (LoadImage), semilla, ancho / alto, fotogramas, FPS y modelo de difusión, y usa los valores de Hail-Drama.",
+        "autoBindHintImage": "Encuentra el prompt, referencias (LoadImage), semilla, ancho / alto y checkpoint, y usa los valores de Hail-Drama.",
         "fromWorkflow": "del workflow",
         "inspect": "Revisar workflow",
-        "inspectTitle": "Así controlará UU889-Drama este workflow",
+        "inspectTitle": "Así controlará Hail-Drama este workflow",
         "colNode": "Nodo",
         "colField": "Campo",
         "colTarget": "Parámetro",
@@ -499,7 +499,7 @@
         "presetApplied": "Ajuste aplicado: {name}",
         "promptTemplate": "Plantilla de prompt",
         "promptTemplatePlaceholder": "p. ej. masterpiece, best quality, {ph}",
-        "promptTemplateHint": "El prompt de UU889-Drama se inserta en {ph}; sin {ph} se antepone; vacío = se envía tal cual.",
+        "promptTemplateHint": "El prompt de Hail-Drama se inserta en {ph}; sin {ph} se antepone; vacío = se envía tal cual.",
         "preview": "Vista previa:",
         "samplePrompt": "una chica con capa roja en la cima nevada, mira atrás a la cámara",
         "translate": "Traducir prompts no ingleses al inglés",
@@ -1477,7 +1477,7 @@
     "helpTitle": "Guía",
     "index": {
       "welcome": {
-        "title": "👋 Te damos la bienvenida a UU889-Drama",
+        "title": "👋 Te damos la bienvenida a Hail-Drama",
         "desc": "Novela → guion → recursos → storyboard → video → montaje final, todo en un solo lugar. Configura primero los servicios de IA y luego crea tu primer proyecto."
       },
       "create": {

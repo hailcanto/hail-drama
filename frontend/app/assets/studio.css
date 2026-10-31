@@ -1,48 +1,48 @@
-/* === UU889-Drama Studio — 暖橙主题色 × 现代 SaaS (light / dark) === */
+/* === Hail 短剧 Studio — 翡翠绿主题色：亮色白绿 / 暗色黑绿 === */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --surface-base: #f7f8fa;
+  --surface-base: #f5f9f7;
   --surface-raised: #ffffff;
-  --surface-muted: #f7f8fa;
-  --surface-soft: #fafbfc;
+  --surface-muted: #f5f9f7;
+  --surface-soft: #f9fcfa;
   --surface-input: #ffffff;
-  --surface-outline: #e7e9ee;
-  --surface-outline-strong: #d6dae1;
+  --surface-outline: #e1ebe5;
+  --surface-outline-strong: #cddcd3;
 
   --bg-base: var(--surface-base);
-  --bg-0: #fafbfc;
+  --bg-0: #f9fcfa;
   --bg-1: #ffffff;
-  --bg-2: #f1f3f6;
-  --bg-3: #e7e9ee;
-  --bg-hover: rgba(23,24,26,0.045);
-  --bg-active: rgba(23,24,26,0.07);
+  --bg-2: #ecf3ef;
+  --bg-3: #e1ebe5;
+  --bg-hover: rgba(15,40,28,0.045);
+  --bg-active: rgba(15,40,28,0.07);
   --bg-input: var(--surface-input);
   --bg-surface: var(--surface-raised);
 
-  --border: #e7e9ee;
-  --border-strong: #d6dae1;
-  --border-focus: #f97316;
+  --border: #e1ebe5;
+  --border-strong: #cddcd3;
+  --border-focus: #059669;
 
-  --text-0: #17181a;
-  --text-1: #3a3f47;
-  --text-2: #5c6370;
-  --text-3: #9aa1ad;
+  --text-0: #0f1a14;
+  --text-1: #34433b;
+  --text-2: #5b6b62;
+  --text-3: #93a39a;
 
-  /* 暖橙主题色（与 logo 渐变末端一致） */
-  --accent: #f97316;
-  --accent-dark: #c2410c;
-  --accent-bg: rgba(249,115,22,0.10);
-  --accent-text: #ea580c;
-  --accent-glow: rgba(249,115,22,0.20);
-  --accent-gradient: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+  /* 翡翠绿主题色（与 logo 的 H 同色系）；成功色用草绿，和主色分开 */
+  --accent: #059669;
+  --accent-dark: #065f46;
+  --accent-bg: rgba(5,150,105,0.10);
+  --accent-text: #047857;
+  --accent-glow: rgba(5,150,105,0.20);
+  --accent-gradient: linear-gradient(135deg, #059669 0%, #10b981 100%);
 
-  --action-primary: #f97316;
-  --action-primary-hover: #ea580c;
-  --action-primary-press: #c2410c;
+  --action-primary: #059669;
+  --action-primary-hover: #047857;
+  --action-primary-press: #065f46;
   --action-primary-text: #ffffff;
-  --action-secondary: #e8eaee;
-  --action-secondary-hover: #dcdfe5;
+  --action-secondary: #e6eee9;
+  --action-secondary-hover: #d9e4dd;
   --action-danger: #dc2626;
   --action-danger-bg: rgba(220,38,38,0.10);
   --action-danger-solid-hover: #b91c1c;
@@ -52,14 +52,14 @@
   --button-height-icon: 36px;
   --button-padding-x: 18px;
   --button-radius: var(--radius-pill);
-  --button-bg: #e8eaee;
-  --button-bg-hover: #dcdfe5;
-  --button-bg-active: #d0d4db;
+  --button-bg: #e6eee9;
+  --button-bg-hover: #d9e4dd;
+  --button-bg-active: #cbd9d0;
   --button-border: transparent;
   --button-border-hover: transparent;
   --button-text: var(--text-0);
   --button-text-hover: var(--text-0);
-  --button-focus: rgba(249,115,22,0.20);
+  --button-focus: rgba(5,150,105,0.20);
   --button-shadow: 0 1px 2px rgba(16,24,40,0.05);
   --button-shadow-hover: 0 1px 2px rgba(16,24,40,0.05);
 
@@ -67,8 +67,8 @@
   --panel-border: var(--surface-outline);
   --shadow-panel: 0 1px 2px rgba(16,24,40,0.05), 0 4px 14px rgba(16,24,40,0.08);
 
-  --success: #16a34a;
-  --success-bg: rgba(22,163,74,0.10);
+  --success: #65a30d;
+  --success-bg: rgba(101,163,13,0.12);
   --error: #dc2626;
   --error-bg: rgba(220,38,38,0.10);
   --info: #2563eb;
@@ -116,22 +116,22 @@
   --on-accent: #ffffff;
   --on-media: rgba(255,255,255,0.85);
   --scrim: rgba(15,23,42,0.45);
-  --header-bg: rgba(247,248,250,0.75);
-  --inverse-surface: #17181a;
+  --header-bg: rgba(245,249,247,0.75);
+  --inverse-surface: #0f1a14;
   --on-inverse: #ffffff;
   /* 视频播放/预览区固定深底（两主题一致，深色块不覆写） */
-  --media-surface: #0b0d10;
-  --scrollbar-thumb: rgba(92,99,112,0.28);
-  --scrollbar-thumb-hover: rgba(92,99,112,0.42);
-  --border-hover: #c3c9d2;
-  --switch-bg: #e8eaee;
+  --media-surface: #080c0a;
+  --scrollbar-thumb: rgba(91,107,98,0.28);
+  --scrollbar-thumb-hover: rgba(91,107,98,0.42);
+  --border-hover: #bccfc4;
+  --switch-bg: #e6eee9;
   --action-danger-bg-hover: rgba(220,38,38,0.16);
   --warn-text: #92400e;
   --warn-bg: #fffbeb;
   --warn-border: #fde68a;
   --warn-link: #b45309;
   --warn-link-hover-bg: #fef3c7;
-  --tag-success-text: #15803d;
+  --tag-success-text: #4d7c0f;
   --tag-info-text: #1d4ed8;
   --tag-warning-text: #b45309;
   --accent-purple: #6366f1;
@@ -146,59 +146,59 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  /* gateway 石板蓝灰暗色（区别于纯黑，带 slate 蓝调） */
-  --surface-base: #0b0f16;
-  --surface-raised: #131a24;
-  --surface-muted: #131a24;
-  --surface-soft: #0e141d;
-  --surface-input: #131a24;
-  --surface-outline: rgba(148,163,184,0.14);
-  --surface-outline-strong: rgba(148,163,184,0.28);
+  /* 黑绿暗色（近黑，带一点绿调） */
+  --surface-base: #0a0f0d;
+  --surface-raised: #111814;
+  --surface-muted: #111814;
+  --surface-soft: #0d1310;
+  --surface-input: #111814;
+  --surface-outline: rgba(134,180,155,0.14);
+  --surface-outline-strong: rgba(134,180,155,0.28);
 
-  --bg-0: #0e141d;
-  --bg-1: #131a24;
-  --bg-2: #182230;
-  --bg-3: #1f2a38;
-  --bg-hover: rgba(148,163,184,0.08);
-  --bg-active: rgba(148,163,184,0.14);
+  --bg-0: #0d1310;
+  --bg-1: #111814;
+  --bg-2: #18221d;
+  --bg-3: #1f2c25;
+  --bg-hover: rgba(134,180,155,0.08);
+  --bg-active: rgba(134,180,155,0.14);
 
-  --border: rgba(148,163,184,0.14);
-  --border-strong: rgba(148,163,184,0.28);
-  --border-focus: #ffb076;
+  --border: rgba(134,180,155,0.14);
+  --border-strong: rgba(134,180,155,0.28);
+  --border-focus: #34d399;
 
-  --text-0: #f1f5f9;
-  --text-1: #dbe2ea;
-  --text-2: rgba(226,232,240,0.65);
-  --text-3: #8b94a3;
+  --text-0: #ecf3ef;
+  --text-1: #cfdbd4;
+  --text-2: rgba(220,235,226,0.65);
+  --text-3: #7f9188;
 
-  /* 蜜桃橙（dark 下品牌色提亮，platform 同款） */
-  --accent: #ffb076;
-  --accent-dark: #f5934e;
-  --accent-bg: rgba(255,176,118,0.14);
-  --accent-text: #ffb076;
-  --accent-glow: rgba(255,176,118,0.30);
-  --accent-gradient: linear-gradient(135deg, #ffb076 0%, #ff9a5c 100%);
+  /* 薄荷绿（暗底上主色提亮） */
+  --accent: #34d399;
+  --accent-dark: #10b981;
+  --accent-bg: rgba(52,211,153,0.14);
+  --accent-text: #34d399;
+  --accent-glow: rgba(52,211,153,0.30);
+  --accent-gradient: linear-gradient(135deg, #34d399 0%, #10b981 100%);
 
-  --action-primary: #ffb076;
-  --action-primary-hover: #ffc194;
-  --action-primary-press: #f5934e;
-  --action-secondary: #1f2a38;
-  --action-secondary-hover: #28364a;
+  --action-primary: #34d399;
+  --action-primary-hover: #6ee7b7;
+  --action-primary-press: #10b981;
+  --action-secondary: #1f2c25;
+  --action-secondary-hover: #283a30;
   --action-danger: #f87171;
   --action-danger-bg: rgba(248,113,113,0.14);
   --action-danger-solid-hover: #fca5a5;
 
-  --button-bg: #1f2a38;
-  --button-bg-hover: #28364a;
-  --button-bg-active: #31435c;
-  --button-focus: rgba(255,176,118,0.30);
+  --button-bg: #1f2c25;
+  --button-bg-hover: #283a30;
+  --button-bg-active: #31473b;
+  --button-focus: rgba(52,211,153,0.30);
   --button-shadow: 0 1px 2px rgba(0,0,0,0.3);
   --button-shadow-hover: 0 1px 2px rgba(0,0,0,0.3);
 
   --shadow-panel: 0 1px 2px rgba(0,0,0,0.3), 0 4px 14px rgba(0,0,0,0.35);
 
-  --success: #4ade80;
-  --success-bg: rgba(74,222,128,0.14);
+  --success: #a3e635;
+  --success-bg: rgba(163,230,53,0.14);
   --error: #f87171;
   --error-bg: rgba(248,113,113,0.14);
   --info: #60a5fa;
@@ -215,24 +215,24 @@
   --shadow-lift: 0 4px 14px rgba(0,0,0,0.35), 0 16px 40px rgba(0,0,0,0.5);
   --shadow-elevated: 0 8px 20px rgba(0,0,0,0.45), 0 24px 56px rgba(0,0,0,0.55);
 
-  --overlay-track: rgba(148,163,184,0.10);
-  --seg-active-bg: #28364a;
-  --on-accent: #2a1503;
+  --overlay-track: rgba(134,180,155,0.10);
+  --seg-active-bg: #283a30;
+  --on-accent: #03140c;
   --scrim: rgba(0,0,0,0.60);
-  --header-bg: rgba(11,15,22,0.75);
-  --inverse-surface: #f1f5f9;
-  --on-inverse: #17181a;
-  --scrollbar-thumb: rgba(148,163,184,0.25);
-  --scrollbar-thumb-hover: rgba(148,163,184,0.40);
-  --border-hover: rgba(148,163,184,0.40);
-  --switch-bg: #1f2a38;
+  --header-bg: rgba(10,15,13,0.75);
+  --inverse-surface: #ecf3ef;
+  --on-inverse: #0f1a14;
+  --scrollbar-thumb: rgba(134,180,155,0.25);
+  --scrollbar-thumb-hover: rgba(134,180,155,0.40);
+  --border-hover: rgba(134,180,155,0.40);
+  --switch-bg: #1f2c25;
   --action-danger-bg-hover: rgba(248,113,113,0.22);
   --warn-text: #fbbf24;
   --warn-bg: rgba(251,191,36,0.12);
   --warn-border: rgba(251,191,36,0.28);
   --warn-link: #fcd34d;
   --warn-link-hover-bg: rgba(251,191,36,0.18);
-  --tag-success-text: #4ade80;
+  --tag-success-text: #a3e635;
   --tag-info-text: #60a5fa;
   --tag-warning-text: #fbbf24;
   --accent-purple: #818cf8;

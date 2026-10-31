@@ -190,7 +190,7 @@ export class ComfyUIVideoAdapter extends ComfyUIClient implements VideoProviderA
       steps: Math.round(steps ?? 20),
       cfg: cfg ?? 5,
     }
-    return this.buildPromptRequest(config, template, values, imageSources, `uu889-${record.id}`, {
+    return this.buildPromptRequest(config, template, values, imageSources, `hail-${record.id}`, {
       kind: 'video',
       ctx,
       bind: {

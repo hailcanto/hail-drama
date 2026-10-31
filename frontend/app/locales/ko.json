@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "UU889-Drama",
+    "title": "Hail-Drama",
     "updateAvailable": "새 버전 v{version}을 사용할 수 있습니다. 「설정 → 업데이트 정보」에서 업그레이드하세요"
   },
   "common": {
@@ -441,11 +441,11 @@
         "workflowEmpty": "\"사용자 워크플로\"를 선택했지만 편집기가 비어 있습니다",
         "exportHint": "플레이스홀더 없이도 동작합니다. 자동 바인딩을 켜 두면 노드 구조로 프롬프트, 이미지, 크기 등을 연결합니다.",
         "autoBind": "자동 바인딩 (권장)",
-        "autoBindHint": "긍정 / 부정 프롬프트, 첫 / 마지막 프레임 / 참조 이미지(LoadImage), 시드, 너비·높이, 프레임 수, FPS, 확산 모델을 찾아 UU889-Drama 값으로 바꿉니다.",
+        "autoBindHint": "긍정 / 부정 프롬프트, 첫 / 마지막 프레임 / 참조 이미지(LoadImage), 시드, 너비·높이, 프레임 수, FPS, 확산 모델을 찾아 Hail-Drama 값으로 바꿉니다.",
         "autoBindHintImage": "긍정 / 부정 프롬프트, 참조 이미지(LoadImage), 시드, 너비·높이, Checkpoint를 찾아 바꿉니다.",
         "fromWorkflow": "워크플로 값",
         "inspect": "워크플로 확인",
-        "inspectTitle": "UU889-Drama가 이 워크플로를 이렇게 제어합니다",
+        "inspectTitle": "Hail-Drama가 이 워크플로를 이렇게 제어합니다",
         "colNode": "노드",
         "colField": "필드",
         "colTarget": "파라미터",
@@ -499,7 +499,7 @@
         "presetApplied": "프리셋 적용: {name}",
         "promptTemplate": "프롬프트 템플릿",
         "promptTemplatePlaceholder": "예: masterpiece, best quality, {ph}",
-        "promptTemplateHint": "{ph} 자리에 UU889-Drama 프롬프트가 들어갑니다. {ph}가 없으면 앞에 붙이고, 비우면 그대로 보냅니다.",
+        "promptTemplateHint": "{ph} 자리에 Hail-Drama 프롬프트가 들어갑니다. {ph}가 없으면 앞에 붙이고, 비우면 그대로 보냅니다.",
         "preview": "미리보기:",
         "samplePrompt": "빨간 망토를 두른 소녀가 설산 정상에서 카메라를 돌아본다",
         "translate": "영어가 아닌 프롬프트를 영어로 번역",
@@ -1477,7 +1477,7 @@
     "helpTitle": "가이드",
     "index": {
       "welcome": {
-        "title": "👋 UU889-Drama에 오신 것을 환영합니다",
+        "title": "👋 Hail-Drama에 오신 것을 환영합니다",
         "desc": "소설 → 대본 → 에셋 → 스토리보드 → 영상 → 완성, 모두 한곳에서. 먼저 AI 서비스를 설정하고 첫 프로젝트를 만들어 보세요."
       },
       "create": {

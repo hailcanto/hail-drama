@@ -47,9 +47,9 @@ test('ComfyUI image: default SDXL workflow with typed placeholders, /view result
   assert.ok(COMFYUI_DEFAULT_IMAGE_WORKFLOW['9'].class_type === 'SaveImage')
 
   assert.equal(adapter.parsePollResponse({}).status, 'processing')
-  const done = adapter.parsePollResponse({ p: { status: { status_str: 'success', completed: true }, outputs: { '9': { images: [{ filename: 'uu889-drama_00001_.png', subfolder: '', type: 'output' }] } } } })
-  assert.deepEqual(done, { status: 'completed', imageUrl: '/view?filename=uu889-drama_00001_.png&subfolder=&type=output' })
-  assert.equal(adapter.resolveDownload(cfg, done.imageUrl!).url, 'http://127.0.0.1:8188/view?filename=uu889-drama_00001_.png&subfolder=&type=output')
+  const done = adapter.parsePollResponse({ p: { status: { status_str: 'success', completed: true }, outputs: { '9': { images: [{ filename: 'hail-drama_00001_.png', subfolder: '', type: 'output' }] } } } })
+  assert.deepEqual(done, { status: 'completed', imageUrl: '/view?filename=hail-drama_00001_.png&subfolder=&type=output' })
+  assert.equal(adapter.resolveDownload(cfg, done.imageUrl!).url, 'http://127.0.0.1:8188/view?filename=hail-drama_00001_.png&subfolder=&type=output')
   assert.equal(adapter.parsePollResponse({ p: { status: { status_str: 'success', completed: true }, outputs: {} } }).status, 'failed')
   assert.equal(adapter.parsePollResponse({ __comfyMissing: true }).status, 'failed')
   assert.equal(adapter.pollProfile.maxDurationMs, null, 'local queue: no 10-minute image cap')

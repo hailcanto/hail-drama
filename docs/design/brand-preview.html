@@ -1,0 +1,227 @@
+<title>Hail 短剧配色与 Logo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* 布局：说明栏 → Logo 三种尺寸 → 亮色 / 暗色两套界面并排（窄屏上下叠放） */
+:root {
+  --page-bg: #f3f7f5;
+  --page-fg: #0f1a14;
+  --page-muted: #5b6b62;
+  --page-line: #dce7e0;
+  --page-card: #ffffff;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --page-bg: #070b09; --page-fg: #e6efe9; --page-muted: #8fa198; --page-line: #1c2822; --page-card: #0d1411; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --page-bg: #070b09; --page-fg: #e6efe9; --page-muted: #8fa198; --page-line: #1c2822; --page-card: #0d1411; color-scheme: dark; }
+
+/* 两套主题各自的令牌（与将写入 studio.css 的值一致） */
+.t-light {
+  --base: #f5f9f7; --raised: #ffffff; --bg2: #ecf3ef; --bg3: #e1ebe5;
+  --border: #e1ebe5; --border-strong: #cddcd3;
+  --text0: #0f1a14; --text1: #34433b; --text2: #5b6b62; --text3: #93a39a;
+  --accent: #059669; --accent-hover: #047857; --accent-bg: rgba(5,150,105,0.10); --accent-text: #047857; --on-accent: #ffffff;
+  --success: #65a30d; --success-bg: rgba(101,163,13,0.12); --success-text: #4d7c0f;
+  --warning: #d97706; --warning-bg: rgba(217,119,6,0.12); --warning-text: #b45309;
+  --error: #dc2626; --error-bg: rgba(220,38,38,0.10);
+  --btn: #e6eee9; --btn-hover: #d9e4dd;
+  --shadow: 0 1px 2px rgba(10,30,20,0.05), 0 4px 14px rgba(10,30,20,0.07);
+}
+.t-dark {
+  --base: #0a0f0d; --raised: #111814; --bg2: #18221d; --bg3: #1f2c25;
+  --border: rgba(134,180,155,0.14); --border-strong: rgba(134,180,155,0.28);
+  --text0: #ecf3ef; --text1: #cfdbd4; --text2: rgba(220,235,226,0.65); --text3: #7f9188;
+  --accent: #34d399; --accent-hover: #6ee7b7; --accent-bg: rgba(52,211,153,0.14); --accent-text: #34d399; --on-accent: #03140c;
+  --success: #a3e635; --success-bg: rgba(163,230,53,0.14); --success-text: #a3e635;
+  --warning: #fbbf24; --warning-bg: rgba(251,191,36,0.14); --warning-text: #fbbf24;
+  --error: #f87171; --error-bg: rgba(248,113,113,0.14);
+  --btn: #1f2c25; --btn-hover: #283a30;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 14px rgba(0,0,0,0.35);
+}
+
+body { background: var(--page-bg); color: var(--page-fg); font-family: var(--font); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 32px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 28px; }
+h1 { font-size: 24px; font-weight: 700; text-wrap: balance; }
+.lede { color: var(--page-muted); font-size: 14px; line-height: 1.7; max-width: 68ch; margin-top: 6px; }
+h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; color: var(--page-muted); text-transform: uppercase; }
+
+.logos { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 28px; padding: 24px; background: var(--page-card); border: 1px solid var(--page-line); border-radius: 14px; }
+.logo-cell { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; color: var(--page-muted); font-variant-numeric: tabular-nums; }
+.logo-cell svg { display: block; }
+.on-bg { display: flex; gap: 12px; }
+.chip-bg { padding: 10px; border-radius: 10px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+
+.themes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 860px) { .themes { grid-template-columns: 1fr; } }
+
+.app { background: var(--base); color: var(--text0); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; min-width: 0; }
+.app-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--raised); }
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; }
+.nav { margin-left: auto; display: flex; gap: 4px; font-size: 13px; }
+.nav span { padding: 5px 10px; border-radius: 999px; color: var(--text2); }
+.nav span.on { background: var(--accent-bg); color: var(--accent-text); font-weight: 600; }
+.app-body { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.label { font-size: 12px; color: var(--text3); }
+
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { height: 34px; padding: 0 16px; border-radius: 999px; border: 0; font: 600 13px var(--font); cursor: pointer; background: var(--btn); color: var(--text0); }
+.btn:hover { background: var(--btn-hover); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn.primary { background: var(--accent); color: var(--on-accent); }
+.btn.primary:hover { background: var(--accent-hover); }
+.btn.danger { background: var(--error-bg); color: var(--error); }
+
+.input { flex: 1; min-width: 0; height: 34px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--raised); color: var(--text0); font: 13px var(--font); }
+.input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
+
+.tag { font-size: 12px; padding: 2px 9px; border-radius: 999px; font-weight: 600; }
+.tag.run { background: var(--accent-bg); color: var(--accent-text); }
+.tag.ok { background: var(--success-bg); color: var(--success-text); }
+.tag.warn { background: var(--warning-bg); color: var(--warning-text); }
+.tag.fail { background: var(--error-bg); color: var(--error); }
+
+.shot { background: var(--raised); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); padding: 12px; display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; }
+.thumb { aspect-ratio: 16 / 9; max-width: 100%; border-radius: 8px; background: linear-gradient(135deg, var(--bg3), var(--bg2)); display: grid; place-items: center; color: var(--text3); font-size: 11px; }
+.shot h3 { font-size: 14px; font-weight: 600; }
+.shot p { font-size: 12.5px; color: var(--text2); line-height: 1.6; margin-top: 4px; }
+.meta { display: flex; gap: 10px; font-size: 12px; color: var(--text3); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.bar { height: 6px; border-radius: 999px; background: var(--bg3); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 62%; background: var(--accent); border-radius: inherit; }
+.progress-text { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); font-variant-numeric: tabular-nums; }
+
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+.sw { border-radius: 8px; border: 1px solid var(--border); overflow: hidden; font-size: 11px; }
+.sw b { display: block; height: 30px; }
+.sw span { display: block; padding: 4px 6px; color: var(--text2); font-family: var(--mono); }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="hail-logo" viewBox="0 0 1024 1024">
+      <defs>
+        <linearGradient id="lg-bg" x1="0.1" y1="0" x2="0.9" y2="1">
+          <stop offset="0" stop-color="#0b1410"/><stop offset="1" stop-color="#14291e"/>
+        </linearGradient>
+        <linearGradient id="lg-h" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#6ee7b7"/><stop offset="1" stop-color="#10b981"/>
+        </linearGradient>
+        <linearGradient id="lg-shine" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffffff" stop-opacity="0.08"/><stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <rect x="32" y="32" width="960" height="960" rx="228" fill="url(#lg-bg)"/>
+      <rect x="32" y="32" width="960" height="960" rx="228" fill="url(#lg-shine)"/>
+      <rect x="44" y="44" width="936" height="936" rx="216" fill="none" stroke="#34d399" stroke-opacity="0.35" stroke-width="10"/>
+      <g fill="#34d399" fill-opacity="0.22">
+        <rect x="170" y="96" width="64" height="38" rx="12"/><rect x="290" y="96" width="64" height="38" rx="12"/><rect x="410" y="96" width="64" height="38" rx="12"/><rect x="550" y="96" width="64" height="38" rx="12"/><rect x="670" y="96" width="64" height="38" rx="12"/><rect x="790" y="96" width="64" height="38" rx="12"/>
+        <rect x="170" y="890" width="64" height="38" rx="12"/><rect x="290" y="890" width="64" height="38" rx="12"/><rect x="410" y="890" width="64" height="38" rx="12"/><rect x="550" y="890" width="64" height="38" rx="12"/><rect x="670" y="890" width="64" height="38" rx="12"/><rect x="790" y="890" width="64" height="38" rx="12"/>
+      </g>
+      <g fill="url(#lg-h)">
+        <rect x="236" y="268" width="112" height="488" rx="56"/>
+        <rect x="676" y="268" width="112" height="488" rx="56"/>
+        <path d="M330 400 L330 624 L676 512 Z" stroke="url(#lg-h)" stroke-width="40" stroke-linejoin="round"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header>
+    <h1>Hail 短剧：配色与 Logo 预览</h1>
+    <p class="lede">Logo 用 A 方案：黑绿底板，字母 H 的横杠做成向右的播放三角，上下两排胶片孔。下面两套界面用的就是准备写进 studio.css 的色值。主按钮用翡翠绿，「已完成」用草绿，两者分开；警告保留琥珀色，错误保留红色。</p>
+  </header>
+
+  <section>
+    <h2>Logo 尺寸</h2>
+    <div class="logos">
+      <div class="logo-cell"><svg width="128" height="128" role="img" aria-label="Hail 短剧 logo"><use href="#hail-logo"/></svg>128 px · README / 安装包</div>
+      <div class="logo-cell"><svg width="64" height="64" aria-hidden="true"><use href="#hail-logo"/></svg>64 px · 桌面图标</div>
+      <div class="logo-cell"><svg width="32" height="32" aria-hidden="true"><use href="#hail-logo"/></svg>32 px · 侧边栏</div>
+      <div class="logo-cell"><svg width="16" height="16" aria-hidden="true"><use href="#hail-logo"/></svg>16 px · 浏览器标签</div>
+      <div class="logo-cell">
+        <div class="on-bg">
+          <div class="chip-bg t-light" style="background: var(--raised); border: 1px solid var(--border); color: var(--text0);"><svg width="28" height="28" aria-hidden="true"><use href="#hail-logo"/></svg>Hail 短剧</div>
+          <div class="chip-bg t-dark" style="background: var(--raised); border: 1px solid var(--border); color: var(--text0);"><svg width="28" height="28" aria-hidden="true"><use href="#hail-logo"/></svg>Hail 短剧</div>
+        </div>
+        放在亮色 / 暗色顶栏上
+      </div>
+    </div>
+  </section>
+
+  <section class="themes" aria-label="两套主题">
+    <article class="app t-light" aria-label="亮色：白绿">
+      <div class="app-head">
+        <div class="brand"><svg width="26" height="26" aria-hidden="true"><use href="#hail-logo"/></svg>Hail 短剧</div>
+        <nav class="nav"><span>项目</span><span class="on">工作台</span><span>设置</span></nav>
+      </div>
+      <div class="app-body">
+        <div class="label">亮色 · 白绿</div>
+        <div class="row">
+          <button class="btn primary" id="l-gen">生成视频</button>
+          <button class="btn" id="l-retry">重试失败</button>
+          <button class="btn danger" id="l-del">删除</button>
+        </div>
+        <div class="row"><input class="input" id="l-input" value="第 3 集 · 雨夜重逢" aria-label="集标题"></div>
+        <div class="row"><span class="tag run">生成中</span><span class="tag ok">已完成</span><span class="tag warn">提示词已精简</span><span class="tag fail">失败</span></div>
+        <div class="shot">
+          <div class="thumb">分镜 12</div>
+          <div>
+            <h3>镜头 12：林夏推开咖啡馆的门</h3>
+            <p>雨夜，门铃响起，她停在门口看向窗边。</p>
+            <div class="meta"><span>8 秒</span><span>768P</span><span>第三方 MiniMax</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="progress-text"><span>采样 第 2 段 · 13 / 20 步</span><span>62%</span></div>
+          <div class="bar"><i></i></div>
+        </div>
+        <div class="swatches">
+          <div class="sw"><b style="background: var(--base)"></b><span>#f5f9f7</span></div>
+          <div class="sw"><b style="background: var(--raised)"></b><span>#ffffff</span></div>
+          <div class="sw"><b style="background: var(--accent)"></b><span>#059669</span></div>
+          <div class="sw"><b style="background: var(--accent-hover)"></b><span>#047857</span></div>
+          <div class="sw"><b style="background: var(--success)"></b><span>#65a30d</span></div>
+          <div class="sw"><b style="background: var(--text0)"></b><span>#0f1a14</span></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="app t-dark" aria-label="暗色：黑绿">
+      <div class="app-head">
+        <div class="brand"><svg width="26" height="26" aria-hidden="true"><use href="#hail-logo"/></svg>Hail 短剧</div>
+        <nav class="nav"><span>项目</span><span class="on">工作台</span><span>设置</span></nav>
+      </div>
+      <div class="app-body">
+        <div class="label">暗色 · 黑绿</div>
+        <div class="row">
+          <button class="btn primary" id="d-gen">生成视频</button>
+          <button class="btn" id="d-retry">重试失败</button>
+          <button class="btn danger" id="d-del">删除</button>
+        </div>
+        <div class="row"><input class="input" id="d-input" value="第 3 集 · 雨夜重逢" aria-label="集标题"></div>
+        <div class="row"><span class="tag run">生成中</span><span class="tag ok">已完成</span><span class="tag warn">提示词已精简</span><span class="tag fail">失败</span></div>
+        <div class="shot">
+          <div class="thumb">分镜 12</div>
+          <div>
+            <h3>镜头 12：林夏推开咖啡馆的门</h3>
+            <p>雨夜，门铃响起，她停在门口看向窗边。</p>
+            <div class="meta"><span>8 秒</span><span>768P</span><span>第三方 MiniMax</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="progress-text"><span>采样 第 2 段 · 13 / 20 步</span><span>62%</span></div>
+          <div class="bar"><i></i></div>
+        </div>
+        <div class="swatches">
+          <div class="sw"><b style="background: var(--base)"></b><span>#0a0f0d</span></div>
+          <div class="sw"><b style="background: var(--raised)"></b><span>#111814</span></div>
+          <div class="sw"><b style="background: var(--accent)"></b><span>#34d399</span></div>
+          <div class="sw"><b style="background: var(--accent-hover)"></b><span>#6ee7b7</span></div>
+          <div class="sw"><b style="background: var(--success)"></b><span>#a3e635</span></div>
+          <div class="sw"><b style="background: var(--text0)"></b><span>#ecf3ef</span></div>
+        </div>
+      </div>
+    </article>
+  </section>
+</div>

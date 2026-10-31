@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "UU889-Drama",
+    "title": "Hail-Drama",
     "updateAvailable": "New version v{version} is available. Upgrade in Settings → About."
   },
   "common": {
@@ -439,13 +439,13 @@
         "copyToEditor": "Copy into the editor to customize",
         "overwriteConfirm": "Replace the workflow in the editor with this template?",
         "workflowEmpty": "\"Custom workflow\" is selected but the editor is empty — paste a workflow or switch to a built-in template",
-        "exportHint": "Works without placeholders: keep auto-bind on and UU889-Drama wires prompt, images, size and more by node structure. Hand-written placeholder categories win.",
+        "exportHint": "Works without placeholders: keep auto-bind on and Hail-Drama wires prompt, images, size and more by node structure. Hand-written placeholder categories win.",
         "autoBind": "Auto-bind (recommended)",
-        "autoBindHint": "Finds the positive / negative prompt, first / last frame / references (LoadImage), seed, width / height, frames, FPS and diffusion model and fills them from UU889-Drama. Off = only hand-written placeholders are replaced.",
-        "autoBindHintImage": "Finds the positive / negative prompt, references (LoadImage), seed, width / height and checkpoint and fills them from UU889-Drama. Off = only hand-written placeholders are replaced.",
+        "autoBindHint": "Finds the positive / negative prompt, first / last frame / references (LoadImage), seed, width / height, frames, FPS and diffusion model and fills them from Hail-Drama. Off = only hand-written placeholders are replaced.",
+        "autoBindHintImage": "Finds the positive / negative prompt, references (LoadImage), seed, width / height and checkpoint and fills them from Hail-Drama. Off = only hand-written placeholders are replaced.",
         "fromWorkflow": "from workflow",
         "inspect": "Check workflow",
-        "inspectTitle": "How UU889-Drama will control this workflow",
+        "inspectTitle": "How Hail-Drama will control this workflow",
         "colNode": "Node",
         "colField": "Field",
         "colTarget": "Parameter",
@@ -499,7 +499,7 @@
         "presetApplied": "Preset applied: {name}",
         "promptTemplate": "Prompt template",
         "promptTemplatePlaceholder": "e.g. masterpiece, best quality, {ph}",
-        "promptTemplateHint": "The UU889-Drama prompt is inserted at {ph}; without {ph} it is prepended; empty = sent as is.",
+        "promptTemplateHint": "The Hail-Drama prompt is inserted at {ph}; without {ph} it is prepended; empty = sent as is.",
         "preview": "Preview:",
         "samplePrompt": "a girl in a red cloak on a snowy peak, looking back at the camera",
         "translate": "Translate non-English prompts to English",
@@ -601,7 +601,7 @@
         "passphrase": "Key passphrase (optional)",
         "test": "Test connection",
         "connected": "Connected: {os} · {host} · home {home}",
-        "remoteHint": "The remote machine needs SSH: macOS → System Settings → General → Sharing → Remote Login; Linux → openssh-server; Windows → \"OpenSSH Server\" (Settings → Optional features). macOS and Linux both accept password and key (certificate) login. Remote downloads run in the background there and finish even if UU889-Drama is closed.",
+        "remoteHint": "The remote machine needs SSH: macOS → System Settings → General → Sharing → Remote Login; Linux → openssh-server; Windows → \"OpenSSH Server\" (Settings → Optional features). macOS and Linux both accept password and key (certificate) login. Remote downloads run in the background there and finish even if Hail-Drama is closed.",
         "root": "{app} install folder",
         "detect": "Detect",
         "browse": "Browse…",
@@ -1477,7 +1477,7 @@
     "helpTitle": "Guide",
     "index": {
       "welcome": {
-        "title": "👋 Welcome to UU889-Drama",
+        "title": "👋 Welcome to Hail-Drama",
         "desc": "Novel → script → assets → storyboard → video → final cut, all in one place. Configure AI services first, then create your first project."
       },
       "create": {

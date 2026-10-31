@@ -7,7 +7,7 @@
  *   填 default 则沿用 WebUI 当前加载的模型；否则经 override_settings.sd_model_checkpoint 临时切换
  * - 尺寸：项目尺寸按 settings.image_base_size²（默认 1024，SD1.5 填 512）换算，对齐 64
  * - 参考图暂不使用（WebUI 的 ControlNet / IP-Adapter 插件参数各异）；需要参考图时请用 ComfyUI 自定义工作流
- * - 提示词模板 settings.prompt_template：「masterpiece, {{prompt}}, cinematic」，{{prompt}} 处插入 UU889-Drama 的提示词
+ * - 提示词模板 settings.prompt_template：「masterpiece, {{prompt}}, cinematic」，{{prompt}} 处插入 Hail 短剧 的提示词
  * - 进度：请求带 force_task_id，出图期间轮询 POST /internal/progress { id_task }（排队位置、进度、ETA）；
  *   老版本没有该接口时退回 GET /sdapi/v1/progress（全局进度：采样步数 / ETA）
  */
@@ -62,7 +62,7 @@ export class SdWebuiImageAdapter implements ImageProviderAdapter {
       send_images: true,
       save_images: false,
       // 自定义任务 ID：出图期间凭它查询排队位置与进度（WebUI 1.6+；老版本忽略该字段）
-      force_task_id: `task(uu889-${record.id}-${randomBytes(3).toString('hex')})`,
+      force_task_id: `task(hail-${record.id}-${randomBytes(3).toString('hex')})`,
     }
     const sampler = textSetting(settings.image_sampler) || sm?.sampler
     if (sampler) body.sampler_name = sampler

@@ -2,9 +2,10 @@
  * i18n 实例（模块级单例）
  * - 实例放独立模块而非插件内：useAgent/useMigrateState 等 setup 外代码
  *   需要 `import { i18n }` 直接用 i18n.global.t
- * - ssr:false，模块顶层读 localStorage 安全；UI 语言偏好持久化 uu889:locale
+ * - ssr:false，模块顶层读 localStorage 安全；UI 语言偏好持久化 hail:locale
  * - legacy:false 必须显式，否则 global.locale 不是 ref 无法运行时切换
  */
+import './legacyStorage'
 import { createI18n } from 'vue-i18n'
 import zh from '../locales/zh.json'
 import en from '../locales/en.json'
@@ -16,7 +17,7 @@ import fr from '../locales/fr.json'
 import es from '../locales/es.json'
 import pt from '../locales/pt.json'
 
-export const LOCALE_STORAGE_KEY = 'uu889:locale'
+export const LOCALE_STORAGE_KEY = 'hail:locale'
 
 export type UiLocale = 'zh' | 'en' | 'ja' | 'ko' | 'vi' | 'de' | 'fr' | 'es' | 'pt'
 

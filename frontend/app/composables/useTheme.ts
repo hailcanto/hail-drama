@@ -6,9 +6,10 @@
  * - 跟随系统：matchMedia('(prefers-color-scheme: dark)')，Web/桌面（Electron
  *   默认 nativeTheme.themeSource='system'）通用，无需桌面桥
  */
+import './legacyStorage'
 import { computed, readonly, ref, watch, type ComputedRef } from 'vue'
 
-export const THEME_STORAGE_KEY = 'uu889:theme'
+export const THEME_STORAGE_KEY = 'hail:theme'
 
 export type ThemeMode = 'light' | 'dark' | 'system'
 export type ResolvedTheme = 'light' | 'dark'

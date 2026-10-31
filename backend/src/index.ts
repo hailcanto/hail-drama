@@ -5,6 +5,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { brandEnv } from './utils/env.js'
 
 import dramas from './routes/dramas.js'
 import episodes from './routes/episodes.js'
@@ -47,7 +48,7 @@ app.use('*', errorHandler)
 // Health check（version 供部署巡检/更新检查核对当前运行版本）
 app.get('/api/v1/health', (c) => c.json({
   status: 'ok',
-  version: process.env.UU889_VERSION || undefined,
+  version: brandEnv('VERSION') || undefined,
   timestamp: new Date().toISOString(),
 }))
 
@@ -89,7 +90,7 @@ app.use('*', serveStatic({ root: distPath }))
 app.get('*', serveStatic({ root: distPath, path: 'index.html' }))
 
 const port = Number(process.env.PORT || 5679)
-console.log(`🚀 UU889-Drama TS server on http://localhost:${port}`)
+console.log(`🚀 Hail-Drama TS server on http://localhost:${port}`)
 
 // 进程重启后内存中的轮询线程全部丢失,残留的 processing 任务永远不会完成,
 // 启动时统一标记为 failed,避免前端一直显示"生成中"

@@ -1,5 +1,5 @@
 /**
- * ComfyUI 内置工作流模板库（API 格式，已写好 UU889-Drama 占位符）
+ * ComfyUI 内置工作流模板库（API 格式，已写好 Hail 短剧 占位符）
  *
  * - 设置页可选择模板直接使用，或「填入编辑框」后按自己的模型 / 节点修改
  * - 未配置自定义工作流时，按 settings.comfyui_template → 模型名（模板 ID 或模板用到的模型文件名）→ 默认模板 的顺序选择
@@ -47,7 +47,7 @@ const WAN21_VAE: ComfyTemplateModelFile = { file: 'wan_2.1_vae.safetensors', fol
 
 const SAVE_VIDEO = (images: [string, number]) => ({
   '60': { class_type: 'CreateVideo', inputs: { fps: '{{fps}}', images }, _meta: { title: '合成视频' } },
-  '61': { class_type: 'SaveVideo', inputs: { filename_prefix: 'video/uu889-drama', format: 'auto', codec: 'auto', video: ['60', 0] }, _meta: { title: '保存视频' } },
+  '61': { class_type: 'SaveVideo', inputs: { filename_prefix: 'video/hail-drama', format: 'auto', codec: 'auto', video: ['60', 0] }, _meta: { title: '保存视频' } },
 })
 
 /** Wan 2.2 14B 高 / 低噪声双模型 + 两段 KSamplerAdvanced 的公共部分 */
@@ -127,7 +127,7 @@ function minimaxH3Workflow(opts: { steps: number; lora?: string; unet?: string; 
     '10': { class_type: 'VAEDecode', inputs: { samples: ['14', 0], vae: ['11', 0] } },
     '23': { class_type: 'VAEDecodeAudio', inputs: { samples: ['14', 0], vae: ['24', 0] }, _meta: { title: '解码音频' } },
     '60': { class_type: 'CreateVideo', inputs: { fps: '{{fps}}', images: ['10', 0], audio: ['23', 0] }, _meta: { title: '合成视频' } },
-    '61': { class_type: 'SaveVideo', inputs: { filename_prefix: 'video/uu889-drama', format: 'auto', codec: 'auto', video: ['60', 0] }, _meta: { title: '保存视频' } },
+    '61': { class_type: 'SaveVideo', inputs: { filename_prefix: 'video/hail-drama', format: 'auto', codec: 'auto', video: ['60', 0] }, _meta: { title: '保存视频' } },
   }
 }
 
@@ -176,7 +176,7 @@ function minimaxH3RefWorkflow(opts: { steps: number; lora?: string; unet: string
     '10': { class_type: 'VAEDecode', inputs: { samples: ['14', 0], vae: ['11', 0] } },
     '23': { class_type: 'VAEDecodeAudio', inputs: { samples: ['14', 0], vae: ['24', 0] }, _meta: { title: '解码音频' } },
     '60': { class_type: 'CreateVideo', inputs: { fps: '{{fps}}', images: ['10', 0], audio: ['23', 0] }, _meta: { title: '合成视频' } },
-    '61': { class_type: 'SaveVideo', inputs: { filename_prefix: 'video/uu889-drama', format: 'auto', codec: 'auto', video: ['60', 0] }, _meta: { title: '保存视频' } },
+    '61': { class_type: 'SaveVideo', inputs: { filename_prefix: 'video/hail-drama', format: 'auto', codec: 'auto', video: ['60', 0] }, _meta: { title: '保存视频' } },
   }
 }
 
@@ -554,7 +554,7 @@ export const COMFY_VIDEO_TEMPLATES: ComfyWorkflowTemplate[] = [
       '55': { class_type: 'Wan22ImageToVideoLatent', inputs: { width: '{{width}}', height: '{{height}}', length: '{{frames}}', batch_size: 1, vae: ['39', 0], start_image: ['56', 0] } },
       '56': { class_type: 'LoadImage', inputs: { image: '{{image}}' }, _meta: { title: '首帧' } },
       '57': { class_type: 'CreateVideo', inputs: { fps: '{{fps}}', images: ['8', 0] } },
-      '58': { class_type: 'SaveVideo', inputs: { filename_prefix: 'video/uu889-drama', format: 'auto', codec: 'auto', video: ['57', 0] } },
+      '58': { class_type: 'SaveVideo', inputs: { filename_prefix: 'video/hail-drama', format: 'auto', codec: 'auto', video: ['57', 0] } },
     },
   },
   {
@@ -672,7 +672,7 @@ export const COMFY_VIDEO_TEMPLATES: ComfyWorkflowTemplate[] = [
   ...COMFY_H3_VRAM_TEMPLATES,
 ]
 
-const SAVE_IMAGE = { class_type: 'SaveImage', inputs: { filename_prefix: 'uu889-drama', images: ['8', 0] }, _meta: { title: '保存图片' } }
+const SAVE_IMAGE = { class_type: 'SaveImage', inputs: { filename_prefix: 'hail-drama', images: ['8', 0] }, _meta: { title: '保存图片' } }
 
 export const COMFY_IMAGE_TEMPLATES: ComfyWorkflowTemplate[] = [
   {

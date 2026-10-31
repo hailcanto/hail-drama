@@ -78,7 +78,7 @@ export async function diagnoseLocalService(expected: LocalProvider, baseUrl: str
         : 'SD WebUI 要加 --listen（以及 --api）启动，才能被别的机器访问'
     const remote = /^https?:\/\/(localhost|127\.|\[::1\])/i.test(base)
       ? ''
-      : '；云服务器（阿里云 / 腾讯云等）还要在「安全组」放行这个端口，系统防火墙（ufw / firewalld / Windows 防火墙）也要放行；如果 UU889-Drama 本身部署在服务器上，是服务器去连这个地址，不是你的浏览器'
+      : '；云服务器（阿里云 / 腾讯云等）还要在「安全组」放行这个端口，系统防火墙（ufw / firewalld / Windows 防火墙）也要放行；如果 Hail 短剧 本身部署在服务器上，是服务器去连这个地址，不是你的浏览器'
     const hint = /ECONNREFUSED/.test(code)
       ? `连接被拒绝：这个端口上没有程序在监听。确认 ${PROVIDER_NAMES[expected]} 已启动、端口号写对；${listen}`
       : /ENOTFOUND|EAI_AGAIN/.test(code) ? '找不到这个主机名，请检查地址'
@@ -101,7 +101,7 @@ export async function diagnoseLocalService(expected: LocalProvider, baseUrl: str
   } else if (stats.json && stats.json.system && (stats.json.devices || stats.json.system.comfyui_version || stats.json.system.python_version)) {
     d = { detected: 'comfyui', label: 'ComfyUI', message: '这个地址是 ComfyUI', suggest_provider: 'comfyui' }
   } else if (paths.some((p) => p.startsWith('/api/v1/queue') || p.startsWith('/api/v2/models')) || /InvokeAI/i.test(bodyText)) {
-    d = { detected: 'invokeai', label: 'InvokeAI', message: '这个地址是 InvokeAI，UU889-Drama 暂不支持；请改用 Stable Diffusion WebUI / ComfyUI / Fooocus' }
+    d = { detected: 'invokeai', label: 'InvokeAI', message: '这个地址是 InvokeAI，Hail 短剧 暂不支持；请改用 Stable Diffusion WebUI / ComfyUI / Fooocus' }
   } else if (isGradio && /fooocus/i.test(bodyText)) {
     d = { detected: 'fooocus_web', label: 'Fooocus 网页版', message: '这是 Fooocus 网页版（没有接口）。请改用 Fooocus-API（https://github.com/mrhan1993/Fooocus-API，默认端口 8888），服务商选 Fooocus', suggest_provider: 'fooocus' }
   } else if (isGradio && /stable diffusion|sd-webui|forge|txt2img/i.test(`${bodyText} ${JSON.stringify(config.json).slice(0, 20000)}`)) {

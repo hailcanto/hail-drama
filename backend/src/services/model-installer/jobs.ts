@@ -1,11 +1,11 @@
 /**
  * 模型下载任务：创建、执行、暂停 / 继续 / 取消、进度、持久化。
  *
- * - 远程：把下载脚本放到远程机器后台运行，后端只负责读进度；UU889-Drama 关掉也会在远程继续下完
- * - 本机：同样用后台下载脚本（独立进程，不是 UU889-Drama 的子进程），关掉 UU889-Drama 也会继续下完；
+ * - 远程：把下载脚本放到远程机器后台运行，后端只负责读进度；Hail 短剧 关掉也会在远程继续下完
+ * - 本机：同样用后台下载脚本（独立进程，不是 Hail 短剧 的子进程），关掉 Hail 短剧 也会继续下完；
  *   本机没有 curl / wget（或 MODEL_INSTALLER_DETACHED=0）时退回由后端进程直接下载，关掉程序会停，下次启动从断点接着下
  * - 下次启动：后台进程还在 → 接着读进度；已经下完 → 标记完成；进程没了（电脑重启 / 被结束）→ 自动从断点重新开始
- * - 所有下载都先写 <文件>.uu889part，下完核对大小 / SHA256 才改成正式文件名，没下完的文件程序不会用到
+ * - 所有下载都先写 <文件>.hailpart，下完核对大小 / SHA256 才改成正式文件名，没下完的文件程序不会用到
  * 任务存 DATA_ROOT/model-downloads/jobs.json（含远程登录信息，只保存在本机数据目录）。
  */
 import fs from 'node:fs'
@@ -318,7 +318,7 @@ function startJob(job: DownloadJob) {
       if (job.target.mode === 'remote' || job.status !== 'running') return failJob(job, err)
       // 本机后台进程起不来：改由后端进程直接下载（关掉程序会停，下次启动接着下）
       job.remote = undefined
-      job.message = `后台下载进程启动失败（${err?.message || err}），改为在程序内下载：关掉 UU889-Drama 会暂停，下次打开自动从断点接着下`
+      job.message = `后台下载进程启动失败（${err?.message || err}），改为在程序内下载：关掉 Hail 短剧 会暂停，下次打开自动从断点接着下`
       touch(job)
       runLocal(job).catch((e) => failJob(job, e))
     })
@@ -356,7 +356,7 @@ export async function cancelJob(id: string) {
   controllers.get(id)?.abort()
   if (isScriptJob(job) && (job.status === 'running' || job.status === 'queued')) await killScript(job).catch(() => {})
   job.status = 'canceled'
-  job.message = '已取消；已下载的部分（.uu889part）保留在模型目录，下次下载同一文件会接着下'
+  job.message = '已取消；已下载的部分（.hailpart）保留在模型目录，下次下载同一文件会接着下'
   for (const i of job.items) if (i.status === 'downloading' || i.status === 'verifying') { i.status = 'pending'; i.speed = 0 }
   touch(job)
   return publicJob(job)
@@ -439,7 +439,7 @@ async function sha256File(p: string, signal: AbortSignal): Promise<string> {
 
 async function downloadLocalItem(job: DownloadJob, item: JobItem, signal: AbortSignal) {
   const dest = item.dest
-  const part = `${dest}.uu889part`
+  const part = `${dest}.hailpart`
   await fs.promises.mkdir(path.dirname(dest), { recursive: true })
   const existing = await fileSize(dest)
   if (existing > 0 && (!item.bytes || existing === item.bytes)) {
@@ -480,7 +480,7 @@ async function fetchToPart(job: DownloadJob, item: JobItem, src: DownloadSource,
   if (item.bytes && have === item.bytes) return
   if (item.bytes && have > item.bytes) { await fs.promises.rm(part, { force: true }); have = 0 }
   const { url, headers } = authorize(src, job.tokens)
-  const reqHeaders: Record<string, string> = { 'User-Agent': 'UU889-Drama-ModelInstaller', ...headers }
+  const reqHeaders: Record<string, string> = { 'User-Agent': 'Hail-Drama-ModelInstaller', ...headers }
   if (have > 0) reqHeaders.Range = `bytes=${have}-`
 
   const stall = new AbortController()
@@ -629,7 +629,7 @@ function whereOf(job: DownloadJob) {
 
 async function launchScript(job: DownloadJob) {
   const t = await targetFs(job)
-  const jobDir = t.join(job.root, '.uu889-downloads', jobTag(job.id))
+  const jobDir = t.join(job.root, '.hail-downloads', jobTag(job.id))
   await t.mkdirp!(jobDir)
   // 同一任务的旧进程（如果还在）先结束，避免两个进程写同一个文件
   await killScript(job, t).catch(() => {})
@@ -645,16 +645,16 @@ async function launchScript(job: DownloadJob) {
   const scriptPath = t.join(jobDir, scriptFileName(t.os))
   const script = t.os === 'windows' ? buildPowerShellScript(job.id, jobDir, items) : buildPosixScript(job.id, jobDir, items)
   await t.writeFile!(scriptPath, script)
-  // 新一轮运行：清空旧日志（已完成的文件会被脚本跳过，没下完的从 .uu889part 续传）
+  // 新一轮运行：清空旧日志（已完成的文件会被脚本跳过，没下完的从 .hailpart 续传）
   await t.writeFile!(t.join(jobDir, 'status.log'), '')
   await t.writeFile!(t.join(jobDir, 'pid'), '')
   if (t.os === 'windows') {
-    // 用 WMI 创建进程：不是本进程（或 SSH 会话）的子进程，UU889-Drama 退出 / SSH 断开都不会结束它
+    // 用 WMI 创建进程：不是本进程（或 SSH 会话）的子进程，Hail 短剧 退出 / SSH 断开都不会结束它
     const cmdline = `powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "${scriptPath}"`
     const r = await t.exec!(psEncoded(`$r = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = '${cmdline.replace(/'/g, "''")}' }; Write-Output $r.ReturnValue`), 30_000)
     if (r.code !== 0 || r.stdout.trim().split(/\s+/).pop() !== '0') throw new Error(`启动后台下载失败：${(r.stderr || r.stdout).trim() || '未知错误'}`)
   } else if (t.mode === 'local') {
-    // 独立会话（setsid）的后台进程：UU889-Drama 退出时不会被一起结束
+    // 独立会话（setsid）的后台进程：Hail 短剧 退出时不会被一起结束
     const out = fs.openSync(path.join(jobDir, 'run.out'), 'a')
     try {
       const child = spawn('sh', [scriptPath], { detached: true, stdio: ['ignore', out, out], cwd: jobDir })
@@ -673,7 +673,7 @@ async function launchScript(job: DownloadJob) {
     if (!/started/.test(r.stdout)) throw new Error(`启动远程下载失败：${(r.stderr || r.stdout).trim()}`)
   }
   job.remote = { jobDir, launchedAt: Date.now(), relaunches: job.remote?.relaunches || 0 }
-  job.message = `已在${whereOf(job)}后台下载（关掉 UU889-Drama 也会继续；下次打开自动接上进度）`
+  job.message = `已在${whereOf(job)}后台下载（关掉 Hail 短剧 也会继续；下次打开自动接上进度）`
   job.updatedAt = Date.now()
   // 立即保存：刚启动就退出程序时，下次打开也要知道后台进程在哪
   save(true)
@@ -737,7 +737,7 @@ async function pollScript(job: DownloadJob) {
         item.speed = 0
       } else if (st.status === 'downloading' || st.status === 'verifying') {
         item.status = st.status
-        const part = await t.stat(`${item.dest}.uu889part`)
+        const part = await t.stat(`${item.dest}.hailpart`)
         const size = part?.size ?? item.received
         const prevAt = (item as any)._pollAt as number | undefined
         if (prevAt && size >= item.received) {
@@ -804,7 +804,7 @@ function ensurePolling() {
 
 /**
  * 后端启动时：后台脚本任务（远程 / 本机）恢复读进度——还在下就接着显示，关闭期间下完的标记完成，
- * 进程没了自动从断点重新开始；程序内下载的任务从 .uu889part 断点接着下。
+ * 进程没了自动从断点重新开始；程序内下载的任务从 .hailpart 断点接着下。
  */
 export function resumeJobsOnStartup() {
   load()

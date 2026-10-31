@@ -64,7 +64,7 @@ export function stripDataPrefix(b64: string): string {
 }
 
 /**
- * 提示词模板：把 UU889-Drama 生成的提示词套进用户的模板里再发给本地服务。
+ * 提示词模板：把 Hail 短剧 生成的提示词套进用户的模板里再发给本地服务。
  * 模板里写 {{prompt}} 表示插入位置；没写时追加在提示词后面（逗号分隔）；模板为空原样返回。
  * 例：「masterpiece, best quality, {{prompt}}, cinematic lighting」
  */

@@ -57,7 +57,7 @@ onMounted(() => {
 @import url('./assets/studio.css');
 
 /* === 应用内引导（driver.js）主题覆写 — 跟随设计 token === */
-.uu889-tour-popover {
+.hail-tour-popover {
   background: var(--surface-raised) !important;
   color: var(--text-1) !important;
   border: 1px solid var(--border) !important;
@@ -65,26 +65,26 @@ onMounted(() => {
   box-shadow: var(--shadow-elevated) !important;
   max-width: 340px;
 }
-.uu889-tour-popover .driver-popover-title {
+.hail-tour-popover .driver-popover-title {
   color: var(--text-0) !important;
   font: 700 14px/1.3 var(--font-body) !important;
   letter-spacing: -0.01em;
 }
-.uu889-tour-popover .driver-popover-description {
+.hail-tour-popover .driver-popover-description {
   color: var(--text-2) !important;
   font: 400 12.5px/1.65 var(--font-body) !important;
 }
-.uu889-tour-popover .driver-popover-progress-text {
+.hail-tour-popover .driver-popover-progress-text {
   color: var(--text-3) !important;
   font-size: 10.5px !important;
 }
-.uu889-tour-popover .driver-popover-close-btn {
+.hail-tour-popover .driver-popover-close-btn {
   color: var(--text-3) !important;
 }
-.uu889-tour-popover .driver-popover-navigation-btns {
+.hail-tour-popover .driver-popover-navigation-btns {
   gap: 6px;
 }
-.uu889-tour-popover .driver-popover-navigation-btns button {
+.hail-tour-popover .driver-popover-navigation-btns button {
   background: var(--button-bg) !important;
   color: var(--button-text) !important;
   border: none !important;
@@ -94,8 +94,8 @@ onMounted(() => {
   text-shadow: none !important;
   cursor: pointer;
 }
-.uu889-tour-popover .driver-popover-navigation-btns button.driver-popover-next-btn,
-.uu889-tour-popover .driver-popover-navigation-btns button.driver-popover-done-btn {
+.hail-tour-popover .driver-popover-navigation-btns button.driver-popover-next-btn,
+.hail-tour-popover .driver-popover-navigation-btns button.driver-popover-done-btn {
   background: var(--accent-gradient) !important;
   color: var(--on-accent) !important;
 }
@@ -103,7 +103,7 @@ onMounted(() => {
   background: var(--scrim) !important;
   backdrop-filter: blur(2px);
 }
-/* 高亮框描边用品牌橙 */
+/* 高亮框描边用品牌绿 */
 .driver-active-element .driver-popover-arrow svg path,
 .driver-active-element .driver-popover-arrow svg polygon {
   fill: var(--accent) !important;

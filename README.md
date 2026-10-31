@@ -1,8 +1,8 @@
-# 🎬 UU889-Drama - AI Short Drama Studio
+# 🎬 Hail-Drama - AI Short Drama Studio
 
 <div align="center">
 
-<img src="docs/images/logo.png" alt="UU889-Drama" width="128" />
+<img src="docs/images/logo.png" alt="Hail-Drama" width="128" />
 
 **A full-stack TypeScript platform that automates AI short-drama production**
 
@@ -20,13 +20,13 @@
 
 </div>
 
-> UU889-Drama is a fork of [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama) (Huobao Drama) under the same [CC BY-NC-SA 4.0](LICENSE) license. On top of a rebrand it adds aiask.me text / image / video providers, aiask.me Grok video and local ComfyUI video generation.
+> Hail-Drama is a fork of UU889-Drama, itself a fork of [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama) (Huobao Drama), under the same [CC BY-NC-SA 4.0](LICENSE) license. On top of a rebrand it adds aiask.me text / image / video providers, aiask.me Grok video and local ComfyUI video generation.
 
 ---
 
 ## 📖 Overview
 
-UU889-Drama turns a novel into a finished short drama: script rewriting → character / scene / prop extraction → image generation → storyboard breakdown → video generation → FFmpeg export. It runs as an Electron desktop app (macOS / Windows), on a server, or in Docker.
+Hail-Drama turns a novel into a finished short drama: script rewriting → character / scene / prop extraction → image generation → storyboard breakdown → video generation → FFmpeg export. It runs as an Electron desktop app (macOS / Windows), on a server, or in Docker.
 
 ```
 frontend/   — Nuxt 3 + Vue 3 + TypeScript (plain CSS, no UI framework)
@@ -61,8 +61,8 @@ data/       — Generated media and the SQLite database
 Requirements: **Node.js 20+** and **npm 9+**. SQLite and FFmpeg are bundled — nothing else to install.
 
 ```bash
-git clone https://github.com/uu889/uu889-drama.git
-cd uu889-drama
+git clone https://github.com/hailcanto/hail-drama.git
+cd hail-drama
 
 cd backend && npm install && npm run dev      # terminal 1: API at http://localhost:5679/api/v1
 cd frontend && npm install && npm run dev     # terminal 2: UI at http://localhost:3013
@@ -79,18 +79,18 @@ cd ../backend && npm start                                      # open http://lo
 
 | Variable | Default | Description |
 |---|---|---|
-| `SQLITE_PATH` | `<repo>/data/uu889.sqlite3` | SQLite database file |
+| `SQLITE_PATH` | `<repo>/data/hail.sqlite3` | SQLite database file |
 | `PORT` | `5679` | Backend port |
 | `STORAGE_PATH` | `<repo>/data/static` | Generated media directory |
-| `UU889_DATA_DIR` | — | Data root injected by the desktop app |
+| `HAIL_DATA_DIR` | — | Data root injected by the desktop app |
 | `WORKSPACE_PATH` | `backend/workspace` | Agent skills / prompts directory |
 | `FRONTEND_DIST` | `frontend/dist` | Frontend build directory |
 | `FFMPEG_BIN` / `FFPROBE_BIN` | bundled binaries | Custom ffmpeg / ffprobe paths |
 | `PUBLIC_BASE_URL` | — | Public URL needed when Seedance references local video/audio |
 | `MODEL_INSTALLER_LOCAL` | `1` | `0` disables "this computer" mode of the one-click model download on server deployments (remote SSH mode stays available) |
 | `SUBTITLE_FONT` | auto | Font file for burned-in subtitles; by default a system CJK font is found automatically (Microsoft YaHei on Windows, PingFang / Heiti on macOS, Noto CJK / WenQuanYi on Linux) |
-| `MODEL_INSTALLER_DETACHED` | `1` | `0` makes this-computer model downloads run inside the app instead of a detached background process (by default downloads keep going after UU889-Drama exits) |
-| `UU889_UPDATE_FEED` | GitHub Releases `latest.json` | Custom update feed |
+| `MODEL_INSTALLER_DETACHED` | `1` | `0` makes this-computer model downloads run inside the app instead of a detached background process (by default downloads keep going after Hail-Drama exits) |
+| `HAIL_UPDATE_FEED` | GitHub Releases `latest.json` | Custom update feed |
 
 API keys, base URLs and models are configured in **Settings** and stored in the database.
 
@@ -178,7 +178,7 @@ Pick the template under **Settings → Text / Image / Video → Add**, paste the
 
 ## 🖥️ Local ComfyUI Video
 
-UU889-Drama talks to ComfyUI's native HTTP API:
+Hail-Drama talks to ComfyUI's native HTTP API:
 
 1. Start ComfyUI (default `http://127.0.0.1:8188`; from Docker use `http://host.docker.internal:8188` and run ComfyUI with `--listen 0.0.0.0`)
 2. **Settings → Video → Add** and pick the **本地 ComfyUI** (local ComfyUI) template; the API key is optional (only for authenticating reverse proxies)
@@ -236,7 +236,7 @@ Per-style overrides, an installed-file check and copy-ready download commands (b
 - **this computer** (Windows / macOS / Linux) or **remote over SSH** (Windows / macOS / Linux; password or key/certificate login on macOS and Linux — OpenSSH, PEM, PKCS#8 and PuTTY .ppk keys); detects SD WebUI / ComfyUI / Fooocus install folders or lets you pick one
 - sources in order: Hugging Face → hf-mirror.com → Civitai → Civitai mirror (CivArchive); Civitai models with an identical (same SHA256) copy on Hugging Face come from HF without a Civitai key
 - progress bars (overall + per file speed / ETA / source), resume, SHA256 verification, pause / resume / cancel
-- background ("offline") downloads: local downloads continue with the page closed and resume after restart; remote downloads run on the remote machine and finish even if UU889-Drama is closed
+- background ("offline") downloads: local downloads continue with the page closed and resume after restart; remote downloads run on the remote machine and finish even if Hail-Drama is closed
 - optional "download missing models when generating": generation waits for the missing files, then starts
 
 ---
@@ -245,7 +245,7 @@ Per-style overrides, an installed-file check and copy-ready download commands (b
 
 ### 🖥️ Desktop app
 
-**Download**: [GitHub Releases](https://github.com/uu889/uu889-drama/releases/latest) (Windows `.exe`, macOS Apple Silicon / Intel `.dmg`)
+**Download**: [GitHub Releases](https://github.com/hailcanto/hail-drama/releases/latest) (Windows `.exe`, macOS Apple Silicon / Intel `.dmg`)
 
 **Publishing a release**: bump `version` in `desktop/package.json` and `backend/package.json`, commit, then push an annotated tag — GitHub Actions builds Windows + both macOS architectures and uploads the installers and the `latest.json` update feed:
 
@@ -263,8 +263,8 @@ npm run dist        # macOS dmg (arm64 + Intel) + updater zip
 npm run dist:win    # Windows NSIS installer (win-x64)
 ```
 
-- User data: macOS `~/Library/Application Support/UU889Drama/`, Windows `%APPDATA%\UU889Drama\`
-- Unsigned macOS builds reported as "damaged": run the bundled `如提示已损坏请双击我.command` or `sudo xattr -cr /Applications/UU889Drama.app`
+- User data: macOS `~/Library/Application Support/HailDrama/`, Windows `%APPDATA%\HailDrama\`
+- Unsigned macOS builds reported as "damaged": run the bundled `如提示已损坏请双击我.command` or `sudo xattr -cr /Applications/HailDrama.app`
 - In-app updates: installed apps read `latest.json` from the latest GitHub Release and offer the upgrade
 - After changing the logo, run `node desktop/scripts/make-brand-icons.mjs` to regenerate every icon from `docs/images/logo.svg`
 
@@ -281,13 +281,15 @@ Put Nginx in front and serve `/static/` straight from `data/static/` for best pe
 
 ```bash
 cp .env.example .env                              # set WATCHTOWER_TOKEN
-UU889_VERSION=1.0.0 docker compose up -d --build  # open http://localhost:5679
+HAIL_VERSION=1.0.0 docker compose up -d --build  # open http://localhost:5679
 ```
 
-- Data lives in the `uu889-data` volume mounted at `/app/data`
-- Updating a source build: `git pull && UU889_VERSION=<new version> docker compose up -d --build`
-- One-click updates (optional): the bundled Watchtower sidecar can only pull an image that exists in a registry. Publish the image (command below) and point `image` in `docker-compose.yml` at it to make "Settings → About → Update now" work; remove the app's `UU889_WATCHTOWER_*` variables to keep only the new-version notice
-- Multi-arch image: `docker buildx build --platform linux/amd64,linux/arm64 --build-arg UU889_VERSION=x.y.z -t <your-registry>/uu889-drama:x.y.z --push .`
+- Data lives in the `hail-data` volume mounted at `/app/data`
+- Image: pushing a `v*` tag publishes `ghcr.io/hailcanto/hail-drama:<version>` and `:latest` (amd64 / arm64) via GitHub Actions
+- Upgrading from UU889-Drama: copy the old `uu889-data` volume into the new one first (command in the header of `docker-compose.yml`); the database is renamed to `hail.sqlite3` on startup and old `UU889_*` variables keep working
+- Updating a source build: `git pull && HAIL_VERSION=<new version> docker compose up -d --build`
+- One-click updates (optional): the bundled Watchtower sidecar can only pull an image that exists in a registry. Publish the image (command below) and point `image` in `docker-compose.yml` at it to make "Settings → About → Update now" work; remove the app's `HAIL_WATCHTOWER_*` variables to keep only the new-version notice
+- Multi-arch image: `docker buildx build --platform linux/amd64,linux/arm64 --build-arg HAIL_VERSION=x.y.z -t <your-registry>/hail-drama:x.y.z --push .`
 
 ---
 
@@ -318,7 +320,7 @@ cd ../frontend && npm run generate
 
 ## 📄 License & Credits
 
-UU889-Drama is derived from [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama) (Huobao Drama); the original authors retain copyright in their work and the full upstream commit history is preserved in this repository.
+Hail-Drama is derived from UU889-Drama and [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama) (Huobao Drama); the original authors retain copyright in their work and the full upstream commit history is preserved in this repository.
 
 As required by the upstream license, this project is also released under **[CC BY-NC-SA 4.0](LICENSE)** (Attribution-NonCommercial-ShareAlike 4.0 International):
 

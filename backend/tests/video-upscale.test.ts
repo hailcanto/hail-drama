@@ -10,8 +10,8 @@ import path from 'node:path'
 import http from 'node:http'
 import { execFileSync } from 'node:child_process'
 
-const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-upscale-'))
-process.env.UU889_DATA_DIR = DATA
+const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-upscale-'))
+process.env.HAIL_DATA_DIR = DATA
 process.env.SQLITE_PATH = path.join(DATA, 'test.sqlite3')
 const SYS_FFMPEG = ['/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg', '/opt/homebrew/bin/ffmpeg'].find((p) => fs.existsSync(p))
 if (SYS_FFMPEG && !process.env.FFMPEG_BIN) {
@@ -114,7 +114,7 @@ before(async () => {
       const h = /^\/history\/u(\d+)/.exec(url)
       if (h) {
         const n = Number(h[1])
-        return json({ [`u${n}`]: { outputs: { 7: { images: [{ filename: `up_${n}.mp4`, subfolder: 'uu889-upscale', type: 'output' }], animated: [true] } }, status: { status_str: 'success', completed: true } } })
+        return json({ [`u${n}`]: { outputs: { 7: { images: [{ filename: `up_${n}.mp4`, subfolder: 'hail-upscale', type: 'output' }], animated: [true] } }, status: { status_str: 'success', completed: true } } })
       }
       const v = /^\/view\?.*filename=up_(\d+)\.mp4/.exec(url)
       if (v) {

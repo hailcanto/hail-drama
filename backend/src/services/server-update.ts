@@ -1,25 +1,26 @@
 /**
  * 服务器 / Docker 部署的版本检查与更新触发
  *
- * - 版本检查：复用桌面版同一份发布清单（UU889_UPDATE_FEED 的 latest.json）
- * - 当前版本：构建时注入 UU889_VERSION（Docker ARG / 环境变量），缺省回退 package.json
- * - 一键更新：仅在配置 Watchtower（UU889_WATCHTOWER_URL）时可用——容器不可变，
+ * - 版本检查：复用桌面版同一份发布清单（HAIL_UPDATE_FEED 的 latest.json）
+ * - 当前版本：构建时注入 HAIL_VERSION（Docker ARG / 环境变量），缺省回退 package.json
+ * - 一键更新：仅在配置 Watchtower（HAIL_WATCHTOWER_URL）时可用——容器不可变，
  *   容器内自更新是反模式，正确路径是由 Watchtower 拉新镜像并重建本容器；
  *   未配置时前端展示手动更新指引（docker compose pull && up -d）
  */
 import { readFileSync } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { brandEnv } from '../utils/env.js'
 
-// 默认读取 GitHub Releases 的 latest.json；UU889_UPDATE_FEED 可整体覆盖（如自建国内镜像）
-const FEED_URLS = process.env.UU889_UPDATE_FEED
-  ? [process.env.UU889_UPDATE_FEED]
+// 默认读取 GitHub Releases 的 latest.json；HAIL_UPDATE_FEED 可整体覆盖（如自建国内镜像）
+const FEED_URLS = process.env.HAIL_UPDATE_FEED
+  ? [process.env.HAIL_UPDATE_FEED]
   : [
-    'https://github.com/uu889/uu889-drama/releases/latest/download/latest.json',
+    'https://github.com/hailcanto/hail-drama/releases/latest/download/latest.json',
   ]
 
-const WATCHTOWER_URL = process.env.UU889_WATCHTOWER_URL?.replace(/\/+$/, '')
-const WATCHTOWER_TOKEN = process.env.UU889_WATCHTOWER_TOKEN || ''
+const WATCHTOWER_URL = brandEnv('WATCHTOWER_URL')?.replace(/\/+$/, '')
+const WATCHTOWER_TOKEN = brandEnv('WATCHTOWER_TOKEN') || ''
 
 export type ServerUpdateMode = 'watchtower' | 'manual'
 
@@ -36,7 +37,7 @@ let lastState: Omit<ServerUpdateState, 'updateMode'> | null = null
 
 function currentVersion(): string {
   // compose 默认注入 dev（本地构建未指定版本）：不是版本号，改用 package.json，避免永远提示有新版本
-  const injected = (process.env.UU889_VERSION || '').replace(/^v/, '')
+  const injected = (brandEnv('VERSION') || '').replace(/^v/, '')
   if (/^\d+\.\d+\.\d+/.test(injected)) return injected
   try {
     const pkg = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../package.json')
@@ -111,7 +112,7 @@ export async function checkServerUpdate(): Promise<ServerUpdateState> {
  * Watchtower 异步执行：拉取新镜像 → 重建容器，本进程随后被替换，调用方只能拿到"已触发"
  */
 export async function triggerWatchtowerUpdate(): Promise<void> {
-  if (!WATCHTOWER_URL) throw new Error('未配置 Watchtower（UU889_WATCHTOWER_URL），无法应用内更新')
+  if (!WATCHTOWER_URL) throw new Error('未配置 Watchtower（HAIL_WATCHTOWER_URL），无法应用内更新')
   const res = await fetch(`${WATCHTOWER_URL}/v1/update`, {
     method: 'POST',
     headers: WATCHTOWER_TOKEN ? { Authorization: `Bearer ${WATCHTOWER_TOKEN}` } : {},

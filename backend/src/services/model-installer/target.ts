@@ -1,5 +1,5 @@
 /**
- * 模型安装的目标机器：本机（运行 UU889-Drama 后端的这台电脑）或远程（SSH 登录的 Windows / macOS / Linux）。
+ * 模型安装的目标机器：本机（运行 Hail 短剧 后端的这台电脑）或远程（SSH 登录的 Windows / macOS / Linux）。
  *
  * 两种目标对外是同一套接口（TargetFs）：判断系统、列目录、查文件大小、查剩余空间、执行命令。
  * 路径统一用「目标机原生写法」：Windows 为 C:\\a\\b，macOS / Linux 为 /a/b。

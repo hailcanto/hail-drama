@@ -1,8 +1,8 @@
-# 🎬 UU889-Drama - AI ショートドラマ制作プラットフォーム
+# 🎬 Hail-Drama - AI ショートドラマ制作プラットフォーム
 
 <div align="center">
 
-<img src="docs/images/logo.png" alt="UU889-Drama" width="128" />
+<img src="docs/images/logo.png" alt="Hail-Drama" width="128" />
 
 **TypeScript フルスタックの AI ショートドラマ自動制作プラットフォーム**
 
@@ -18,7 +18,7 @@
 
 </div>
 
-> UU889-Drama は [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama)（火宝短劇）のフォークです。同じ [CC BY-NC-SA 4.0](LICENSE) ライセンスのもと、ブランドを変更し、aiask.me のテキスト / 画像 / 動画プロバイダー、aiask.me Grok 動画、ローカル ComfyUI 動画生成を追加しました。
+> Hail-Drama は UU889-Drama のフォークで、UU889-Drama は [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama)（火宝短劇）のフォークです。同じ [CC BY-NC-SA 4.0](LICENSE) ライセンスのもと、ブランドを変更し、aiask.me のテキスト / 画像 / 動画プロバイダー、aiask.me Grok 動画、ローカル ComfyUI 動画生成を追加しました。
 
 ## 📖 概要
 
@@ -39,8 +39,8 @@ UI と生成コンテンツの言語：中文 / English / 日本語 / 한국어 
 Node.js 20+ / npm 9+ のみ必要です（SQLite と FFmpeg は同梱）。
 
 ```bash
-git clone https://github.com/uu889/uu889-drama.git
-cd uu889-drama
+git clone https://github.com/hailcanto/hail-drama.git
+cd hail-drama
 cd backend && npm install && npm run dev      # API: http://localhost:5679/api/v1
 cd frontend && npm install && npm run dev     # UI:  http://localhost:3013
 ```
@@ -71,10 +71,10 @@ Grok 動画のパラメーター：`duration_seconds`（1–15 秒）、`ratio`�
 
 - **デスクトップ**：`npm run build:frontend` の後 `cd desktop && npm install && npm run dist`（macOS）/ `npm run dist:win`（Windows）
 - **サーバー**：`cd frontend && npm run generate && cp -r .output/public dist`、`cd backend && npm start`
-- **Docker**：`cp .env.example .env` の後 `UU889_VERSION=1.0.0 docker compose up -d --build`（データはボリューム `uu889-data`）
+- **Docker**：`cp .env.example .env` の後 `HAIL_VERSION=1.0.0 docker compose up -d --build`（データはボリューム `hail-data`）
 
 詳細は [简体中文 README](README.zh-CN.md) / [English README](README.md) を参照してください。
 
 ## 📄 ライセンスとクレジット
 
-本プロジェクトは [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama) を元にしており、原作者が著作権を保持します（上流のコミット履歴を保持）。上流と同じく **[CC BY-NC-SA 4.0](LICENSE)** で公開しており、**商用利用は原作者の書面による許可なく禁止**です。
+本プロジェクトは UU889-Drama と [chatfire-AI/huobao-drama](https://github.com/chatfire-AI/huobao-drama) を元にしており、原作者が著作権を保持します（上流のコミット履歴を保持）。上流と同じく **[CC BY-NC-SA 4.0](LICENSE)** で公開しており、**商用利用は原作者の書面による許可なく禁止**です。

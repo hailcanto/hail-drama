@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "UU889-Drama",
+    "title": "Hail-Drama",
     "updateAvailable": "新バージョン v{version} があります。「設定 → 更新について」でアップグレードできます"
   },
   "common": {
@@ -441,11 +441,11 @@
         "workflowEmpty": "「カスタムワークフロー」が選択されていますがエディタが空です",
         "exportHint": "プレースホルダーなしでも動きます。自動バインドを有効にすると、ノード構造からプロンプト・画像・サイズなどを接続します。",
         "autoBind": "自動バインド（推奨）",
-        "autoBindHint": "ポジティブ / ネガティブプロンプト、先頭 / 末尾フレーム / 参照画像（LoadImage）、シード、幅・高さ、フレーム数、FPS、拡散モデルを自動で見つけて UU889-Drama の値に置き換えます。",
+        "autoBindHint": "ポジティブ / ネガティブプロンプト、先頭 / 末尾フレーム / 参照画像（LoadImage）、シード、幅・高さ、フレーム数、FPS、拡散モデルを自動で見つけて Hail-Drama の値に置き換えます。",
         "autoBindHintImage": "ポジティブ / ネガティブプロンプト、参照画像（LoadImage）、シード、幅・高さ、Checkpoint を自動で見つけて置き換えます。",
         "fromWorkflow": "ワークフローの値",
         "inspect": "ワークフローを確認",
-        "inspectTitle": "UU889-Drama はこのワークフローをこう制御します",
+        "inspectTitle": "Hail-Drama はこのワークフローをこう制御します",
         "colNode": "ノード",
         "colField": "フィールド",
         "colTarget": "パラメーター",
@@ -499,7 +499,7 @@
         "presetApplied": "プリセットを適用：{name}",
         "promptTemplate": "プロンプトテンプレート",
         "promptTemplatePlaceholder": "例：masterpiece, best quality, {ph}",
-        "promptTemplateHint": "{ph} の位置に UU889-Drama のプロンプトが入ります。{ph} がない場合は先頭に付加、空欄ならそのまま送信。",
+        "promptTemplateHint": "{ph} の位置に Hail-Drama のプロンプトが入ります。{ph} がない場合は先頭に付加、空欄ならそのまま送信。",
         "preview": "プレビュー：",
         "samplePrompt": "赤いマントの少女が雪山の頂でカメラを振り返る",
         "translate": "英語以外のプロンプトを英語に翻訳",
@@ -1477,7 +1477,7 @@
     "helpTitle": "ガイド",
     "index": {
       "welcome": {
-        "title": "👋 UU889-Drama へようこそ",
+        "title": "👋 Hail-Drama へようこそ",
         "desc": "小説 → 脚本 → アセット → 絵コンテ → 動画 → 完成、すべてワンストップ。まず AI サービスを設定し、最初のプロジェクトを作成しましょう。"
       },
       "create": {

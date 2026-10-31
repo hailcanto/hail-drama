@@ -1,13 +1,13 @@
 /**
- * 后台下载脚本：放到远程机器（或本机）后在后台独立运行（UU889-Drama 关掉、断网也会继续下完）。
+ * 后台下载脚本：放到远程机器（或本机）后在后台独立运行（Hail 短剧 关掉、断网也会继续下完）。
  *
  * - macOS / Linux：POSIX sh + curl（没有 curl 用 wget），远程 nohup（+ setsid）后台运行，本机用独立会话的进程
  * - Windows：PowerShell + curl.exe（Windows 10 1803+ 自带），用 WMI 创建进程，SSH 断开后不会被结束
  *
- * 每个文件：已存在且大小正确 → 跳过；否则下载到 <文件>.uu889part，按来源顺序尝试（每个来源重试 3 次，
+ * 每个文件：已存在且大小正确 → 跳过；否则下载到 <文件>.hailpart，按来源顺序尝试（每个来源重试 3 次，
  * 续传 curl -C -），下完核对大小与 SHA256（不知道精确大小的文件至少要 1 MB），再改名为正式文件。
  * 进度写在 status.log，后端轮询读取；全部结束后删掉脚本本身（里面可能有下载 Token）。
- * 所有进程的命令行都带 uu889dl-<任务 ID>，暂停 / 取消时按它结束进程。
+ * 所有进程的命令行都带 haildl-<任务 ID>，暂停 / 取消时按它结束进程。
  */
 import { psQuote, shQuote, type TargetOs } from './target'
 
@@ -19,14 +19,14 @@ export interface ScriptItem {
 }
 
 export function jobTag(jobId: string): string {
-  return `uu889dl-${jobId}`
+  return `haildl-${jobId}`
 }
 
 export function buildPosixScript(jobId: string, jobDir: string, items: ScriptItem[]): string {
   const tag = jobTag(jobId)
   const lines = [
     '#!/bin/sh',
-    `# UU889-Drama 模型下载任务 ${jobId}（自动生成）`,
+    `# Hail 短剧 模型下载任务 ${jobId}（自动生成）`,
     `JOB_DIR=${shQuote(jobDir)}`,
     'LOG="$JOB_DIR/status.log"',
     'echo $$ > "$JOB_DIR/pid"',
@@ -47,7 +47,7 @@ export function buildPosixScript(jobId: string, jobDir: string, items: ScriptIte
     'dl() {',
     '  i=$1; dest=$2; bytes=$3; want=$4; shift 4',
     '  if [ -f "$dest" ] && { { [ "$bytes" = 0 ] && [ "$(fsize "$dest")" -ge 1048576 ]; } || [ "$(fsize "$dest")" = "$bytes" ]; }; then log "SKIP $i"; return 0; fi',
-    '  mkdir -p "$(dirname "$dest")"; part="$dest.uu889part"; log "BEGIN $i"',
+    '  mkdir -p "$(dirname "$dest")"; part="$dest.hailpart"; log "BEGIN $i"',
     '  while [ $# -ge 3 ]; do',
     '    label=$1; url=$2; hdr=$3; shift 3; ok=0; n=0',
     '    while [ $n -lt 3 ]; do',
@@ -80,7 +80,7 @@ export function buildPosixScript(jobId: string, jobDir: string, items: ScriptIte
 export function buildPowerShellScript(jobId: string, jobDir: string, items: ScriptItem[]): string {
   const tag = jobTag(jobId)
   const lines = [
-    `# UU889-Drama 模型下载任务 ${jobId}（自动生成）`,
+    `# Hail 短剧 模型下载任务 ${jobId}（自动生成）`,
     "$ErrorActionPreference = 'Continue'",
     `$JobDir = ${psQuote(jobDir)}`,
     "$Log = Join-Path $JobDir 'status.log'",
@@ -102,7 +102,7 @@ export function buildPowerShellScript(jobId: string, jobDir: string, items: Scri
     'function Dl($i, $dest, [long]$bytes, $want, $src) {',
     '  if ((Test-Path -LiteralPath $dest) -and (($bytes -eq 0 -and (FSize $dest) -ge 1048576) -or (FSize $dest) -eq $bytes)) { Log "SKIP $i"; return }',
     '  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $dest) | Out-Null',
-    '  $part = "$dest.uu889part"; Log "BEGIN $i"',
+    '  $part = "$dest.hailpart"; Log "BEGIN $i"',
     '  for ($k = 0; $k -lt $src.Count; $k += 3) {',
     '    $label = $src[$k]; $url = $src[$k + 1]; $hdr = $src[$k + 2]; $ok = $false',
     '    for ($n = 0; $n -lt 3; $n++) {',

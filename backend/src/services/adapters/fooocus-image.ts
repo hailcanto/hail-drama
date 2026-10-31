@@ -10,7 +10,7 @@
  * - settings.fooocus_performance（Speed / Quality / Extreme Speed / Lightning / Hyper-SD）、
  *   settings.fooocus_styles（逗号分隔，留空用 Fooocus 默认风格）
  * - 开启 --apikey 时配置里 API Key 填同一个值（以 X-API-KEY 头发送）
- * - 提示词模板 settings.prompt_template（{{prompt}} 处插入 UU889-Drama 的提示词）
+ * - 提示词模板 settings.prompt_template（{{prompt}} 处插入 Hail 短剧 的提示词）
  * - 进度：query-job 的 job_progress（0~100）与 job_status（如 "Sampling step 12/30"）
  */
 import type {

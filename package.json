@@ -1,8 +1,8 @@
 {
-  "name": "uu889-drama",
+  "name": "hail-drama",
   "version": "1.0.0",
   "private": true,
-  "description": "UU889-Drama — AI 短剧制作工具（桌面版编排入口）",
+  "description": "Hail 短剧 — AI 短剧制作工具（桌面版编排入口）",
   "scripts": {
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",

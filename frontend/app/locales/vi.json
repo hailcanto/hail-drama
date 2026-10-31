@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "UU889-Drama",
+    "title": "Hail-Drama",
     "updateAvailable": "Đã có phiên bản mới v{version}. Nâng cấp tại Cài đặt → Giới thiệu & cập nhật."
   },
   "common": {
@@ -439,13 +439,13 @@
         "copyToEditor": "Chép vào trình soạn để sửa",
         "overwriteConfirm": "Ghi đè workflow trong trình soạn bằng mẫu này?",
         "workflowEmpty": "Đã chọn \"Workflow tùy chỉnh\" nhưng trình soạn đang trống",
-        "exportHint": "Không cần placeholder: bật tự động liên kết, UU889-Drama sẽ nối prompt, ảnh, kích thước… theo cấu trúc node.",
+        "exportHint": "Không cần placeholder: bật tự động liên kết, Hail-Drama sẽ nối prompt, ảnh, kích thước… theo cấu trúc node.",
         "autoBind": "Tự động liên kết (khuyến nghị)",
-        "autoBindHint": "Tự tìm prompt tích cực / tiêu cực, khung đầu / cuối / ảnh tham chiếu (LoadImage), seed, rộng / cao, số khung, FPS và model khuếch tán rồi thay bằng giá trị của UU889-Drama.",
-        "autoBindHintImage": "Tự tìm prompt, ảnh tham chiếu (LoadImage), seed, rộng / cao và checkpoint rồi thay bằng giá trị của UU889-Drama.",
+        "autoBindHint": "Tự tìm prompt tích cực / tiêu cực, khung đầu / cuối / ảnh tham chiếu (LoadImage), seed, rộng / cao, số khung, FPS và model khuếch tán rồi thay bằng giá trị của Hail-Drama.",
+        "autoBindHintImage": "Tự tìm prompt, ảnh tham chiếu (LoadImage), seed, rộng / cao và checkpoint rồi thay bằng giá trị của Hail-Drama.",
         "fromWorkflow": "theo workflow",
         "inspect": "Kiểm tra workflow",
-        "inspectTitle": "UU889-Drama sẽ điều khiển workflow này như sau",
+        "inspectTitle": "Hail-Drama sẽ điều khiển workflow này như sau",
         "colNode": "Node",
         "colField": "Trường",
         "colTarget": "Tham số",
@@ -499,7 +499,7 @@
         "presetApplied": "Đã áp dụng: {name}",
         "promptTemplate": "Mẫu prompt",
         "promptTemplatePlaceholder": "vd: masterpiece, best quality, {ph}",
-        "promptTemplateHint": "Prompt của UU889-Drama được chèn tại {ph}; không có {ph} thì thêm vào đầu; để trống thì gửi nguyên văn.",
+        "promptTemplateHint": "Prompt của Hail-Drama được chèn tại {ph}; không có {ph} thì thêm vào đầu; để trống thì gửi nguyên văn.",
         "preview": "Xem trước:",
         "samplePrompt": "cô gái áo choàng đỏ trên đỉnh núi tuyết, ngoảnh lại nhìn máy quay",
         "translate": "Dịch prompt không phải tiếng Anh sang tiếng Anh",
@@ -1477,7 +1477,7 @@
     "helpTitle": "Hướng dẫn",
     "index": {
       "welcome": {
-        "title": "👋 Chào mừng đến với UU889-Drama",
+        "title": "👋 Chào mừng đến với Hail-Drama",
         "desc": "Tiểu thuyết → kịch bản → tài nguyên → phân cảnh → video → thành phẩm, tất cả tại một nơi. Hãy cấu hình dịch vụ AI trước, rồi tạo dự án đầu tiên."
       },
       "create": {

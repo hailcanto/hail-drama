@@ -523,7 +523,7 @@ app.get('/style-models', (c) => {
 /**
  * POST /ai-configs/comfyui/inspect — 检查工作流会被怎样控制
  * body: { service_type, workflow?, comfyui_template?, model?, comfyui_auto_bind?, steps?, cfg?, base_url?, api_key? }
- * 返回绑定表（哪个节点的哪个字段接 UU889-Drama 的哪个参数）、提醒、用到的模型文件；
+ * 返回绑定表（哪个节点的哪个字段接 Hail 短剧 的哪个参数）、提醒、用到的模型文件；
  * 传了 base_url 时再查 ComfyUI 里这些模型文件是否存在。
  */
 app.post('/comfyui/inspect', async (c) => {

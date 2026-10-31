@@ -460,8 +460,8 @@ function fmtEta(s) {
 .mi-job-head, .mi-item-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 11.5px; min-width: 0; }
 .mi-spacer { flex: 1; }
 .mi-tag { font-size: 10.5px; padding: 0 6px; border-radius: 4px; background: var(--bg-1); color: var(--text-2); }
-.mi-tag-lora { background: var(--accent-soft, rgba(249,115,22,0.12)); color: var(--accent, #ea580c); }
-.mi-link { margin-left: 6px; color: var(--accent, #ea580c); text-decoration: none; }
+.mi-tag-lora { background: var(--accent-bg); color: var(--accent-text); }
+.mi-link { margin-left: 6px; color: var(--accent-text); text-decoration: none; }
 .mi-link:hover { text-decoration: underline; }
 .mi-bar { height: 8px; border-radius: 999px; background: var(--bg-1); overflow: hidden; border: 1px solid var(--border); }
 .mi-bar-sm { height: 5px; }

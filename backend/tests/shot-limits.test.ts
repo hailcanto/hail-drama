@@ -5,8 +5,8 @@ import os from 'node:os'
 import path from 'node:path'
 
 // 临时数据库（必须在导入 db 之前设置）
-const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-shot-limits-'))
-process.env.UU889_DATA_DIR = DATA
+const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-shot-limits-'))
+process.env.HAIL_DATA_DIR = DATA
 process.env.SQLITE_PATH = path.join(DATA, 'test.sqlite3')
 
 const { db, initDb, schema } = await import('../src/db/index')

@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "UU889-Drama",
+    "title": "Hail 短剧",
     "updateAvailable": "发现新版本 v{version}，可在「设置 → 关于更新」中升级"
   },
   "common": {
@@ -439,13 +439,13 @@
         "copyToEditor": "填入编辑框，按需修改",
         "overwriteConfirm": "编辑框里已有工作流，确定用模板覆盖吗？",
         "workflowEmpty": "选择了「自定义工作流」但编辑框是空的，请粘贴工作流或改用内置模板",
-        "exportHint": "没有占位符也能用：保持下方「自动绑定」开启，UU889-Drama 会按节点结构接入提示词、图片、尺寸等参数。手写占位符的类别以手写为准。",
+        "exportHint": "没有占位符也能用：保持下方「自动绑定」开启，Hail 短剧 会按节点结构接入提示词、图片、尺寸等参数。手写占位符的类别以手写为准。",
         "autoBind": "自动绑定（推荐）",
-        "autoBindHint": "自动找出工作流里的正 / 负提示词、首帧 / 尾帧 / 参考图（LoadImage）、种子、宽高、帧数、FPS 和扩散模型，用 UU889-Drama 的参数替换。关闭后只替换手写的占位符。",
-        "autoBindHintImage": "自动找出工作流里的正 / 负提示词、参考图（LoadImage）、种子、宽高和 Checkpoint，用 UU889-Drama 的参数替换。关闭后只替换手写的占位符。",
+        "autoBindHint": "自动找出工作流里的正 / 负提示词、首帧 / 尾帧 / 参考图（LoadImage）、种子、宽高、帧数、FPS 和扩散模型，用 Hail 短剧 的参数替换。关闭后只替换手写的占位符。",
+        "autoBindHintImage": "自动找出工作流里的正 / 负提示词、参考图（LoadImage）、种子、宽高和 Checkpoint，用 Hail 短剧 的参数替换。关闭后只替换手写的占位符。",
         "fromWorkflow": "沿用工作流",
         "inspect": "检查工作流",
-        "inspectTitle": "UU889-Drama 会这样控制这个工作流",
+        "inspectTitle": "Hail 短剧 会这样控制这个工作流",
         "colNode": "节点",
         "colField": "字段",
         "colTarget": "接入参数",
@@ -499,7 +499,7 @@
         "presetApplied": "已套用预设：{name}",
         "promptTemplate": "提示词模板",
         "promptTemplatePlaceholder": "例：masterpiece, best quality, {ph}",
-        "promptTemplateHint": "{ph} 处插入 UU889-Drama 生成的提示词；不写 {ph} 时追加在提示词后面；留空则原样发送。",
+        "promptTemplateHint": "{ph} 处插入 Hail 短剧 生成的提示词；不写 {ph} 时追加在提示词后面；留空则原样发送。",
         "preview": "预览：",
         "samplePrompt": "一位穿红色斗篷的少女站在雪山之巅，回头望向镜头",
         "translate": "中文提示词自动翻译成英文",
@@ -601,7 +601,7 @@
         "passphrase": "私钥密码（没有可留空）",
         "test": "测试连接",
         "connected": "已连接：{os} · {host} · 主目录 {home}",
-        "remoteHint": "远程机器需要开启 SSH：macOS 在「系统设置 → 通用 → 共享」开启「远程登录」，Linux 安装 openssh-server，Windows 安装「OpenSSH 服务器」（设置 → 可选功能）。macOS 和 Linux 都支持账号密码登录与证书（私钥）登录。远程下载在对方后台独立运行，关掉 UU889-Drama 也会继续下完。",
+        "remoteHint": "远程机器需要开启 SSH：macOS 在「系统设置 → 通用 → 共享」开启「远程登录」，Linux 安装 openssh-server，Windows 安装「OpenSSH 服务器」（设置 → 可选功能）。macOS 和 Linux 都支持账号密码登录与证书（私钥）登录。远程下载在对方后台独立运行，关掉 Hail 短剧 也会继续下完。",
         "root": "{app} 安装根目录",
         "detect": "自动识别",
         "browse": "选择目录…",
@@ -1477,7 +1477,7 @@
     "helpTitle": "使用引导",
     "index": {
       "welcome": {
-        "title": "👋 欢迎使用 UU889-Drama",
+        "title": "👋 欢迎使用 Hail 短剧",
         "desc": "小说 → 剧本 → 资产 → 分镜 → 视频 → 成片，一站式 AI 短剧制作。先配置 AI 服务，再创建第一个项目。"
       },
       "create": {

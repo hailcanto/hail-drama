@@ -8,8 +8,8 @@ import os from 'node:os'
 import path from 'node:path'
 import { execFileSync } from 'node:child_process'
 
-const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-intro-'))
-process.env.UU889_DATA_DIR = DATA
+const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-intro-'))
+process.env.HAIL_DATA_DIR = DATA
 process.env.SQLITE_PATH = path.join(DATA, 'test.sqlite3')
 const SYS_FFMPEG = ['/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg', '/opt/homebrew/bin/ffmpeg'].find((p) => fs.existsSync(p))
 if (SYS_FFMPEG && !process.env.FFMPEG_BIN) {
@@ -34,7 +34,7 @@ test('options: off when disabled, duration clamped, image must be a local static
   assert.equal(o.image, 'static/images/cover.png')
   assert.equal(o.title, '第 3 集 重逢')
   assert.equal(intro.normalizeIntroOptions({ duration: 0.2 })!.duration, 1)
-  assert.equal(intro.normalizeIntroOptions({ image: 'static/../uu889.sqlite3' })!.image, null)
+  assert.equal(intro.normalizeIntroOptions({ image: 'static/../hail.sqlite3' })!.image, null)
   assert.equal(intro.normalizeIntroOptions({ image: 'https://x.com/a.png' })!.image, null)
 })
 
@@ -89,7 +89,7 @@ test('fonts: lists only fonts present here, uploaded fonts can be saved / resolv
   assert.match(up.id, /^static\/fonts\/[0-9a-z]+-我的_字体\.ttf$/)
   assert.ok(fonts.listIntroFonts().some((f) => f.id === up.id && f.uploaded))
   assert.ok(fonts.resolveIntroFont(up.id)!.endsWith('.ttf'))
-  assert.equal(fonts.deleteIntroFont('static/../uu889.sqlite3'), false)
+  assert.equal(fonts.deleteIntroFont('static/../hail.sqlite3'), false)
   assert.equal(fonts.deleteIntroFont(up.id), true)
   assert.ok(!fonts.listIntroFonts().some((f) => f.id === up.id))
 })

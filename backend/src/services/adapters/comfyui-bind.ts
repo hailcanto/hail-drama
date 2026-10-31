@@ -1,5 +1,5 @@
 /**
- * ComfyUI 工作流自动绑定：让「直接从 ComfyUI 导出、没写任何占位符」的工作流也受 UU889-Drama 控制。
+ * ComfyUI 工作流自动绑定：让「直接从 ComfyUI 导出、没写任何占位符」的工作流也受 Hail 短剧 控制。
  *
  * 按节点结构识别要控制的字段，改写成 {{占位符}}，之后统一走 renderComfyWorkflow 替换：
  *   - 正 / 负提示词：从采样器（KSampler / KSamplerAdvanced / SamplerCustom / CFGGuider…）的 positive / negative
@@ -68,7 +68,7 @@ const TEXT_SOURCE_FIELDS = ['value', 'string', 'text', 'prompt']
 const ENCODER_RE = /textencode|cliptext|prompt|conditioning.*text|textencoder/i
 /** 自带 prompt 文本框的视频条件节点（MiniMax H3 等），提示词直接写在这类节点上 */
 const PROMPT_CONDITIONING_RE = /MiniMaxH3|tovideo|ImageToVideo/i
-/** 输出宽高的辅助节点（如官方 H3 模板的 Resolution Selector）：自动绑定时改成直接填 UU889-Drama 的宽高 */
+/** 输出宽高的辅助节点（如官方 H3 模板的 Resolution Selector）：自动绑定时改成直接填 Hail 短剧 的宽高 */
 const RESOLUTION_HELPER_RE = /ResolutionSelector|Resolution\s*Selector|AspectRatio|ResolutionPicker/i
 /** 标题像「时长 / duration」的数字常量节点：自动绑定为时长（秒） */
 const DURATION_TITLE_RE = /duration|seconds|时长|秒/i
@@ -257,7 +257,7 @@ export function autoBindComfyWorkflow(
         bind(n, f, 'negative_prompt')
       }
     }
-    if (!positive.size) report.warnings.push('没有找到正向提示词节点（CLIPTextEncode 等），UU889-Drama 的提示词无法传入；请在文本节点里写 {{prompt}}')
+    if (!positive.size) report.warnings.push('没有找到正向提示词节点（CLIPTextEncode 等），Hail 短剧 的提示词无法传入；请在文本节点里写 {{prompt}}')
   }
 
   // ── 图片 ───────────────────────────────────────────────
@@ -419,7 +419,7 @@ export function autoBindComfyWorkflow(
       ? '没有找到保存视频的节点：请在末尾加 SaveVideo（或 VHS_VideoCombine）'
       : '没有找到保存图片的节点：请在末尾加 SaveImage')
   } else if (kind === 'video' && report.outputs.every((o) => /AnimatedWEBP|AnimatedPNG|PreviewImage|SaveImage/i.test(o.class_type))) {
-    report.warnings.push('工作流只输出图片 / 动图，UU889-Drama 需要 mp4：请改用 SaveVideo 或 VHS_VideoCombine（format 选 video/h264-mp4）')
+    report.warnings.push('工作流只输出图片 / 动图，Hail 短剧 需要 mp4：请改用 SaveVideo 或 VHS_VideoCombine（format 选 video/h264-mp4）')
   }
   const boundTargets = new Set(report.bindings.map((b) => b.target))
   if (kind === 'video' && !['image', 'first_frame', 'last_frame'].some((k) => boundTargets.has(k)) && ![...boundTargets].some((k) => k.startsWith('reference_image_'))) {

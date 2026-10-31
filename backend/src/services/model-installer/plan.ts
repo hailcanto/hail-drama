@@ -194,7 +194,7 @@ export async function checkPlanFiles(fs: TargetFs, layout: InstallLayout, files:
     if (!folder) continue
     const dest = fs.join(folder, f.file)
     const cur = await fs.stat(dest)
-    const part = await fs.stat(`${dest}.uu889part`)
+    const part = await fs.stat(`${dest}.hailpart`)
     let state: PlanFileState['state'] = 'missing'
     if (cur && !cur.isDir) {
       state = f.bytes && cur.size !== f.bytes ? 'size_mismatch' : 'present'

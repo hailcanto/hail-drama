@@ -8,8 +8,8 @@ import os from 'node:os'
 import path from 'node:path'
 import { execFileSync, spawnSync } from 'node:child_process'
 
-const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-bgm-'))
-process.env.UU889_DATA_DIR = DATA
+const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-bgm-'))
+process.env.HAIL_DATA_DIR = DATA
 process.env.SQLITE_PATH = path.join(DATA, 'test.sqlite3')
 const SYS_FFMPEG = ['/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg', '/opt/homebrew/bin/ffmpeg'].find((p) => fs.existsSync(p))
 if (SYS_FFMPEG && !process.env.FFMPEG_BIN) {
@@ -22,7 +22,7 @@ const bgm = await import('../src/services/bgm')
 test('options: only files inside the music library, volume as 0~1 or percent', () => {
   assert.equal(bgm.normalizeBgmOptions(null), null)
   assert.equal(bgm.normalizeBgmOptions({ path: 'static/uploads/a.mp3' }), null)
-  assert.equal(bgm.normalizeBgmOptions({ path: 'static/bgm/../uu889.sqlite3' }), null)
+  assert.equal(bgm.normalizeBgmOptions({ path: 'static/bgm/../hail.sqlite3' }), null)
   assert.equal(bgm.normalizeBgmOptions({ path: 'static/bgm/a.exe' }), null)
   assert.deepEqual(bgm.normalizeBgmOptions({ path: '/static/bgm/a.mp3' }), { path: 'static/bgm/a.mp3', volume: 0.3, duck: true, fade: true })
   assert.equal(bgm.normalizeBgmOptions({ path: 'static/bgm/a.mp3', volume: 45 })!.volume, 0.45)

@@ -209,9 +209,9 @@ test('comfyui: placeholders are typed, missing images prune LoadImage and its li
   assert.deepEqual(text2video['55'].inputs.vae, ['39', 0])
 
   const withImage = renderComfyWorkflow(COMFYUI_DEFAULT_WORKFLOW, {
-    prompt: 'rain', negative_prompt: 'blur', seed: 7, width: 1248, height: 704, frames: 121, fps: 24, image: 'uu889-1-image.png',
+    prompt: 'rain', negative_prompt: 'blur', seed: 7, width: 1248, height: 704, frames: 121, fps: 24, image: 'hail-1-image.png',
   })
-  assert.equal(withImage['56'].inputs.image, 'uu889-1-image.png')
+  assert.equal(withImage['56'].inputs.image, 'hail-1-image.png')
   assert.deepEqual(withImage['55'].inputs.start_image, ['56', 0])
 
   // 级联：LoadImage → ImageScale 一并移除，消费方只丢掉那条连线
@@ -238,7 +238,7 @@ test('comfyui: submit / history / view lifecycle', async () => {
   const req = await adapter.buildGenerateRequest(cfg, { id: 9, prompt: 'rain', duration: 5, aspectRatio: '16:9', resolution: '480p', seed: 3 })
   assert.equal(req.url, 'http://127.0.0.1:8188/prompt')
   assert.equal(req.headers.Authorization, undefined)
-  assert.equal(req.body.client_id, 'uu889-drama')
+  assert.equal(req.body.client_id, 'hail-drama')
   assert.equal(req.body.prompt['55'].inputs.length, 81)
   assert.equal(req.body.prompt['55'].inputs.width, 864)
   assert.equal(req.body.prompt['57'].inputs.fps, 16)
@@ -264,13 +264,13 @@ test('comfyui: submit / history / view lifecycle', async () => {
       status: { status_str: 'success', completed: true, messages: [] },
       outputs: {
         '9': { images: [{ filename: 'preview.png', subfolder: '', type: 'temp' }] },
-        '58': { images: [{ filename: 'uu889-drama_00001_.mp4', subfolder: 'video', type: 'output' }], animated: [true] },
+        '58': { images: [{ filename: 'hail-drama_00001_.mp4', subfolder: 'video', type: 'output' }], animated: [true] },
       },
     },
   })
   assert.equal(done.status, 'completed')
-  assert.equal(done.videoUrl, '/view?filename=uu889-drama_00001_.mp4&subfolder=video&type=output')
-  assert.equal(adapter.resolveDownload(cfg, done.videoUrl!).url, 'http://127.0.0.1:8188/view?filename=uu889-drama_00001_.mp4&subfolder=video&type=output')
+  assert.equal(done.videoUrl, '/view?filename=hail-drama_00001_.mp4&subfolder=video&type=output')
+  assert.equal(adapter.resolveDownload(cfg, done.videoUrl!).url, 'http://127.0.0.1:8188/view?filename=hail-drama_00001_.mp4&subfolder=video&type=output')
 
   const failed = adapter.parsePollResponse({
     abc: { status: { status_str: 'error', completed: false, messages: [['execution_error', { node_type: 'UNETLoader', exception_message: 'model not found' }]] }, outputs: {} },

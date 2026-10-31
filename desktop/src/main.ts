@@ -8,7 +8,7 @@
  * 后端可重启（startBackend）：存储位置迁移 = 停后端 → 搬文件 → 换 currentDataDir →
  * 重启后端（见 migrate.ts）；backendRestarting 期间抑制「异常退出」弹窗。
  */
-import { app, BrowserWindow, dialog, ipcMain, shell, utilityProcess } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, nativeTheme, shell, utilityProcess } from 'electron'
 import type { UtilityProcess } from 'electron'
 import * as net from 'net'
 import * as fs from 'fs'
@@ -17,6 +17,7 @@ import * as path from 'path'
 import { registerMigrationIpc } from './migrate'
 import { resolveMigrationTarget } from './migrate-core'
 import { registerUpdater, markQuitting } from './updater'
+import { maybeImportLegacyData } from './legacy-import'
 
 // 主进程打 CJS 产物，__dirname 天然可用（import.meta.url 在 CJS 下为 undefined）
 declare const __dirname: string
@@ -51,12 +52,14 @@ let quitting = false
 let backendRestarting = false
 let backendPort = 0
 let currentDataDir = ''
+// 导入旧数据期间只有进度小窗，关掉它不能触发 window-all-closed 退出
+let importingLegacy = false
 
 // userData 显式按模式区分：打包版 / dev 版互不干扰（数据库、上传文件、单实例锁均隔离），
 // 不依赖 package.json 命名（打包后与 dev 同名会导致单实例锁误杀）
 app.setPath('userData', path.join(
   app.getPath('appData'),
-  app.isPackaged ? 'UU889Drama' : 'UU889Drama-Dev',
+  app.isPackaged ? 'HailDrama' : 'HailDrama-Dev',
 ))
 
 // 从终端启动时若父进程管道关闭（如 `| head` 退出/终端关闭），转发后端日志会写出
@@ -206,10 +209,10 @@ function startBackend(): void {
   const env: NodeJS.ProcessEnv = {
     ...process.env,
     PORT: String(backendPort),
-    UU889_DESKTOP: '1',
+    HAIL_DESKTOP: '1',
     // 数据目录单一来源：重启/迁移后只需改 currentDataDir
-    UU889_DATA_DIR: currentDataDir,
-    SQLITE_PATH: path.join(currentDataDir, 'uu889.sqlite3'),
+    HAIL_DATA_DIR: currentDataDir,
+    SQLITE_PATH: path.join(currentDataDir, 'hail.sqlite3'),
     WORKSPACE_PATH: currentWorkspaceDir,
     FRONTEND_DIST: currentFrontendDist,
   }
@@ -221,7 +224,7 @@ function startBackend(): void {
 
   backend = utilityProcess.fork(BACKEND_BUNDLE, [], {
     env,
-    serviceName: 'uu889-backend',
+    serviceName: 'hail-backend',
     stdio: 'pipe',
   })
   console.log(`[main] backend forked from ${BACKEND_BUNDLE}`)
@@ -231,7 +234,7 @@ function startBackend(): void {
     backend = null
     // 迁移/重启期间的退出是预期行为，由调用方接管
     if (!quitting && !backendRestarting) {
-      dialog.showErrorBox('UU889-Drama', `后台服务异常退出（code ${code}），应用即将关闭。请重新启动。`)
+      dialog.showErrorBox('Hail 短剧', `后台服务异常退出（code ${code}），应用即将关闭。请重新启动。`)
       app.quit()
     }
   })
@@ -243,8 +246,10 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 900,
-    title: 'UU889-Drama',
+    title: 'Hail 短剧',
     show: false,
+    // 暗色主题下启动不闪白：先用页面底色
+    backgroundColor: nativeTheme.shouldUseDarkColors ? '#0a0f0d' : '#f5f9f7',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -272,7 +277,7 @@ function createWindow() {
     if (details.reason === 'clean-exit' || !mainWindow || mainWindow.isDestroyed()) return
     // 1 分钟内连续崩溃不再自动重载，避免死循环
     if (Date.now() - lastCrashReload < 60_000) {
-      dialog.showErrorBox('UU889-Drama', `界面进程异常退出（${details.reason}），请重新打开应用。`)
+      dialog.showErrorBox('Hail 短剧', `界面进程异常退出（${details.reason}），请重新打开应用。`)
       return
     }
     lastCrashReload = Date.now()
@@ -298,6 +303,11 @@ async function bootstrap() {
     currentDataDir = loadStorageConfig()
     fs.mkdirSync(currentDataDir, { recursive: true })
 
+    // 改名前（UU889-Drama）的数据：首次启动询问是否复制过来，须在 workspace 模板同步之前
+    importingLegacy = true
+    await maybeImportLegacyData(currentDataDir, app.isPackaged ? path.join(userData, 'workspace') : null)
+    importingLegacy = false
+
     const resources = resolveResourceDir()
     const templateDir = app.isPackaged
       ? path.join(resources, 'workspace-template')
@@ -317,7 +327,7 @@ async function bootstrap() {
     await createWindow()
   } catch (err) {
     console.error('[main] 启动失败:', err)
-    dialog.showErrorBox('UU889-Drama', `启动失败：\n${(err as Error)?.message || err}`)
+    dialog.showErrorBox('Hail 短剧', `启动失败：\n${(err as Error)?.message || err}`)
     app.quit()
   }
 }
@@ -326,19 +336,19 @@ async function bootstrap() {
 
 /** 可写探针 */
 async function assertWritable(dir: string): Promise<void> {
-  const probe = path.join(dir, `.uu889-probe-${Date.now()}`)
+  const probe = path.join(dir, `.hail-probe-${Date.now()}`)
   await fsp.writeFile(probe, 'probe')
   await fsp.rm(probe)
 }
 
-ipcMain.handle('uu889:pick-directory', async () => {
+ipcMain.handle('hail:pick-directory', async () => {
   if (!mainWindow) return { ok: false, error: '窗口未就绪' }
   const res = await dialog.showOpenDialog(mainWindow, {
     title: '选择数据存储目录',
     properties: ['openDirectory', 'createDirectory'],
   })
   if (res.canceled || !res.filePaths[0]) return { ok: false, canceled: true }
-  // 选了已有内容的文件夹（如 D:\）时自动用其中的 UU889Drama-Data 子目录
+  // 选了已有内容的文件夹（如 D:\）时自动用其中的 HailDrama-Data 子目录
   let target: string
   try {
     target = await resolveMigrationTarget(res.filePaths[0], currentDataDir)
@@ -389,5 +399,5 @@ app.on('before-quit', () => {
 })
 
 app.on('window-all-closed', () => {
-  app.quit()
+  if (!importingLegacy) app.quit()
 })

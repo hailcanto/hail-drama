@@ -174,7 +174,7 @@ async function upscaleWithComfy(
   const model = pickUpscaleModel(models)
   if (!model) throw new UpscaleUnavailable(`ComfyUI 里没有放大模型。${UPSCALE_MODEL_HINT}`)
 
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'uu889-up-'))
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'hail-up-'))
   try {
     // 1. 切成约 2 秒一段（重新编码保证每段从关键帧开始、帧数准确）
     const seg = 2
@@ -192,7 +192,7 @@ async function upscaleWithComfy(
       report(`AI 超分第 ${i + 1}/${chunks.length} 段（${model}，→ ${dims.width}×${dims.height}）`, 0.05 + 0.85 * base)
       // 上传
       const form = new FormData()
-      const name = `uu889_upscale_${taskId}_${i}.mp4`
+      const name = `hail_upscale_${taskId}_${i}.mp4`
       form.append('image', new Blob([fs.readFileSync(path.join(tmp, chunks[i]))], { type: 'video/mp4' }), name)
       form.append('type', 'input')
       form.append('overwrite', 'true')
@@ -202,7 +202,7 @@ async function upscaleWithComfy(
       const sub = await comfyJson(config, '/prompt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: buildUpscaleWorkflow(file, model, dims, `uu889-upscale/t${taskId}_${i}`), client_id: 'uu889-drama' }),
+        body: JSON.stringify({ prompt: buildUpscaleWorkflow(file, model, dims, `hail-upscale/t${taskId}_${i}`), client_id: 'hail-drama' }),
       })
       const promptId = String(sub?.prompt_id || '')
       if (!promptId) throw new Error('ComfyUI 没有返回任务 ID')

@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "UU889-Drama",
+    "title": "Hail-Drama",
     "updateAvailable": "Neue Version v{version} verfügbar. Update unter Einstellungen → Info & Updates."
   },
   "common": {
@@ -439,13 +439,13 @@
         "copyToEditor": "In den Editor kopieren und anpassen",
         "overwriteConfirm": "Workflow im Editor durch diese Vorlage ersetzen?",
         "workflowEmpty": "„Eigener Workflow“ gewählt, aber der Editor ist leer",
-        "exportHint": "Funktioniert ohne Platzhalter: Mit Auto-Bindung verbindet UU889-Drama Prompt, Bilder, Größe usw. anhand der Knotenstruktur.",
+        "exportHint": "Funktioniert ohne Platzhalter: Mit Auto-Bindung verbindet Hail-Drama Prompt, Bilder, Größe usw. anhand der Knotenstruktur.",
         "autoBind": "Auto-Bindung (empfohlen)",
-        "autoBindHint": "Findet positiven / negativen Prompt, Start- / Endbild / Referenzen (LoadImage), Seed, Breite / Höhe, Frames, FPS und Diffusionsmodell und setzt die Werte von UU889-Drama ein.",
-        "autoBindHintImage": "Findet Prompt, Referenzen (LoadImage), Seed, Breite / Höhe und Checkpoint und setzt die Werte von UU889-Drama ein.",
+        "autoBindHint": "Findet positiven / negativen Prompt, Start- / Endbild / Referenzen (LoadImage), Seed, Breite / Höhe, Frames, FPS und Diffusionsmodell und setzt die Werte von Hail-Drama ein.",
+        "autoBindHintImage": "Findet Prompt, Referenzen (LoadImage), Seed, Breite / Höhe und Checkpoint und setzt die Werte von Hail-Drama ein.",
         "fromWorkflow": "aus Workflow",
         "inspect": "Workflow prüfen",
-        "inspectTitle": "So steuert UU889-Drama diesen Workflow",
+        "inspectTitle": "So steuert Hail-Drama diesen Workflow",
         "colNode": "Knoten",
         "colField": "Feld",
         "colTarget": "Parameter",
@@ -499,7 +499,7 @@
         "presetApplied": "Vorlage übernommen: {name}",
         "promptTemplate": "Prompt-Vorlage",
         "promptTemplatePlaceholder": "z. B. masterpiece, best quality, {ph}",
-        "promptTemplateHint": "Der UU889-Drama-Prompt wird bei {ph} eingesetzt; ohne {ph} vorangestellt; leer = unverändert.",
+        "promptTemplateHint": "Der Hail-Drama-Prompt wird bei {ph} eingesetzt; ohne {ph} vorangestellt; leer = unverändert.",
         "preview": "Vorschau:",
         "samplePrompt": "ein Mädchen im roten Umhang auf einem Schneegipfel, blickt zur Kamera zurück",
         "translate": "Nicht-englische Prompts ins Englische übersetzen",
@@ -1477,7 +1477,7 @@
     "helpTitle": "Anleitung",
     "index": {
       "welcome": {
-        "title": "👋 Willkommen bei UU889-Drama",
+        "title": "👋 Willkommen bei Hail-Drama",
         "desc": "Roman → Drehbuch → Assets → Storyboard → Video → Endschnitt, alles an einem Ort. Zuerst die KI-Dienste konfigurieren, dann das erste Projekt anlegen."
       },
       "create": {
