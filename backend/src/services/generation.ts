@@ -19,7 +19,7 @@ import { burnSubtitles, normalizeSubtitleOptions, storyboardDialogue } from './s
 import { getEpisodeSystemVoice } from './system-voice.js'
 import { assertNotCancelled, cancelRunningTask, clearTaskCancel, isTaskCancelled, onTaskCancel, taskAbortSignal, TaskCancelledError, TASK_CANCELLED_MESSAGE } from './task-cancel.js'
 import { acquireGpuLane, cloudLaneKey, cloudLaneLimit, gpuLaneKey, laneLimit, laneNeedsFree, laneVideosSinceRestart, releaseGpuLane } from './gpu-queue.js'
-import { isBusyMessage, isModerationFailure, isTransientFailure, isUpstreamBusy, moderationRetries, retryAfterMs } from './upstream-busy.js'
+import { isBusyMessage, isModerationFailure, isTransientFailure, isUpstreamBusy, moderationRetries, retryAfterMs, isConnectionFailure } from './upstream-busy.js'
 import { clampDuration, describeFit, fitPromptBytes, videoLimits } from './video-limits.js'
 import { promptByteLimitFor } from './adapters/video-common.js'
 import { autoRestartEnabled, comfyAlive, comfyMemoryLeftover, comfySystemStats, freeComfyMemory, rebootComfy, restartEveryVideos, shouldFreeVramBetween, startComfyIfConfigured, waitComfyAlive } from './adapters/comfyui-common.js'
@@ -298,7 +298,7 @@ export async function cancelTask(id: number): Promise<{ ok: boolean; status: str
   return { ok, status: ok ? 'failed' : row.status }
 }
 
-async function processTask(id: number, config: AIConfig) {
+async function processTask(id: number, config: AIConfig, submitRetries = 0) {
   // 交给 pollTask 之后由它负责释放排队名额
   let handedToPoll = false
   try {
@@ -555,6 +555,19 @@ async function processTask(id: number, config: AIConfig) {
   } catch (err: any) {
     // 手动取消：状态已经落库，不再改写
     if (isTaskCancelled(id)) return
+    // 「根本没连上」的网络错误：服务端肯定没收到请求，可以安全重试（最多 2 次）
+    if (isConnectionFailure(err) && submitRetries < 2) {
+      const waitMs = 10_000 // 等 10 秒后重试
+      const desc = describeSubmitError(err, config.baseUrl)
+      logTaskWarn('SysTask', 'submit-connection-retry', { id, error: desc.slice(0, 200), attempt: submitRetries + 1, waitMs })
+      setTaskProgress(id, {
+        stage: 'queued',
+        message: `连接 ${new URL(config.baseUrl).hostname} 失败（${desc.slice(0, 120)}），${waitMs / 1000} 秒后自动重新提交（第 ${submitRetries + 1} 次）`,
+      })
+      await sleep(waitMs)
+      // 重新处理，增加重试计数
+      return processTask(id, config, submitRetries + 1)
+    }
     await failTask(id, describeSubmitError(err, config.baseUrl))
   } finally {
     if (!handedToPoll) {

@@ -1,7 +1,7 @@
 {
   "name": "hail-drama-desktop",
   "productName": "HailDrama",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "private": true,
   "description": "Hail 短剧 桌面版（Electron 壳）",
   "author": "hailcanto",

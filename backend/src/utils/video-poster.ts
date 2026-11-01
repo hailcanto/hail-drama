@@ -42,9 +42,9 @@ export async function extractVideoPoster(relativePath: string): Promise<string |
   }
 }
 
-/** 由视频相对路径推导结尾帧路径：static/videos/x.mp4 → static/videos/x_last.jpg */
+/** 由视频相对路径推导结尾帧路径：static/videos/x.mp4 → static/videos/x_last.png */
 export function endFramePathFor(relativePath: string): string {
-  return relativePath.replace(/\.[^./]+$/, '_last.jpg')
+  return relativePath.replace(/\.[^./]+$/, '_last.png')
 }
 
 /**
@@ -62,7 +62,8 @@ export async function extractVideoEndFrame(relativePath: string, force = false):
       ffmpeg(getAbsolutePath(relativePath))
         // 从结尾往前 0.2 秒开始读，取第一帧即最后一帧附近（避开个别编码器末尾的黑帧 / 空帧）
         .inputOptions(['-sseof', '-0.2'])
-        .outputOptions(['-frames:v', '1', '-q:v', '2', '-y'])
+        // PNG 无损编码，避免接戏链条长时 JPEG 质量累积劣化
+        .outputOptions(['-frames:v', '1', '-c:v', 'png', '-y'])
         .output(endAbs)
         .on('end', () => resolve())
         .on('error', reject)

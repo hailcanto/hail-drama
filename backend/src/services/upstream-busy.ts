@@ -88,6 +88,21 @@ export function isUpstreamBusy(status: number, bodyText: string | null | undefin
   return isBusyMessage(bodyText) || isTransientFailure(bodyText)
 }
 
+/**
+ * 是否「根本没连上」的网络错误：连接超时、连接被拒绝、DNS 失败——这时服务端肯定没收到请求，可以安全重试。
+ * 排除「请求已发出、之后才断开」的情况（如 ECONNRESET），那种情况服务端可能已经收到并开始处理。
+ */
+export function isConnectionFailure(err: any): boolean {
+  const msg = String(err?.message || '')
+  const code = err?.cause?.code || err?.code
+  // 连接超时、连接被拒绝、DNS 失败、网络不可达
+  if (/UND_ERR_CONNECT_TIMEOUT|ETIMEDOUT|ECONNREFUSED|ENOTFOUND|ENETUNREACH|EHOSTUNREACH/i.test(code)) return true
+  // 超时报错（AbortSignal.timeout）
+  if (err?.name === 'TimeoutError' || /aborted due to timeout/i.test(msg)) return true
+  // 排除 ECONNRESET（连接被重置，可能已发出请求）、EPIPE（写入时连接断开）等
+  return false
+}
+
 /** Retry-After 头（秒数或 HTTP 日期）→ 毫秒，限制在 1 秒到 3 分钟；没有 / 非法返回 null */
 export function retryAfterMs(header: string | null | undefined): number | null {
   const raw = String(header || '').trim()
