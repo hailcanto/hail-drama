@@ -4774,7 +4774,7 @@ function previousShotInScene(sb) {
 // 其余厂商首帧会顶掉角色参考图，改为放在参考图第 1 张
 const previousFrameMode = computed(() => {
   const provider = selectedVideoConfig.value?.provider
-  if (provider === 'comfyui' || provider === 'minimax' || provider === 'minimax_huanling' || provider === 'runway') return 'first_frame'
+  if (provider === 'comfyui' || provider === 'minimax' || provider === 'minimax_huanling' || provider === 'aiask' || provider === 'xai' || provider === 'runway') return 'first_frame'
   if (refImageLimit.value <= 1) return 'first_frame'
   return 'reference'
 })
