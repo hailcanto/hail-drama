@@ -236,7 +236,8 @@
       "styles": "Style Presets",
       "storage": "Storage",
       "about": "About & Updates",
-      "agents": "Agent Config"
+      "agents": "Agent Config",
+      "logs": "Logs"
     },
     "common": {
       "disabled": "Disabled",
@@ -733,6 +734,21 @@
     "skillDelete": {
       "title": "Delete Skill",
       "message": "Delete skill “{id}”? The corresponding Agent will fall back to its built-in default prompt."
+    },
+    "logs": {
+      "title": "Logs",
+      "desc": "Live output of the backend: requests sent to providers, image-host uploads, poll results and errors. Copy the relevant lines when reporting a problem; API keys are hidden.",
+      "filter": "Filter (task id, VideoTask, ImageUpload…)",
+      "onlyErrors": "Warnings and errors only",
+      "autoScroll": "Auto-scroll",
+      "pause": "Pause",
+      "resume": "Resume",
+      "copy": "Copy shown lines",
+      "copied": "Copied {n} lines",
+      "clear": "Clear",
+      "empty": "No logs yet",
+      "file": "Log file: {path}",
+      "count": "Showing {shown} / {total} lines"
     }
   },
   "episode": {

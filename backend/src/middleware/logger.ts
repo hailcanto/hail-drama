@@ -27,6 +27,8 @@ function formatTime(): string {
 export const requestLogger: MiddlewareHandler = async (c, next) => {
   const method = c.req.method
   const path = c.req.path
+  // 设置页「运行日志」每 2 秒轮询一次，不记它自己，免得刷屏
+  if (path === '/api/v1/logs') return next()
   const start = performance.now()
 
   // 打印请求

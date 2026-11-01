@@ -59,3 +59,6 @@ desktop/dist/
 desktop/release/
 desktop/resources/
 frontend/dist
+
+# 本地开发用的桌面数据副本
+.devdata/

@@ -389,6 +389,15 @@ async function processTask(id: number, config: AIConfig) {
       const resolvedReferenceAudioUrls = resolvePublicMediaUrls(params.referenceAudioUrls, 'audio')
       const resolvedReferenceFileUrl = resolvePublicMediaUrl(params.referenceFileUrl, 'file')
       const imageCount = [resolvedImageUrl, resolvedFirstFrameUrl, resolvedLastFrameUrl].filter(Boolean).length + resolvedReferenceImageUrls.length
+      logTaskProgress(label, 'media', {
+        id,
+        provider: config.provider,
+        firstFrame: params.firstFrameUrl || params.imageUrl || '无',
+        lastFrame: params.lastFrameUrl || '无',
+        referenceImages: (params.referenceImageUrls || []).join(', ') || '无',
+        unreadable: [params.firstFrameUrl && !resolvedFirstFrameUrl ? '首帧' : '', params.lastFrameUrl && !resolvedLastFrameUrl ? '尾帧' : '',
+          (params.referenceImageUrls?.length || 0) > resolvedReferenceImageUrls.length ? '部分参考图' : ''].filter(Boolean).join('、') || undefined,
+      })
       setTaskProgress(id, {
         stage: 'preparing',
         percent: 2,

@@ -345,6 +345,30 @@
           <p v-else class="config-empty">{{ t('settings.about.serverNote') }}</p>
         </div>
 
+        <!-- ===== 运行日志 ===== -->
+        <div v-else-if="tab === 'logs'" class="settings-scroll logs-pane">
+          <div class="settings-head">
+            <h2 class="settings-title">{{ t('settings.logs.title') }}</h2>
+            <p class="settings-desc">{{ t('settings.logs.desc') }}</p>
+          </div>
+          <div class="logs-toolbar">
+            <input v-model="logFilter" class="input logs-filter" :placeholder="t('settings.logs.filter')" />
+            <label class="check-row"><input v-model="logOnlyErrors" type="checkbox" /> {{ t('settings.logs.onlyErrors') }}</label>
+            <label class="check-row"><input v-model="logAutoScroll" type="checkbox" /> {{ t('settings.logs.autoScroll') }}</label>
+            <button class="btn btn-ghost btn-sm ml-auto" @click="logPaused = !logPaused">{{ logPaused ? t('settings.logs.resume') : t('settings.logs.pause') }}</button>
+            <button class="btn btn-ghost btn-sm" @click="copyLogs">{{ t('settings.logs.copy') }}</button>
+            <button class="btn btn-ghost btn-sm" @click="clearLogs">{{ t('settings.logs.clear') }}</button>
+          </div>
+          <div ref="logBox" class="logs-box mono">
+            <div v-if="!shownLogs.length" class="logs-empty">{{ t('settings.logs.empty') }}</div>
+            <div v-for="e in shownLogs" :key="e.seq" :class="['log-line', `log-${e.level}`]"><span class="log-time">{{ logTime(e.time) }}</span>{{ e.text }}</div>
+          </div>
+          <div class="logs-foot">
+            <span>{{ t('settings.logs.count', { shown: shownLogs.length, total: logEntries.length }) }}</span>
+            <span v-if="logFile" class="mono truncate">{{ t('settings.logs.file', { path: logFile }) }}</span>
+          </div>
+        </div>
+
         <!-- ===== Agent 配置（左侧 tab 切换，Prompt 与 Skills 整合在同一 Agent 下） ===== -->
         <div v-else-if="tab === 'agents'" class="skills-layout">
           <!-- Agent 左侧 tab 列表 -->
@@ -1065,7 +1089,7 @@ import ModelInstallerPanel from '~/components/ModelInstallerPanel.vue'
 import { toast } from 'vue-sonner'
 import { toastError } from '~/composables/useToast'
 import { useI18n } from 'vue-i18n'
-import { aiConfigAPI, promptAPI, skillsAPI, storageAPI, stylePresetAPI, settingsAPI, serverUpdateAPI } from '~/composables/useApi'
+import { aiConfigAPI, promptAPI, skillsAPI, storageAPI, stylePresetAPI, settingsAPI, serverUpdateAPI, logsAPI } from '~/composables/useApi'
 import { useDesktopBridge } from '~/composables/useDesktopBridge'
 import { useMigrateState } from '~/composables/useMigrateState'
 import { useTheme } from '~/composables/useTheme'
@@ -1085,6 +1109,7 @@ const baseTabs = computed(() => [
   { id: 'agents', label: t('settings.tabs.agents'), icon: Bot },
   { id: 'storage', label: t('settings.tabs.storage'), icon: HardDrive },
   { id: 'about', label: t('settings.tabs.about'), icon: RefreshCw },
+  { id: 'logs', label: t('settings.tabs.logs'), icon: FileText },
 ])
 
 // ===== AI Service Configs =====
@@ -2167,6 +2192,61 @@ async function applyUpdate() {
   }
 }
 
+// ===== 运行日志：每 2 秒增量拉取，只在日志页轮询 =====
+const LOG_KEEP = 3000
+const logEntries = ref([])
+const logFile = ref('')
+const logFilter = ref('')
+const logOnlyErrors = ref(false)
+const logAutoScroll = ref(true)
+const logPaused = ref(false)
+const logBox = ref(null)
+let logSince = 0
+let logTimer = null
+const shownLogs = computed(() => {
+  const q = logFilter.value.trim().toLowerCase()
+  return logEntries.value.filter(e =>
+    (!logOnlyErrors.value || e.level !== 'info') && (!q || e.text.toLowerCase().includes(q)))
+})
+function logTime(iso) {
+  return new Date(iso).toLocaleTimeString('zh-CN', { hour12: false }) + ' '
+}
+async function pullLogs() {
+  if (logPaused.value) return
+  try {
+    const res = await logsAPI.list(logSince)
+    logFile.value = res.file || ''
+    // 后端重启后 seq 从头计：清空重拉
+    if (res.last < logSince) { logEntries.value = []; logSince = 0; return pullLogs() }
+    logSince = res.last
+    if (!res.entries.length) return
+    logEntries.value = [...logEntries.value, ...res.entries].slice(-LOG_KEEP)
+    if (logAutoScroll.value) nextTick(() => { if (logBox.value) logBox.value.scrollTop = logBox.value.scrollHeight })
+  } catch { /* 后端暂时连不上，下次再拉 */ }
+}
+function startLogPoll() {
+  stopLogPoll()
+  pullLogs()
+  logTimer = setInterval(pullLogs, 2000)
+}
+function stopLogPoll() {
+  if (logTimer) clearInterval(logTimer)
+  logTimer = null
+}
+async function copyLogs() {
+  const text = shownLogs.value.map(e => `${logTime(e.time)}[${e.level}] ${e.text}`).join('\n')
+  try {
+    await navigator.clipboard.writeText(text)
+    toast.success(t('settings.logs.copied', { n: shownLogs.value.length }))
+  } catch (e) { toastError(e) }
+}
+async function clearLogs() {
+  try {
+    await logsAPI.clear()
+    logEntries.value = []
+  } catch (e) { toastError(e) }
+}
+
 watch(tab, (t) => {
   if (t === 'about') refreshUpdateState()
   // 进入 Agent 页总是按当前内容语言重载（幂等）：兜住「先切语言、后进 Agent」的时序
@@ -2174,9 +2254,14 @@ watch(tab, (t) => {
     loadAgentPrompt(selectedAgent.value)
     loadAllSkills()
   }
+  if (t === 'logs') startLogPoll()
+  else stopLogPoll()
 })
 
-onBeforeUnmount(stopUsagePoll)
+onBeforeUnmount(() => {
+  stopUsagePoll()
+  stopLogPoll()
+})
 </script>
 
 <style scoped>
@@ -2679,6 +2764,21 @@ onBeforeUnmount(stopUsagePoll)
 .tpl-file-path b { color: var(--text-0); font-weight: 600; }
 .tpl-file-link { flex-shrink: 0; color: var(--accent); text-decoration: none; }
 .tpl-card-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+/* 运行日志 */
+.logs-pane { display: flex; flex-direction: column; }
+.logs-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 10px; width: 100%; }
+.logs-filter { flex: 1 1 260px; min-width: 0; }
+.logs-box {
+  flex: 1; min-height: 360px; width: 100%; overflow: auto; padding: 10px 12px;
+  background: var(--surface-muted); border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: 11.5px; line-height: 1.55; color: var(--text-1);
+}
+.log-line { white-space: pre-wrap; word-break: break-all; }
+.log-time { color: var(--text-3); }
+.log-warn { color: var(--warning); }
+.log-error { color: var(--error); }
+.logs-empty { color: var(--text-3); padding: 24px 0; text-align: center; }
+.logs-foot { display: flex; gap: 16px; margin-top: 8px; font-size: 11px; color: var(--text-3); width: 100%; min-width: 0; }
 .check-row { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: var(--text-1); cursor: pointer; }
 .check-row input { margin-top: 2px; accent-color: var(--accent); }
 .check-row > span { display: flex; flex-direction: column; gap: 2px; }

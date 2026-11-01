@@ -4770,11 +4770,11 @@ function previousShotInScene(sb) {
   if (!prev || (prev.scene_id || prev.sceneId) !== sceneId) return null
   return prev
 }
-// 上一镜结尾帧怎么用：给了首帧仍保留参考图的厂商（ComfyUI / MiniMax）和只用一张图的厂商（Runway、Veo Lite）作首帧；
+// 上一镜结尾帧怎么用：给了首帧仍保留参考图的厂商（ComfyUI / MiniMax 官方与幻灵网关）和只用一张图的厂商（Runway、Veo Lite）作首帧；
 // 其余厂商首帧会顶掉角色参考图，改为放在参考图第 1 张
 const previousFrameMode = computed(() => {
   const provider = selectedVideoConfig.value?.provider
-  if (provider === 'comfyui' || provider === 'minimax' || provider === 'runway') return 'first_frame'
+  if (provider === 'comfyui' || provider === 'minimax' || provider === 'minimax_huanling' || provider === 'runway') return 'first_frame'
   if (refImageLimit.value <= 1) return 'first_frame'
   return 'reference'
 })

@@ -6,7 +6,9 @@
  *
  * 与官方的差异（网关裁剪）：
  * - 仅 MiniMax-H3（无 H3-Max），分辨率固定 768P，时长 1–15 秒
+ * - ratio 始终必填（有首帧时传 adaptive）
  * - 媒体只接受公网 HTTPS URL，不支持 base64 / mm_file://
+ * - 网关不允许首帧/尾帧与参考图混用（官方允许），有首帧时只能传首帧，不能再传参考图
  * - content.url 是网关代理地址，下载必须带 Authorization
  */
 import type {
@@ -83,7 +85,7 @@ export class MiniMaxHuanlingVideoAdapter implements VideoProviderAdapter {
       }
 
       // 上传本地图片到图床，获取公网 URL
-      console.log(`[MiniMaxHuanling] 检测到本地媒体，正在上传到 ${uploader.serviceName}...`)
+      console.log(`[MiniMaxHuanling] 任务 ${record.id} 有 ${allMedia.length - allMedia.filter(u => /^https:\/\//i.test(u)).length} 个本地素材，上传到 ${uploader.serviceName}（首帧 ${firstFrame ? '有' : '无'}、尾帧 ${lastFrame ? '有' : '无'}、参考图 ${refImages.length} 张）`)
       const uploadedMedia: string[] = []
       for (const url of allMedia) {
         if (url.startsWith('https://')) {
@@ -115,9 +117,15 @@ export class MiniMaxHuanlingVideoAdapter implements VideoProviderAdapter {
     }
 
     const content: any[] = [{ type: 'text', text: prompt }]
-    if (firstFrame) content.push({ type: 'image_url', image_url: { url: firstFrame }, role: 'first_frame' })
-    if (lastFrame) content.push({ type: 'image_url', image_url: { url: lastFrame }, role: 'last_frame' })
-    for (const url of refImages) content.push({ type: 'image_url', image_url: { url }, role: 'reference_image' })
+    // 幻灵网关不允许首帧/尾帧与参考图混用（官方 MiniMax 允许）：
+    // 有首帧时只传首帧；没有首帧时才传参考图
+    if (firstFrame) {
+      content.push({ type: 'image_url', image_url: { url: firstFrame }, role: 'first_frame' })
+    } else {
+      if (lastFrame) content.push({ type: 'image_url', image_url: { url: lastFrame }, role: 'last_frame' })
+      for (const url of refImages) content.push({ type: 'image_url', image_url: { url }, role: 'reference_image' })
+    }
+    // 参考视频和音频不受上述限制，始终可以传
     for (const url of refVideos) content.push({ type: 'video_url', video_url: { url }, role: 'reference_video' })
     for (const url of refAudios) content.push({ type: 'audio_url', audio_url: { url } })
 
@@ -128,11 +136,16 @@ export class MiniMaxHuanlingVideoAdapter implements VideoProviderAdapter {
       // 网关只认 768P，2K 会被 400 拒绝
       resolution: '768P',
     }
-    // 图生视频（有首帧）ratio 恒为 adaptive，省略；文生视频 ratio 必填
-    if (!firstFrame) {
+    // 网关与官方不同：ratio 始终必填（官方图生视频可省略，网关省略会报 400 ratio is required）。
+    // 有首帧时传 adaptive，比例跟随首帧图；文生视频传项目比例
+    if (firstFrame) {
+      body.ratio = 'adaptive'
+    } else {
       const ratio = (record.aspectRatio || '').trim()
       body.ratio = VALID_RATIOS.has(ratio) ? ratio : '16:9'
     }
+    // 排查首帧 / 参考图：逐项列出角色与地址（提示词另见 request payload）
+    console.log(`[MiniMaxHuanling] 任务 ${record.id} 提交素材：${content.slice(1).map((c: any, i: number) => `\n  ${i + 1}. ${c.role || c.type} ${c.image_url?.url || c.video_url?.url || c.audio_url?.url}`).join('') || '无（纯文生视频）'}\n  ratio=${body.ratio} duration=${body.duration}`)
 
     return {
       url: joinProviderUrl(config.baseUrl, '/v2', '/video_generation'),

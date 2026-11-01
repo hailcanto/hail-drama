@@ -1,4 +1,6 @@
 import 'dotenv/config'
+// 最先接管 console，设置页「运行日志」才能收到启动阶段的输出
+import './utils/log-buffer.js'
 import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
@@ -25,6 +27,7 @@ import settings from './routes/settings.js'
 import storage from './routes/storage.js'
 import serverUpdate from './routes/serverUpdate.js'
 import modelInstaller from './routes/modelInstaller.js'
+import logs from './routes/logs.js'
 import { resumeJobsOnStartup } from './services/model-installer/jobs.js'
 import { requestLogger, errorHandler } from './middleware/logger.js'
 import { db, schema } from './db/index.js'
@@ -73,6 +76,7 @@ api.route('/storage', storage)
 api.route('/settings', settings)
 api.route('/server-update', serverUpdate)
 api.route('/model-installer', modelInstaller)
+api.route('/logs', logs)
 
 app.route('/api/v1', api)
 

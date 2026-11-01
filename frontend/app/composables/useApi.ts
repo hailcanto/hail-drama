@@ -235,6 +235,11 @@ export const settingsAPI = {
 }
 
 // 服务器/Docker 部署的版本检查与更新（桌面版走 useDesktopBridge，不用此 API）
+export const logsAPI = {
+  list: (since = 0) => api.get<{ entries: { seq: number; time: string; level: string; text: string }[]; last: number; file: string }>(`/logs?since=${since}`),
+  clear: () => api.del('/logs'),
+}
+
 export const serverUpdateAPI = {
   state: () => api.get('/server-update/state'),
   check: () => api.post('/server-update/check'),
