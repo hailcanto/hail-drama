@@ -69,7 +69,7 @@
                 :class="['input', 'ep-title-input', `ep-title-input-${ep.id}`]"
                 v-model="editingTitle"
                 @click.stop
-                @keydown.enter="saveEditTitle(ep, $event)"
+                @keydown.enter.prevent="saveEditTitle(ep, $event)"
                 @keydown.esc="cancelEditTitle"
                 @blur="saveEditTitle(ep, $event)"
               />
@@ -640,6 +640,7 @@ const epStatusMenuId = ref(null)
 // 剧集标题编辑
 const editingEpisodeId = ref(null)
 const editingTitle = ref('')
+const isSavingTitle = ref(false)
 
 function startEditTitle(ep, event) {
   event.stopPropagation()
@@ -657,17 +658,35 @@ function startEditTitle(ep, event) {
 function cancelEditTitle() {
   editingEpisodeId.value = null
   editingTitle.value = ''
+  isSavingTitle.value = false
 }
 
 async function saveEditTitle(ep, event) {
   event.stopPropagation()
+
+  // 如果正在保存中，避免重复调用
+  if (isSavingTitle.value) {
+    return
+  }
+
   const newTitle = editingTitle.value.trim()
+
+  // 如果标题为空，取消编辑并恢复原标题
+  if (!newTitle) {
+    cancelEditTitle()
+    return
+  }
+
+  // 如果标题没有变化，直接取消编辑
   if (newTitle === ep.title) {
     cancelEditTitle()
     return
   }
+
   const prevTitle = ep.title
   ep.title = newTitle
+  isSavingTitle.value = true
+
   try {
     await episodeAPI.update(ep.id, { title: newTitle })
     toast.success(t('detail.ep.titleUpdated'))
@@ -675,6 +694,7 @@ async function saveEditTitle(ep, event) {
   } catch (e) {
     ep.title = prevTitle
     toastError(e)
+    isSavingTitle.value = false
   }
 }
 
