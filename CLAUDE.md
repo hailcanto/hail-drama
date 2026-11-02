@@ -81,6 +81,33 @@ configs/   — 遗留死配置，代码零引用
 - userData：打包版 `~/Library/Application Support/HailDrama/`，dev 版 `HailDrama-Dev/`（互不干扰）
 - 后端 bundle 在 asar 内（externals 经 asar node_modules 解析，.node 自动重定向 unpacked）
 
+## Release Workflow (版本发布流程)
+
+**自动化发布**：推送版本标签（`v*`）后 GitHub Actions 自动构建、发布
+
+### 发布步骤
+1. **更新版本号**：同步修改 `desktop/package.json` 与 `backend/package.json` 的 `version` 字段（必须一致）
+2. **提交代码**：`git commit -m "chore: bump version to X.Y.Z"`
+3. **推送代码**：`git push origin main`
+4. **创建并推送标签**：
+   ```bash
+   git tag -a vX.Y.Z -m "版本更新说明"
+   git push origin vX.Y.Z
+   ```
+5. **GitHub Actions 自动执行**（`.github/workflows/release.yml`）：
+   - 并行构建三个平台安装包（Windows x64、macOS arm64、macOS x64）
+   - 生成应用内更新清单 `latest.json`
+   - 创建 GitHub Release 并上传所有安装包
+   - 构建并推送 Docker 镜像到 `ghcr.io/<owner>/<repo>:<版本>` 与 `:latest`
+6. **桌面应用自动检测更新**：用户打开应用时会检测到新版本并提示更新
+
+### 查看构建进度
+- Actions 页面：https://github.com/hailcanto/hail-drama/actions
+- Releases 页面：https://github.com/hailcanto/hail-drama/releases
+
+### 手动触发
+如果自动构建失败，可在 Actions 页面手动触发 workflow 并填写已有标签名
+
 ## Database
 SQLite 单文件（默认 `data/hail.sqlite3`，桌面版在 userData）。启动时 `initSqliteSchema` 幂等建表 + 风格预设种子。MySQL→SQLite 一次性迁移：`cd backend && npx tsx scripts/import-mysql-to-sqlite.ts [--force]`（逐表行数校验、写前备份）。
 
