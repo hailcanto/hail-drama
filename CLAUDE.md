@@ -86,13 +86,14 @@ configs/   — 遗留死配置，代码零引用
 **自动化发布**：推送版本标签（`v*`）后 GitHub Actions 自动构建、发布
 
 ### 发布步骤
-1. **更新版本号**：同步修改 `desktop/package.json` 与 `backend/package.json` 的 `version` 字段（必须一致）
+1. **更新版本号**：同步修改 `desktop/package.json` 与 `backend/package.json` 的 `version` 字段（必须一致，否则构建会失败）
 2. **提交代码**：`git commit -m "chore: bump version to X.Y.Z"`
-3. **推送代码**：`git push origin main`
-4. **创建并推送标签**：
+3. **暂不推送**：等待下次功能开发完成后一起推送（避免频繁触发构建）
+4. **功能开发完成后一起推送**：
    ```bash
+   git push origin main              # 推送所有累积的提交
    git tag -a vX.Y.Z -m "版本更新说明"
-   git push origin vX.Y.Z
+   git push origin vX.Y.Z            # 触发自动构建
    ```
 5. **GitHub Actions 自动执行**（`.github/workflows/release.yml`）：
    - 并行构建三个平台安装包（Windows x64、macOS arm64、macOS x64）
