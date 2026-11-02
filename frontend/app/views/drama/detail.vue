@@ -62,7 +62,30 @@
             <b>{{ String(ep.episode_number || ep.episodeNumber).padStart(2, '0') }}</b>
           </div>
           <div class="ep-main">
-            <h3 class="ep-title">{{ ep.title }}</h3>
+            <div class="ep-title-wrapper">
+              <h3 v-if="editingEpisodeId !== ep.id" class="ep-title">{{ ep.title }}</h3>
+              <input
+                v-else
+                :class="['input', 'ep-title-input', `ep-title-input-${ep.id}`]"
+                v-model="editingTitle"
+                @click.stop
+                @keydown.enter="saveEditTitle(ep, $event)"
+                @keydown.esc="cancelEditTitle"
+                @blur="saveEditTitle(ep, $event)"
+              />
+              <button
+                v-if="editingEpisodeId !== ep.id"
+                class="btn btn-icon btn-sm ep-title-edit-btn"
+                type="button"
+                :title="t('detail.ep.editTitle')"
+                @click.stop="startEditTitle(ep, $event)"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
+            </div>
             <div class="ep-meta-row">
               <span v-if="ep.duration" class="ep-meta">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -565,6 +588,7 @@
 import { toast } from 'vue-sonner'
 import { toastError } from '~/composables/useToast'
 import { useI18n } from 'vue-i18n'
+import { nextTick } from 'vue'
 import { dramaAPI, episodeAPI, characterAPI, sceneAPI, propAPI, uploadAPI } from '~/composables/useApi'
 import BaseSelect from '~/components/BaseSelect.vue'
 
@@ -612,6 +636,47 @@ const epStatusOptions = computed(() => ([
   { label: t('index.status.completed'), value: 'completed' },
 ]))
 const epStatusMenuId = ref(null)
+
+// 剧集标题编辑
+const editingEpisodeId = ref(null)
+const editingTitle = ref('')
+
+function startEditTitle(ep, event) {
+  event.stopPropagation()
+  editingEpisodeId.value = ep.id
+  editingTitle.value = ep.title || ''
+  nextTick(() => {
+    const input = document.querySelector(`.ep-title-input-${ep.id}`)
+    if (input) {
+      input.focus()
+      input.select()
+    }
+  })
+}
+
+function cancelEditTitle() {
+  editingEpisodeId.value = null
+  editingTitle.value = ''
+}
+
+async function saveEditTitle(ep, event) {
+  event.stopPropagation()
+  const newTitle = editingTitle.value.trim()
+  if (newTitle === ep.title) {
+    cancelEditTitle()
+    return
+  }
+  const prevTitle = ep.title
+  ep.title = newTitle
+  try {
+    await episodeAPI.update(ep.id, { title: newTitle })
+    toast.success(t('detail.ep.titleUpdated'))
+    cancelEditTitle()
+  } catch (e) {
+    ep.title = prevTitle
+    toastError(e)
+  }
+}
 
 function epStatus(ep) { return ep.status || 'draft' }
 function epStatusLabel(ep) { return epStatusOptions.value.find(s => s.value === epStatus(ep))?.label || t('index.status.draft') }
@@ -1064,10 +1129,40 @@ onMounted(load)
 
 /* 中部：标题 + 元数据（单行不换行，防止卡片被撑高错位） */
 .ep-main { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+.ep-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
 .ep-title {
   font-size: 13.5px; font-weight: 600; color: var(--text-0);
   line-height: 1.35; margin: 0;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+.ep-title-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 4px 8px;
+  line-height: 1.35;
+  margin: -4px 0;
+}
+.ep-title-edit-btn {
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s var(--ease-out);
+  color: var(--text-3);
+}
+.ep-card:hover .ep-title-edit-btn {
+  opacity: 1;
+}
+.ep-title-edit-btn:hover {
+  color: var(--text-1);
+  background: var(--bg-hover);
 }
 .ep-meta-row {
   display: flex; align-items: center; gap: 8px;
@@ -1623,6 +1718,7 @@ onMounted(load)
   .page-head { flex-wrap: wrap; }
   .ep-grid { grid-template-columns: 1fr; }
   .ep-actions { opacity: 1; } /* 移动端始终显示操作按钮 */
+  .ep-title-edit-btn { opacity: 1; } /* 移动端始终显示编辑按钮 */
   .dialog-foot { flex-wrap: wrap; gap: 10px; }
   .dialog-foot-copy { display: none; }
 }

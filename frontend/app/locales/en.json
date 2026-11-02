@@ -179,7 +179,9 @@
       "res720": "720p · HD",
       "res480": "480p · Smooth",
       "resSwitched": "Video resolution switched to {res}",
-      "res1080": "1080p · UHD"
+      "res1080": "1080p · UHD",
+      "editTitle": "Edit episode title",
+      "titleUpdated": "Episode title updated"
     },
     "epCreate": {
       "title": "Create Episode",

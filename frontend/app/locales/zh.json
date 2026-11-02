@@ -179,7 +179,9 @@
       "res720": "720p · 高清",
       "res480": "480p · 流畅",
       "resSwitched": "本集视频分辨率已切换为 {res}",
-      "res1080": "1080p · 超清"
+      "res1080": "1080p · 超清",
+      "editTitle": "编辑剧集标题",
+      "titleUpdated": "剧集标题已更新"
     },
     "epCreate": {
       "title": "创建新集",
