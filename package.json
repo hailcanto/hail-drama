@@ -1,6 +1,6 @@
 {
   "name": "hail-drama",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "private": true,
   "description": "Hail 短剧 — AI 短剧制作工具（桌面版编排入口）",
   "scripts": {
