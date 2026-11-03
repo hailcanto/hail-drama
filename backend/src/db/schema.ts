@@ -167,6 +167,7 @@ export const aiServiceConfigs = sqliteTable('ai_service_configs', {
   isDefault: integer('is_default', { mode: 'boolean' }).default(false),
   isActive: integer('is_active', { mode: 'boolean' }).default(true),
   settings: text('settings'),
+  promptSkill: text('prompt_skill'), // 视频配置专用：指定生成提示词时使用的 skill 名称（如 video-prompt-minimax-h3）
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
   // 注意: 此表无 deleted_at

@@ -8,6 +8,7 @@ import { mastra } from '../mastra/index.js'
 import { buildAgentRequestContext } from '../agents/context.js'
 import { logTaskError, logTaskProgress, logTaskStart, logTaskSuccess } from '../utils/task-logger.js'
 import { splitOverlongShots } from './shot-split.js'
+import { resolveModelTag, getModelPromptLimit, getModelReferenceImageLimit } from './video-model-tags.js'
 
 export interface VideoPromptBatchStatus {
   status: 'running' | 'done' | 'error'
@@ -45,9 +46,22 @@ export async function startVideoPromptBatch(
   // 视频模型标签：跟随该集锁定的视频配置，供 Agent 按模型特性生成
   const [ep] = await db.select().from(schema.episodes).where(eq(schema.episodes.id, episodeId))
   let videoLabel = '默认'
+  let modelTag = 'default'
+  let promptLimit: number | null = null
+  let refImageLimit: number | null = null
+  let promptSkill: string | null = null  // 用户在配置中手动绑定的 skill 名称
+
   if (ep?.videoConfigId) {
     const [cfg] = await db.select().from(schema.aiServiceConfigs).where(eq(schema.aiServiceConfigs.id, ep.videoConfigId))
-    if (cfg) videoLabel = `${cfg.name} (${cfg.provider})`
+    if (cfg) {
+      videoLabel = `${cfg.name} (${cfg.provider})`
+      const providerParam = cfg.provider === null ? '' : cfg.provider
+      const modelParam: string | undefined = cfg.model === null ? undefined : cfg.model
+      modelTag = resolveModelTag(providerParam, modelParam)
+      promptLimit = getModelPromptLimit(modelTag)
+      refImageLimit = getModelReferenceImageLimit(modelTag)
+      promptSkill = cfg.promptSkill || null  // 读取用户指定的 skill
+    }
   }
 
   const task: VideoPromptBatchStatus = {
@@ -69,14 +83,58 @@ export async function startVideoPromptBatch(
       modelOverride: opts.model || undefined,
       textConfigId: opts.configId || undefined,
     })
+
+    // 动态读取 skill 内容（如果配置指定了 prompt_skill）
+    let skillContent = ''
+    if (promptSkill) {
+      try {
+        const { skillsManagerWorkspace } = await import('../agents/skills.js')
+        const fs = skillsManagerWorkspace.filesystem
+        if (fs) {
+          const skillPath = `skills/${promptSkill}/SKILL.md`
+          const content = await fs.readFile(skillPath)
+          const contentStr = typeof content === 'string' ? content : content.toString('utf-8')
+          // 去掉 frontmatter，只保留正文
+          const bodyMatch = contentStr.match(/^---\s*\n[\s\S]*?\n---\s*\n(.*)$/s)
+          skillContent = bodyMatch ? bodyMatch[1].trim() : contentStr.trim()
+          console.log(`[VideoPrompt] Loaded skill "${promptSkill}", content length: ${skillContent.length}`)
+        } else {
+          console.log('[VideoPrompt] filesystem is null')
+        }
+      } catch (err: any) {
+        logTaskError('VideoPrompt', 'load-skill', { skill: promptSkill, error: err?.message })
+        console.error(`[VideoPrompt] Failed to load skill "${promptSkill}":`, err)
+      }
+    } else {
+      console.log('[VideoPrompt] No promptSkill specified')
+    }
+
     for (const sb of pending) {
       task.current_storyboard_id = sb.id
       logTaskProgress('VideoPrompt', 'batch-shot', { episodeId, storyboardId: sb.id, index: task.completed + task.failed + 1, total: task.total })
       try {
+        // 构建模型相关的提示信息
+        let modelInfo = `视频模型: ${videoLabel}\n模型标签: ${modelTag}`
+        if (promptLimit) modelInfo += `\n提示词字节上限: ${promptLimit} 字节`
+        if (refImageLimit) modelInfo += `\n参考图数量上限: ${refImageLimit} 张`
+
+        // 如果配置指定了 skill 且成功加载，将完整 skill 内容作为格式规范附加
+        let formatSection = ''
+        if (skillContent) {
+          formatSection = `\n\n## 提示词格式规范\n\n${skillContent}\n\n请严格遵循上述格式规范生成 video_prompt。`
+        }
+
+        const userMessage = `请为分镜 #${sb.storyboardNumber}(ID:${sb.id})生成视频提示词(video_prompt)。
+
+${modelInfo}${formatSection}
+
+请先调用 read_storyboard_context 获取该分镜的画面描述(含【镜头N】子镜头与台词/旁白)、氛围及时长，据此生成 video_prompt，然后调用 update_storyboard 保存到分镜 ID:${sb.id}。update_storyboard 参数只传 storyboard_id 和 video_prompt 两个键，不要回传该分镜的其他任何字段，不要重新拆分整集。`
+
+        console.log(`[VideoPrompt] Storyboard ${sb.id} - Message length: ${userMessage.length}, has formatSection: ${!!formatSection}`)
+
         await agent.generate([{
           role: 'user',
-          content: `请为分镜 #${sb.storyboardNumber}(ID:${sb.id})生成视频提示词(video_prompt)。视频模型:${videoLabel},请根据该模型的特性和时长限制生成。
-请先调用 read_storyboard_context 获取该分镜的画面描述(含【镜头N】子镜头与台词/旁白)、氛围及时长，据此生成 video_prompt(第一行是信息头：列出该分镜出场的人物与场景，用 @角色名/@场景名 引用；之后按 3 秒分段换行、用 @角色名/@场景名/@道具名 引用参考素材；段落内允许多镜头切镜，段与段可以是不同景别/角度/对象，但不跨场景，切镜点对齐分镜 description 的【镜头N】结构;分镜有 blocking(站位)时在信息头下一行写「站位：…」并全程保持左右关系;台词只用 description 里的原句、只写在说话人入镜的段,没有台词的段写明「（无人说话）」),然后调用 update_storyboard 保存到分镜 ID:${sb.id}。update_storyboard 参数只传 storyboard_id 和 video_prompt 两个键,不要回传该分镜的其他任何字段,不要重新拆分整集。`,
+          content: userMessage,
         }], { maxSteps: 8, requestContext })
         // 以实际落库为准判定成败
         const [fresh] = await db.select().from(schema.storyboards).where(eq(schema.storyboards.id, sb.id))

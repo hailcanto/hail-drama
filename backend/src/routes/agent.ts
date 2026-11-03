@@ -44,7 +44,7 @@ app.post('/:type/chat', async (c) => {
   }
 
   const body = await c.req.json()
-  const { message, drama_id, episode_id } = body
+  const { message, drama_id, episode_id, config_id, video_config_id } = body
 
   logTaskStart('Agent', agentType, {
     dramaId: drama_id,
@@ -58,6 +58,48 @@ app.post('/:type/chat', async (c) => {
     return badRequest(c, '需要 drama_id 与 episode_id')
   }
 
+  // prompt_generator 专用：动态加载该集视频配置指定的 skill（如 video-prompt-minimax-h3）
+  let skillFormatSection = ''
+  if (agentType === 'prompt_generator') {
+    try {
+      // 优先使用前端传来的 video_config_id，否则回退到 episode.videoConfigId
+      let videoConfigId = video_config_id ? Number(video_config_id) : null
+      if (!videoConfigId) {
+        const [ep] = await db.select().from(schema.episodes).where(eq(schema.episodes.id, Number(episode_id)))
+        videoConfigId = ep?.videoConfigId || null
+      }
+
+      logTaskProgress('Agent', 'load-skill-check', {
+        episodeId: episode_id,
+        videoConfigIdFromRequest: video_config_id,
+        finalConfigId: videoConfigId
+      })
+
+      if (videoConfigId) {
+        const [cfg] = await db.select().from(schema.aiServiceConfigs).where(eq(schema.aiServiceConfigs.id, videoConfigId))
+        logTaskProgress('Agent', 'load-skill-config', { configId: videoConfigId, hasConfig: !!cfg, promptSkill: cfg?.promptSkill })
+        if (cfg?.promptSkill) {
+          const { skillsManagerWorkspace } = await import('../agents/skills.js')
+          const fs = skillsManagerWorkspace.filesystem
+          if (fs) {
+            const skillPath = `skills/${cfg.promptSkill}/SKILL.md`
+            const content = await fs.readFile(skillPath)
+            const contentStr = typeof content === 'string' ? content : content.toString('utf-8')
+            // 去掉 frontmatter，只保留正文
+            const bodyMatch = contentStr.match(/^---\s*\n[\s\S]*?\n---\s*\n(.*)$/s)
+            const skillContent = bodyMatch ? bodyMatch[1].trim() : contentStr.trim()
+            skillFormatSection = `\n\n## 提示词格式规范\n\n${skillContent}\n\n请严格遵循上述格式规范生成 video_prompt。`
+            logTaskSuccess('Agent', 'load-skill', { skill: cfg.promptSkill, contentLength: skillContent.length })
+          } else {
+            logTaskError('Agent', 'load-skill', { skill: cfg.promptSkill, error: 'filesystem is null' })
+          }
+        }
+      }
+    } catch (err: any) {
+      logTaskError('Agent', 'load-skill', { agentType, error: err?.message })
+    }
+  }
+
   const agent = mastra.getAgent(agentType)
   if (!agent) {
     logTaskError('Agent', agentType, { reason: 'agent not found' })
@@ -68,14 +110,22 @@ app.post('/:type/chat', async (c) => {
     episodeId: episode_id,
     dramaId: drama_id,
     modelOverride: body.model || undefined,
-    textConfigId: body.config_id || undefined,
+    // 注意：body.config_id 是视频配置 ID，不传给 textConfigId，让系统使用默认文本模型
   })
 
   const startTime = performance.now()
 
   try {
+    // 将 skill 格式规范附加到用户消息（如果有）
+    const finalMessage = message + skillFormatSection
+    logTaskProgress('Agent', 'generate-message', {
+      originalLength: message.length,
+      finalLength: finalMessage.length,
+      hasSkillSection: !!skillFormatSection
+    })
+
     const result = await agent.generate(
-      [{ role: 'user', content: message }],
+      [{ role: 'user', content: finalMessage }],
       { maxSteps: 20, requestContext },
     )
 

@@ -34,6 +34,7 @@
  */
 import { Loader2 } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
   progress: { type: Object, default: null },
@@ -41,6 +42,20 @@ const props = defineProps({
 })
 
 const { t, locale } = useI18n()
+
+// 实时更新当前时间，用于计算已用时间
+const now = ref(Date.now());
+let timer = null;
+
+onMounted(() => {
+  timer = setInterval(() => {
+    now.value = Date.now();
+  }, 1000);
+});
+
+onUnmounted(() => {
+  if (timer) clearInterval(timer);
+});
 
 const active = computed(() => !['completed', 'failed'].includes(props.progress?.stage))
 const showServerText = computed(() => locale.value === 'zh')
@@ -98,7 +113,11 @@ const chips = computed(() => {
   }
   if (d.eta_seconds != null && active.value) out.push(t('episode.progress.eta', { time: fmtDuration(d.eta_seconds) }))
   if (!props.compact && d.poll_count && !d.steps) out.push(t('episode.progress.polls', { n: d.poll_count }))
-  if (p.started_at && p.updated_at && active.value) out.push(t('episode.progress.elapsed', { time: fmtDuration((p.updated_at - p.started_at) / 1000) }))
+  // 使用实时的当前时间计算已用时间，而不是 updated_at，这样时间会实时递增
+  if (p.started_at && active.value) {
+    const elapsedSeconds = (now.value - p.started_at) / 1000
+    out.push(t('episode.progress.elapsed', { time: fmtDuration(elapsedSeconds) }))
+  }
   return out
 })
 </script>

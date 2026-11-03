@@ -681,6 +681,50 @@ app.post('/local/models', async (c) => {
   }
 })
 
+// GET /ai-configs/video-prompt-skills - 列出可用的视频提示词 skills
+app.get('/video-prompt-skills', async (c) => {
+  const { readdirSync, statSync, readFileSync } = await import('fs')
+  const { join, resolve } = await import('path')
+  const { fileURLToPath } = await import('url')
+  const { dirname } = await import('path')
+
+  // 获取 workspace 目录（与 agents/skills.ts 保持一致）
+  const __filename = fileURLToPath(import.meta.url)
+  const __dirname = dirname(__filename)
+  const WORKSPACE_DIR = process.env.WORKSPACE_PATH
+    ? resolve(process.env.WORKSPACE_PATH)
+    : resolve(__dirname, '../../workspace')
+  const skillsDir = join(WORKSPACE_DIR, 'skills')
+
+  const skills: Array<{ name: string; description: string }> = []
+
+  try {
+    const entries = readdirSync(skillsDir, { withFileTypes: true })
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue
+      const name = entry.name
+      // 只列出 video-prompt 开头的 skill
+      if (!name.startsWith('video-prompt')) continue
+
+      const skillPath = join(skillsDir, name, 'SKILL.md')
+      try {
+        statSync(skillPath)
+        // 读取 frontmatter 的 description
+        const content = readFileSync(skillPath, 'utf-8')
+        const match = content.match(/^---\s*\n.*?description:\s*(.+?)\s*\n.*?---/s)
+        const description = match?.[1]?.trim() || '视频提示词生成规范'
+        skills.push({ name, description })
+      } catch {
+        // SKILL.md 不存在，跳过
+      }
+    }
+  } catch (err: any) {
+    logTaskError('ListSkills', 'video-prompt', { error: err?.message })
+  }
+
+  return success(c, skills)
+})
+
 // GET /ai-configs/:id
 app.get('/:id', async (c) => {
   const id = Number(c.req.param('id'))
@@ -712,6 +756,7 @@ app.put('/:id', async (c) => {
   if ('model' in body) updates.model = JSON.stringify(body.model)
   if ('priority' in body) updates.priority = body.priority
   if ('is_active' in body) updates.isActive = body.is_active
+  if ('prompt_skill' in body) updates.promptSkill = body.prompt_skill || null  // 视频配置专用：指定 skill 名称
   // 与已有 settings 合并：清空的 temperature / ComfyUI 配置从 JSON 中移除
   const settingsPatch: Record<string, any> = {}
   if ('temperature' in body) {

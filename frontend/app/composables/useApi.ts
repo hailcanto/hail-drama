@@ -198,6 +198,8 @@ export const aiConfigAPI = {
   localModels: (d: any) => api.post('/ai-configs/local/models', d),
   /** 视觉风格 → 推荐模型清单、模型目录与下载命令 */
   styleModels: (provider: string, serviceType: 'image' | 'video') => api.get(`/ai-configs/style-models?provider=${encodeURIComponent(provider)}&service_type=${serviceType}`),
+  /** 列出可用的视频提示词 skills */
+  videoPromptSkills: () => api.get<Array<{ name: string; description: string }>>('/ai-configs/video-prompt-skills'),
 }
 
 // lang 缺省/为 zh 时读写基础版（不带 query，保持原请求形态）

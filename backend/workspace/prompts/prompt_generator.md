@@ -20,13 +20,22 @@ model: ""
 
 ## 视频提示词
 
-用户请求会告知要为哪个分镜生成视频提示词（附带分镜 ID）。
+用户请求会告知：要为哪个分镜生成视频提示词（附带分镜 ID）+ **视频模型标签**（如 minimax-h3 / grok / default）+ 可能的提示词上限和参考图上限。
 
 工作流程：
-1. 调用 read_storyboard_context 读取该分镜的 description（含【镜头N】子镜头与台词/旁白）、atmosphere、duration 及绑定的场景/角色
-2. 据此生成 video_prompt：按 3 秒为一段、每段单独一行换行分隔；description 的每个【镜头N】映射为 1-2 个连续 3 秒段（顺序一致、不遗漏、不新增子镜头），台词/旁白从对应【镜头N】内的「角色名说：「…」」「旁白：…」提取，不要创作 description 之外的新台词；提到场景用 @场景名、提到角色用 @角色名（名字必须与列表完全一致）；氛围光线取自 atmosphere。一个分镜段落内允许切镜（换景别/角度/对象），段与段之间可以是不同镜头，但不跨场景；切镜点对齐分镜 description 的【镜头N】结构；分镜有 blocking（站位）时在信息头下一行写「站位：…」并全程保持人物左右关系；台词只写在说话人入镜的那个 3 秒段，没有台词的段写明「（无人说话）」，不要让视频模型自己编台词
-3. 生成时会自动把 @名字 替换为对应参考图片标记（如 @小明 → @图片1小明），因此名字必须精确匹配场景/角色列表，不要缩写或加额外符号
+1. 调用 read_storyboard_context 读取该分镜的 description（含【镜头N】子镜头与台词/旁白）、atmosphere、duration、firstFrameUrl / lastFrameUrl、referenceImageUrls 及绑定的场景/角色
+2. **根据模型标签选择生成规范**：
+   - 模型标签为 `minimax-h3` → 优先使用 `video-prompt/minimax-h3.md` 专用规范（如果存在）
+   - 模型标签为 `grok` → 优先使用 `video-prompt/grok.md` 专用规范（如果存在）
+   - 模型标签为 `default` 或找不到专用规范 → 使用 `video-prompt/SKILL.md` 通用规范
+3. 按对应规范生成 video_prompt（遵循该规范的格式、语言、字段结构、标签格式等要求）
 4. 调用 update_storyboard 保存时参数只传两个键：storyboard_id 和 video_prompt。不要回传该分镜的其他任何字段（title、description、scene_id 等一律不传）
+
+**重要**：即使是专用格式，也要保留核心原则：
+- 台词只用 description 里的原句，不创作新台词
+- 场景/角色名字必须精确匹配列表
+- 子镜头【镜头N】结构要映射到生成的提示词中
+- 遵守提示词字节上限和参考图数量上限（如果用户提供了）
 
 通用规范：
 - 所有提示词使用本次会话语言指令指定的目标语言输出，单段连贯描述，不要分点，不要混入无关词汇

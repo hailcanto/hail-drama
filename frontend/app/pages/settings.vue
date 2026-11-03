@@ -753,6 +753,16 @@
               <span class="field-hint">{{ t('settings.cfg.video.maxDurationHint') }}</span>
             </label>
             <label class="field">
+              <span class="field-label">{{ locale === 'zh' ? '提示词格式 (Skill)' : 'Prompt Format (Skill)' }}</span>
+              <select v-model="cfgForm.prompt_skill" class="input">
+                <option :value="null">{{ locale === 'zh' ? '通用格式（默认）' : 'General format (default)' }}</option>
+                <option v-for="skill in videoPromptSkills" :key="skill.name" :value="skill.name">
+                  {{ skill.name }} — {{ skill.description }}
+                </option>
+              </select>
+              <span class="field-hint">{{ locale === 'zh' ? '指定该配置生成视频提示词时使用的格式规范。不同模型（如 MiniMax H3）可能需要特定格式' : 'Specify the prompt format for this config. Different models (e.g. MiniMax H3) may require specific formats' }}</span>
+            </label>
+            <label class="field">
               <span class="field-label">{{ t('settings.cfg.video.maxPromptBytes') }}</span>
               <input v-model="cfgForm.max_prompt_bytes" class="input" type="number" min="0" max="200000" step="1" :placeholder="t('settings.cfg.video.unlimited')" />
               <span class="field-hint">{{ t('settings.cfg.video.maxPromptBytesHint') }}</span>
@@ -1118,6 +1128,7 @@ const cfgDialog = ref(false)
 const cfgEditId = ref(null)
 const cfgTesting = ref(false)
 const cfgTestResult = ref(null)
+const videoPromptSkills = ref([]) // 视频提示词 skills 列表
 // aiask.me 一键配置：同一个 Key 写入文本、图片、视频（Grok）三类推荐配置
 const AIASK_SITE_URL = 'https://aiask.me'
 const aiaskApiKey = ref('')
@@ -1125,7 +1136,7 @@ const aiaskSaving = ref(false)
 // 本地服务（ComfyUI / SD WebUI / Fooocus）专属参数存后端 settings JSON，接口上以顶层字段读写
 const LOCAL_SETTING_FIELDS = ['max_concurrent', 'max_duration', 'max_prompt_bytes', 'moderation_retries', 'restart_every', 'comfy_start_command', 'comfyui_workflow', 'comfyui_template', 'comfyui_fps', 'comfyui_steps', 'comfyui_cfg', 'comfyui_negative_prompt', 'prompt_template', 'image_base_size', 'image_steps', 'image_cfg_scale', 'image_sampler', 'image_negative_prompt', 'fooocus_performance', 'fooocus_styles']
 // 布尔设置单独处理：自动绑定默认开；中文翻译默认值按服务类型（本地生图开、ComfyUI 视频关）
-const EMPTY_CFG_FORM = { name: '', provider: '', api_key: '', base_url: '', models: [], service_type: 'text', priority: 0, temperature: '', ...Object.fromEntries(LOCAL_SETTING_FIELDS.map(k => [k, ''])), comfyui_auto_bind: true, free_vram_between: '', auto_restart_comfy: true, oom_lower_resolution: true, prompt_translate: true, style_models_enabled: false, style_models: {}, model_install: null, style_models_auto_download: false, download_prefer_mirror: false, civitai_token: '', hf_token: '', imgbb_api_key: '', imgbb_base_url: 'https://api.imgbb.com' }
+const EMPTY_CFG_FORM = { name: '', provider: '', api_key: '', base_url: '', models: [], service_type: 'text', priority: 0, temperature: '', prompt_skill: null, ...Object.fromEntries(LOCAL_SETTING_FIELDS.map(k => [k, ''])), comfyui_auto_bind: true, free_vram_between: '', auto_restart_comfy: true, oom_lower_resolution: true, prompt_translate: true, style_models_enabled: false, style_models: {}, model_install: null, style_models_auto_download: false, download_prefer_mirror: false, civitai_token: '', hf_token: '', imgbb_api_key: '', imgbb_base_url: 'https://api.imgbb.com' }
 const cfgForm = reactive({ ...EMPTY_CFG_FORM })
 const LOCAL_BASE_URLS = { comfyui: 'http://127.0.0.1:8188', sdwebui: 'http://127.0.0.1:7860', fooocus: 'http://127.0.0.1:8888' }
 const FOOOCUS_PERFORMANCE = ['Speed', 'Quality', 'Extreme Speed', 'Lightning', 'Hyper-SD']
@@ -1450,6 +1461,7 @@ function applyProviderPreset(type, provider) {
 }
 
 async function loadCfgs() { try { cfgs.value = await aiConfigAPI.list() } catch (e) { toastError(e) } }
+async function loadVideoPromptSkills() { try { videoPromptSkills.value = await aiConfigAPI.videoPromptSkills() } catch (e) { console.error('Failed to load video prompt skills:', e) } }
 
 // ===== 默认模型选择 =====
 // 默认解析规则与工作台/后端一致：启用配置中优先级最高者的模型列表首位
@@ -1539,6 +1551,8 @@ function startAddCfg(t) {
   comfySource.value = 'builtin'
   inspectResult.value = null
   localModels.value = null
+  // 加载视频 prompt skills（仅视频配置需要）
+  if (t === 'video') loadVideoPromptSkills()
   cfgDialog.value = true
 }
 function startEditCfg(c) {
@@ -1553,6 +1567,7 @@ function startEditCfg(c) {
     service_type: c.service_type,
     priority: c.priority ?? 0,
     temperature: c.temperature ?? '',
+    prompt_skill: c.prompt_skill ?? null,
     ...Object.fromEntries(LOCAL_SETTING_FIELDS.map(k => [k, c[k] ?? ''])),
     comfyui_workflow: formatWorkflow(c.comfyui_workflow),
     comfyui_auto_bind: c.comfyui_auto_bind !== false,
@@ -1573,6 +1588,8 @@ function startEditCfg(c) {
   comfySource.value = c.comfyui_workflow ? 'custom' : 'builtin'
   inspectResult.value = null
   localModels.value = null
+  // 加载视频 prompt skills（仅视频配置需要）
+  if (c.service_type === 'video') loadVideoPromptSkills()
   cfgDialog.value = true
 }
 async function testCfgPayload(payload) {
@@ -1722,8 +1739,13 @@ async function saveCfg() {
     toast.warning(t('settings.cfg.comfy.workflowEmpty')); return
   }
   try {
-    if (cfgEditId.value) await aiConfigAPI.update(cfgEditId.value, { name: cfgForm.name, provider: cfgForm.provider, api_key: cfgForm.api_key, base_url: cfgForm.base_url, model: models, priority: cfgForm.priority, temperature, ...comfy })
-    else await aiConfigAPI.create({ service_type: cfgForm.service_type, provider: cfgForm.provider, name: cfgForm.name || `${cfgForm.provider}-${cfgForm.service_type}`, api_key: cfgForm.api_key, base_url: cfgForm.base_url, model: models, priority: cfgForm.priority, temperature, ...comfy })
+    const basePayload = { name: cfgForm.name, provider: cfgForm.provider, api_key: cfgForm.api_key, base_url: cfgForm.base_url, model: models, priority: cfgForm.priority, temperature, ...comfy }
+    // 视频配置专用字段
+    if (cfgForm.service_type === 'video') {
+      basePayload.prompt_skill = cfgForm.prompt_skill || null
+    }
+    if (cfgEditId.value) await aiConfigAPI.update(cfgEditId.value, basePayload)
+    else await aiConfigAPI.create({ service_type: cfgForm.service_type, ...basePayload, name: cfgForm.name || `${cfgForm.provider}-${cfgForm.service_type}` })
     cfgDialog.value = false; toast.success(t('common.saved')); loadCfgs()
   } catch (e) { toastError(e) }
 }

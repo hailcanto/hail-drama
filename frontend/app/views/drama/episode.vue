@@ -3376,22 +3376,29 @@ function genTaskTargetLabel(task) {
 
 // 统一行结构：image / video / merge 三类合并按时间倒序
 const genTaskRows = computed(() => {
-  const taskRows = genTasks.value.map(t => ({
-    key: `task-${t.id}`,
-    kind: t.type, // image | video
-    id: t.id,
-    targetLabel: genTaskTargetLabel(t),
-    provider: t.provider || '',
-    model: t.model || '',
-    status: t.status || 'processing',
-    errorMsg: t.error_msg || '',
-    progress: t.progress || null,
-    previewUrl: t.local_path || t.result_url || '',
-    prompt: t.prompt || '',
-    createdAt: t.created_at || '',
-    completedAt: t.completed_at || '',
-  }))
-  const mergeRows = genMerges.value.map(m => ({
+  // 根据当前步骤过滤任务：资产制作只显示图片任务，视频制作显示视频任务和合并任务
+  const isAssetsTab = prodTab.value === 'assets'
+
+  const taskRows = genTasks.value
+    .filter(t => isAssetsTab ? t.type === 'image' : t.type === 'video')
+    .map(t => ({
+      key: `task-${t.id}`,
+      kind: t.type, // image | video
+      id: t.id,
+      targetLabel: genTaskTargetLabel(t),
+      provider: t.provider || '',
+      model: t.model || '',
+      status: t.status || 'processing',
+      errorMsg: t.error_msg || '',
+      progress: t.progress || null,
+      previewUrl: t.local_path || t.result_url || '',
+      prompt: t.prompt || '',
+      createdAt: t.created_at || '',
+      completedAt: t.completed_at || '',
+    }))
+
+  // 合并任务只在视频制作步骤显示
+  const mergeRows = isAssetsTab ? [] : genMerges.value.map(m => ({
     key: `merge-${m.id}`,
     kind: 'merge',
     id: m.id,
@@ -3405,6 +3412,7 @@ const genTaskRows = computed(() => {
     createdAt: m.created_at || '',
     completedAt: m.completed_at || '',
   }))
+
   return [...taskRows, ...mergeRows].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
 })
 
@@ -4186,7 +4194,7 @@ async function genVideoPrompt(sb) {
       drama_id: dramaId,
       episode_id: epId.value,
       model: chatModelOverride() || undefined,
-      config_id: chatConfigId() || undefined,
+      video_config_id: ownerConfigId(videoModelOptions.value, videoModel.value) || undefined,
     })
     toast.success(t('episode.sb.promptGenerated', { n: idx }))
     await refresh()

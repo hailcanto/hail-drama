@@ -402,6 +402,8 @@ const REMOVE_SQL = 'DELETE FROM style_presets WHERE "value" = ? AND "prompt" = ?
 const ADDED_COLUMNS: Array<{ table: string; column: string; ddl: string }> = [
   // 分镜段落的人物站位与衔接（开场站位 / 结尾状态），用于接戏
   { table: 'storyboards', column: 'blocking', ddl: 'ALTER TABLE storyboards ADD COLUMN blocking TEXT' },
+  // 视频配置专用：指定生成提示词时使用的 skill 名称（如 video-prompt-minimax-h3）
+  { table: 'ai_service_configs', column: 'prompt_skill', ddl: 'ALTER TABLE ai_service_configs ADD COLUMN prompt_skill TEXT' },
 ]
 
 function ensureAddedColumns(sqlite: Database.Database) {
