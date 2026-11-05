@@ -28,13 +28,17 @@
     "serviceType": {
       "text": "Văn bản",
       "image": "Hình ảnh",
-      "video": "Video"
+      "video": "Video",
+      "voice": "Giọng nói"
     }
   },
   "layout": {
     "nav": {
       "projects": "Dự án",
-      "settings": "Cài đặt"
+      "settings": "Cài đặt",
+      "oneClick": "Một chạm",
+      "agents": "Tác tử",
+      "workflows": "Quy trình"
     },
     "banner": {
       "missing": "Chưa cấu hình mô hình {types}. Các tính năng AI hiện không khả dụng.",
@@ -294,11 +298,15 @@
       "meta": {
         "text": "Khả năng văn bản: viết lại kịch bản, trích xuất tài nguyên, chia phân cảnh",
         "image": "Tạo ảnh tĩnh: nhân vật, cảnh và cảnh quay",
-        "video": "Tạo video trực tiếp cho cảnh quay: video Grok của aiask.me, ComfyUI cục bộ, Seedance và nhiều hơn nữa"
+        "video": "Tạo video trực tiếp cho cảnh quay: video Grok của aiask.me, ComfyUI cục bộ, Seedance và nhiều hơn nữa",
+        "voice": "Dialogue voice-over and voice cloning: aiask.me (edge-tts / gpt-sovits), local edge-tts / GPT-SoVITS, Volcengine Doubao speech"
       },
       "quickModelSaved": "Đã tự lưu: mô hình {type} mặc định là {model}",
       "quickModelPicked": "Đã chọn mô hình {type} {model}; có hiệu lực sau khi nhập key và áp dụng",
-      "quickPickHint": "Nhấp để dùng, tự động lưu"
+      "quickPickHint": "Nhấp để dùng, tự động lưu",
+      "quickKeyInvalid": "aiask.me rejected this key ({status}); nothing was saved. Check that it was copied completely and is not expired or disabled.",
+      "quickAppliedMore": "aiask.me quick setup saved; {n} other aiask.me configs now use the new key too",
+      "quickKeyUnverified": "Could not reach aiask.me; the key was saved but not verified. Click Test later to confirm"
     },
     "styles": {
       "title": "Phong cách mẫu",
@@ -1522,6 +1530,149 @@
         "title": "Xem lại bất cứ lúc nào",
         "desc": "Nhấn nút \"?\" này để xem lại hướng dẫn của trang. Chúc bạn sáng tạo vui vẻ!"
       }
+    }
+  },
+  "voice": {
+    "defaultVoice": "Default voice",
+    "defaultVoiceHint": "Empty = recommended voice; pick from the list or type a voice ID",
+    "defaultSpeed": "Default speed",
+    "defaultSpeedHint": "0.5–2×, empty = 1×",
+    "optional": "optional",
+    "volcAppIdHint": "Legacy console: App ID here and the access token as API Key. New console: API Key only, leave this empty",
+    "edgeCommand": "edge-tts command",
+    "edgeCommandHint": "Used when Base URL is empty; give the full path if it is not on PATH",
+    "edgeBaseUrlPlaceholder": "empty = local edge-tts CLI, or http://127.0.0.1:5050",
+    "preview": "Preview",
+    "previewBtn": "Preview",
+    "previewHint": "Synthesizes a line with the current form (no need to save first)",
+    "previewCloneHint": "gpt-sovits / GPT-SoVITS needs a cloned voice: add one below first",
+    "useDefaultVoice": "Default voice",
+    "presetVoices": "Preset voices",
+    "clonedVoices": "Cloned voices",
+    "noClones": "No cloned voices yet",
+    "textRequired": "Enter some text",
+    "needClone": "Pick a cloned voice first (create one below)",
+    "useTryListen": "The local edge-tts CLI has no endpoint to test: use Preview below",
+    "cloneTitle": "Cloned voices",
+    "cloneSovitsDesc": "Upload a 3–10 s reference clip plus its exact transcript; shared by aiask.me gpt-sovits and local GPT-SoVITS",
+    "cloneVolcDesc": "Upload a recording to Volcengine voice cloning; usable once training finishes",
+    "status": {
+      "ready": "Ready",
+      "training": "Training",
+      "failed": "Failed"
+    },
+    "refresh": "Refresh",
+    "deleteConfirm": "Delete cloned voice \"{name}\"? The reference audio is deleted too",
+    "cloneName": "Voice name",
+    "cloneNamePlaceholder": "e.g. Lin Fan (lead)",
+    "speakerId": "Volcengine voice ID",
+    "cloneResource": "Clone resource",
+    "recording": "Recording",
+    "refAudio": "Reference audio",
+    "duration": "{s} s",
+    "refLang": "Reference language",
+    "lang": {
+      "zh": "Chinese",
+      "en": "English",
+      "ja": "Japanese",
+      "ko": "Korean",
+      "yue": "Cantonese",
+      "auto": "Auto (mixed)"
+    },
+    "refText": "Reference text",
+    "refTextPlaceholder": "Exactly what is said in the reference audio",
+    "refTextHint": "Must match the audio word for word, otherwise the cloned voice drifts and drops words",
+    "consent": "This is my own voice, or I have the speaker's permission; it will not be used to impersonate anyone",
+    "saveFirst": "Save this voice config (App ID / key) before uploading to Volcengine",
+    "uploadTrain": "Upload & train",
+    "addClone": "Add cloned voice",
+    "uploaded": "Uploaded; Volcengine is training, click Refresh later",
+    "cloneAdded": "Added cloned voice \"{name}\"",
+    "tooShort": "too short, needs {min}–{max} s",
+    "tooLong": "too long, needs {min}–{max} s; trim it to one sentence",
+    "tooShortVolc": "too short, 10–30 s recommended",
+    "err": {
+      "name": "Enter a voice name",
+      "audio": "Upload an audio file",
+      "size": "Audio must be 10 MB or less",
+      "refText": "Enter the reference text (what is said in the clip)",
+      "speaker": "Enter the Volcengine voice ID (starts with S_)",
+      "consent": "Confirm you have permission to use this voice"
+    }
+  },
+  "catalog": {
+    "common": {
+      "new": "New",
+      "search": "Search",
+      "mine": "Mine",
+      "none": "Nothing here yet",
+      "source": "Source",
+      "copy": "Copy",
+      "copied": "Copied",
+      "stop": "Stop",
+      "edit": "Edit",
+      "customize": "Make my version",
+      "name": "Name",
+      "category": "Category",
+      "description": "Description",
+      "other": "Other",
+      "saved": "Saved",
+      "deleteConfirm": "Delete \"{name}\"? The built-in version will come back.",
+      "overrideHint": "Built-in templates are never changed: saving creates \"my version\" with the same ID; delete it to restore the built-in one.",
+      "emptyOutput": "The model returned nothing. Try another text model."
+    },
+    "agents": {
+      "title": "Agents",
+      "sub": "Creative assistants with system prompts and skills: screenwriting, hook review, storyboards… Send any result to One-click.",
+      "pick": "Pick an agent on the left to start",
+      "skill": "Skill",
+      "clear": "Clear chat",
+      "welcome": "Chat with \"{name}\", or start with an example below",
+      "placeholder": "Describe what you need. You can paste a script, a novel excerpt or a synopsis",
+      "enterHint": "Enter to send, Shift+Enter for a new line",
+      "send": "Send",
+      "newTitle": "New agent",
+      "editTitle": "Edit agent",
+      "instructions": "System prompt",
+      "starters": "Example prompts",
+      "startersHint": "One per line, shown in an empty chat"
+    },
+    "workflows": {
+      "title": "Workflows",
+      "sub": "Multi-step AI writing chains. Edit any step's result and continue from the next step, then hand it to One-click for images and video.",
+      "pick": "Pick a workflow on the left",
+      "stepCount": "{n} steps",
+      "hasHandoff": "Hands off to One-click",
+      "run": "Run",
+      "rerunFrom": "Rerun from here",
+      "rerunFromTitle": "Use the (possibly edited) results above and run again from this step",
+      "fillInput": "Please fill in \"{label}\"",
+      "finished": "Workflow finished",
+      "stopped": "Stopped",
+      "newTitle": "New workflow",
+      "editTitle": "Edit workflow",
+      "jsonHint": "Steps run in order. Use {'{{'}inputs.key{'}}'} for inputs and {'{{'}steps.stepId{'}}'} for earlier results; add handoff to send the result to One-click.",
+      "badJson": "Invalid JSON: {msg}"
+    },
+    "styles": {
+      "button": "Style library",
+      "title": "Style library",
+      "desc": "Visual styles collected from the template library. Add one to use it for new projects; edit it later under Settings → Style presets.",
+      "empty": "The style library is empty",
+      "mine": "My styles",
+      "library": "Style library (added when chosen)",
+      "import": "Add to my styles",
+      "imported": "Added \"{name}\"",
+      "useIt": "New project with it"
+    },
+    "handoff": {
+      "button": "Send to One-click",
+      "title": "Send to One-click",
+      "desc": "Create a project with this text as episode 1's source, then rewrite, extract characters and scenes, generate images, storyboard and video.",
+      "titlePlaceholder": "Defaults to the first line",
+      "content": "Episode 1 source",
+      "hint": "You can keep editing it in the studio, or add attachments.",
+      "submit": "Create and open"
     }
   }
 }
