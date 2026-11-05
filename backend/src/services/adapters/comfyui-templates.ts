@@ -599,8 +599,8 @@ export const COMFY_VIDEO_TEMPLATES: ComfyWorkflowTemplate[] = [
     id: 'hail-h3-fluid',
     kind: 'video',
     label: 'Hail定制版 - MiniMax H3 流畅版（参考图 + 优化采样）',
-    description: '基于 YZ 金鱼工作流优化：9 张参考图支持、SelfLift 采样、稀疏注意力、Sigma Shift 优化。音画同出，图片和文字双重控制，支持参考图锁定角色外观。显存约 48GB 起。',
-    descriptionEn: 'Optimized from YZ Goldfish workflow: 9 reference images, SelfLift sampling, sparse attention and Sigma Shift optimization. Native audio sync, image-text control for character consistency. ~48 GB VRAM.',
+    description: '基于 YZ 金鱼工作流优化：9 张参考图支持、SelfLift 采样、稀疏注意力、Sigma Shift 优化。音画同出，图片和文字双重控制，支持参考图锁定角色外观。显存 8GB 起可运行。',
+    descriptionEn: 'Optimized from YZ Goldfish workflow: 9 reference images, SelfLift sampling, sparse attention and Sigma Shift optimization. Native audio sync, image-text control for character consistency. 8GB+ VRAM.',
     files: [
       { file: 'minimax_h3_hybrid_fl2va_ref2va_b25-49-int8.safetensors', folder: 'models/diffusion_models', url: 'https://huggingface.co/MiniMax-AI/MiniMax-H3-Files/resolve/main/diffusion_models/minimax_h3_hybrid_fl2va_ref2va_b25-49-int8.safetensors' },
       { file: 'qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors', folder: 'models/text_encoders', url: 'https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors' },
