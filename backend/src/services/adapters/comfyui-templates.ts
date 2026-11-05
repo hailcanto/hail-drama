@@ -527,7 +527,95 @@ export const COMFY_H3_VRAM_TEMPLATES: ComfyWorkflowTemplate[] = [
   }),
 ]
 
+/**
+ * Hail 定制版 MiniMax H3 流畅版：基于 YZ 金鱼工作流改造
+ * - 参考图生视频（9 张）+ 首尾帧锚定
+ * - 包含 SelfLift 采样、稀疏注意力、Sigma Shift 等优化
+ * - 支持自定义 LoRA（风格调整）
+ */
+function hailCustomH3FluidWorkflow(): Record<string, any> {
+  const refNodes: Record<string, any> = {}
+  const refInputs: Record<string, [string, number]> = {}
+  for (let i = 0; i < 9; i++) {
+    const id = String(19 + i * 10)
+    refNodes[id] = {
+      class_type: 'LoadImage',
+      inputs: { image: `{{reference_image_${i + 1}}}` },
+      _meta: { title: `参考图 ${i + 1}` }
+    }
+    refInputs[`ref_images.ref_image_${i}`] = [id, 0]
+  }
+
+  return {
+    '19': refNodes['19'],
+    '29': refNodes['29'],
+    '39': refNodes['39'],
+    '49': refNodes['49'],
+    '59': refNodes['59'],
+    '69': refNodes['69'],
+    '79': refNodes['79'],
+    '89': refNodes['89'],
+    '99': refNodes['99'],
+    '36': { inputs: { vae_name: 'minimax_h3_video_vae_int8_convrot.safetensors' }, class_type: 'VAELoader', _meta: { title: '加载VAE' } },
+    '37': { inputs: { vae_name: 'minimax_h3_audio_vae_fp32.safetensors' }, class_type: 'VAELoader', _meta: { title: '加载VAE（音频）' } },
+    '38': { inputs: { clip_name: 'qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors', type: 'minimax', device: 'default' }, class_type: 'CLIPLoader', _meta: { title: '加载CLIP' } },
+    '53': { inputs: { lora_name: 'minimax_h3_dmad_full_dareties_v4_step600_comfy_fro.safetensors', strength_model: 0.8, model: ['192', 0] }, class_type: 'LoraLoaderModelOnly', _meta: { title: 'LoRA加载器' } },
+    '192': { inputs: { unet_name: 'minimax_h3_hybrid_fl2va_ref2va_b25-49-int8.safetensors', weight_dtype: 'default' }, class_type: 'UNETLoader', _meta: { title: 'UNet加载器' } },
+    '252': { inputs: { aspect_ratio: '16:9 (Widescreen)', megapixels: 1, multiple: 32 }, class_type: 'ResolutionSelector', _meta: { title: '分辨率选择器' } },
+    '253': { inputs: { samples: ['397', 0], vae: ['36', 0] }, class_type: 'VAEDecode', _meta: { title: 'VAE解码' } },
+    '254': { inputs: { samples: ['397', 0], vae: ['37', 0] }, class_type: 'VAEDecodeAudio', _meta: { title: 'VAE解码（音频）' } },
+    '255': { inputs: { sampler_name: 'euler' }, class_type: 'KSamplerSelect', _meta: { title: 'K采样器选择' } },
+    '261': { inputs: { scheduler: 'simple', steps: 10, denoise: 1, model: ['329', 0] }, class_type: 'BasicScheduler', _meta: { title: '基本调度器' } },
+    '265': {
+      inputs: {
+        prompt: '{{prompt}}',
+        width: ['252', 0],
+        height: ['252', 1],
+        length: '{{frames}}',
+        ref_image_size: 'match',
+        clip: ['38', 0],
+        vae: ['36', 0],
+        audio_vae: ['37', 0],
+        ...refInputs
+      },
+      class_type: 'MiniMaxH3ReferenceToVideo',
+      _meta: { title: 'MiniMax H3 参考转视频' }
+    },
+    '328': { inputs: { conditioning: ['265', 0] }, class_type: 'ConditioningZeroOut', _meta: { title: '条件零化' } },
+    '329': { inputs: { max_resolution: 1024, jpeg_quality: 80, suppress_default_preview: true, preview_frames: 1024, preview_fps: 12, tiny_vae: 'taeh3.safetensors', model: ['403', 0], vae: ['36', 0] }, class_type: 'ModelPreviewOverrideKJ', _meta: { title: 'Model Preview Override' } },
+    '331': { inputs: { attention: 'comfy kitchen attention', model: ['400', 0] }, class_type: 'ModelAttentionBackend', _meta: { title: '模型注意力后端' } },
+    '332': { inputs: { selection: 'sol-attn', 'selection.tau': 1.3, start_percent: 0.2, end_percent: 1, dense_blocks: '', min_tokens: 12288, extra_tokens: 256, sink_conditioning: 'exact_kv_and_rows', verbose: true, model: ['331', 0] }, class_type: 'BlockSparseAttention', _meta: { title: '模型稀疏注意力' } },
+    '333': { inputs: { shift_video: 12, shift_audio: 3, model: ['332', 0] }, class_type: 'MiniMaxH3SigmaShift', _meta: { title: 'MiniMax H3 Sigma Shift' } },
+    '364': { inputs: { frame_rate: 24, loop_count: 0, filename_prefix: 'hail-drama', format: 'video/h264-mp4', pix_fmt: 'yuv420p', crf: 19, save_metadata: true, trim_to_audio: false, pingpong: false, save_output: true, images: ['253', 0], audio: ['254', 0] }, class_type: 'VHS_VideoCombine', _meta: { title: 'Video Combine' } },
+    '397': { inputs: { seed: '{{seed}}', cfg: 1, transition_step: 6, lowres_scale: 0.6, rho: 0, w_min: 0.5, w_max: 1, upscaler_model: 'h3_upscaler_lms_v0.1.safetensors', highres_tiling: false, upscaler_unload: true, model: ['329', 0], positive: ['265', 0], negative: ['328', 0], vae: ['36', 0], latent_image: ['265', 1], sampler: ['255', 0], sigmas: ['261', 0] }, class_type: 'SelfLiftH3Sampler', _meta: { title: 'SelfLift Progressive Sampler' } },
+    '400': { inputs: { lora_name: 'MysticXXX_MMH3-V1.safetensors', strength_model: 0.35, model: ['53', 0] }, class_type: 'LoraLoaderModelOnly', _meta: { title: 'LoRA加载器' } },
+    '401': { inputs: { chunks: 2, seq_threshold: 4096, model: ['333', 0] }, class_type: 'MiniMaxChunkFeedForward', _meta: { title: 'MiniMax H3 Chunk FeedForward' } },
+    '403': { inputs: { head_chunks: 4, model: ['401', 0] }, class_type: 'MiniMaxLowVRAMAttention', _meta: { title: 'MiniMax H3 Low VRAM Attention' } },
+  }
+}
+
 export const COMFY_VIDEO_TEMPLATES: ComfyWorkflowTemplate[] = [
+  {
+    id: 'hail-h3-fluid',
+    kind: 'video',
+    label: 'Hail定制版 - MiniMax H3 流畅版（参考图 + 优化采样）',
+    description: '基于 YZ 金鱼工作流优化：9 张参考图支持、SelfLift 采样、稀疏注意力、Sigma Shift 优化。音画同出，图片和文字双重控制，支持参考图锁定角色外观。显存约 48GB 起。',
+    descriptionEn: 'Optimized from YZ Goldfish workflow: 9 reference images, SelfLift sampling, sparse attention and Sigma Shift optimization. Native audio sync, image-text control for character consistency. ~48 GB VRAM.',
+    files: [
+      { file: 'minimax_h3_hybrid_fl2va_ref2va_b25-49-int8.safetensors', folder: 'models/diffusion_models', url: 'https://huggingface.co/MiniMax-AI/MiniMax-H3-Files/resolve/main/diffusion_models/minimax_h3_hybrid_fl2va_ref2va_b25-49-int8.safetensors' },
+      { file: 'qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors', folder: 'models/text_encoders', url: 'https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors' },
+      { file: 'minimax_h3_video_vae_int8_convrot.safetensors', folder: 'models/vae', url: 'https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_video_vae_int8_convrot.safetensors' },
+      { file: 'minimax_h3_audio_vae_fp32.safetensors', folder: 'models/vae', url: 'https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_audio_vae_fp32.safetensors' },
+      { file: 'minimax_h3_dmad_full_dareties_v4_step600_comfy_fro.safetensors', folder: 'models/loras', url: 'https://huggingface.co/YZGoldfish/YZGoldfish-Models/resolve/main/minimax_h3_dmad_full_dareties_v4_step600_comfy_fro.safetensors' },
+      { file: 'MysticXXX_MMH3-V1.safetensors', folder: 'models/loras', url: 'https://huggingface.co/MysticX/MysticXXX_MMH3/resolve/main/MysticXXX_MMH3-V1.safetensors' },
+      { file: 'h3_upscaler_lms_v0.1.safetensors', folder: 'models/upscale_models', url: 'https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/upscale_models/h3_upscaler_lms_v0.1.safetensors' },
+      { file: 'taeh3.safetensors', folder: 'models/vae', url: 'https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/taeh3.safetensors' },
+    ],
+    defaultModel: 'hail-h3-fluid',
+    recommended: { fps: 24, steps: 10, maxShortEdge: 768 },
+    needsImage: 'optional',
+    workflow: hailCustomH3FluidWorkflow(),
+  },
   {
     id: 'wan2.2-ti2v-5b',
     kind: 'video',
